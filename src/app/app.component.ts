@@ -4,9 +4,6 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'gow-root',
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  template: '<router-outlet />',
 })
-export class AppComponent {
-  title = 'gow-portal';
-}
+export class AppComponent {}
