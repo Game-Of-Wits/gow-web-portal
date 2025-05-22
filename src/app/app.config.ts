@@ -35,7 +35,15 @@ export const appConfig: ApplicationConfig = {
 
     // PrimeNG
     providePrimeNG({
-      theme: { preset: Aura },
+      theme: {
+        preset: Aura,
+        options: {
+          cssLayer: {
+            name: 'primeng',
+            order: 'theme, base, primeng',
+          },
+        },
+      },
     }),
 
     // Firebase
