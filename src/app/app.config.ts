@@ -1,7 +1,6 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -19,11 +18,12 @@ import {
 } from '@angular/fire/analytics';
 
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
 
 import { routes } from './app.routes';
 
 import { environment } from '../environments/environment';
+
+import { GowPreset } from './style/gow-preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,8 +36,10 @@ export const appConfig: ApplicationConfig = {
     // PrimeNG
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: GowPreset,
         options: {
+          prefix: 'p',
+          darkModeSelector: false,
           cssLayer: {
             name: 'primeng',
             order: 'theme, base, primeng',
