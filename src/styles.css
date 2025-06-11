@@ -1,2 +1,41 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
+
+@font-face {
+  font-family: "Venus Rising";
+  src: url("/assets/fonts/Venus Rising V1.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-display: swap;
+}
+
+:root {
+  --font-title: "Venus Rising";
+  --font-body: "Century Gothic";
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-title);
+}
