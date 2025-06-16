@@ -1,7 +1,7 @@
-import { definePreset } from '@primeng/themes';
-import Aura from '@primeng/themes/aura';
+import { definePreset } from '@primeng/themes'
+import Aura from '@primeng/themes/aura'
 
-import { getContrastColor } from './utils';
+import { getContrastColor } from './utils'
 
 export const GoWTheme = definePreset(Aura, {
   semantic: {
@@ -17,7 +17,7 @@ export const GoWTheme = definePreset(Aura, {
       800: '#B77432',
       900: '#875728',
       950: '#875728',
-      contrastColor: getContrastColor('#FF9E3F'),
+      contrastColor: getContrastColor('#FF9E3F')
     },
     danger: {
       50: '#FFF0EF',
@@ -31,7 +31,7 @@ export const GoWTheme = definePreset(Aura, {
       800: '#692621',
       900: '#3D1714',
       950: '#3D1714',
-      contrastColor: getContrastColor('#D95046'),
+      contrastColor: getContrastColor('#D95046')
     },
     info: {
       50: '#EEFEFF',
@@ -45,7 +45,7 @@ export const GoWTheme = definePreset(Aura, {
       800: '#336166',
       900: '#214043',
       950: '#214043',
-      contrastColor: getContrastColor('#63C5CF'),
+      contrastColor: getContrastColor('#63C5CF')
     },
     success: {
       50: '#ECFDF5',
@@ -59,7 +59,7 @@ export const GoWTheme = definePreset(Aura, {
       800: '#065F46',
       900: '#05382B',
       950: '#05382B',
-      contrastColor: getContrastColor('#10B981'),
+      contrastColor: getContrastColor('#10B981')
     },
     warning: {
       50: '#FFFBEB',
@@ -73,7 +73,7 @@ export const GoWTheme = definePreset(Aura, {
       800: '#92400E',
       900: '#78350F',
       950: '#78350F',
-      contrastColor: getContrastColor('#F59E0B'),
+      contrastColor: getContrastColor('#F59E0B')
     },
     primaryColor: '{primary.500}',
     surface: {
@@ -88,7 +88,7 @@ export const GoWTheme = definePreset(Aura, {
       700: '#616161',
       800: '#424242',
       900: '#212121',
-      950: '#121212',
+      950: '#121212'
     },
     textColor: '{surface.800}',
     mutedTextColor: '{surface.600}',
@@ -97,14 +97,14 @@ export const GoWTheme = definePreset(Aura, {
 
     highlight: {
       background: '{surface.100}',
-      textColor: '{surface.900}',
+      textColor: '{surface.900}'
     },
 
     focusRing: {
       color: '{primary.500}',
       width: '2px',
       offset: '1px',
-      shadow: '0 0 0 0.2rem {primary.200}',
+      shadow: '0 0 0 0.2rem {primary.200}'
     },
 
     disabledColor: '{surface.200}',
@@ -113,50 +113,6 @@ export const GoWTheme = definePreset(Aura, {
     maskBackground: 'rgba(0, 0, 0, 0.4)',
 
     hoverBackground: '{surface.100}',
-    activeBackground: '{surface.200}',
-  },
-  components: {
-    button: {
-      colorScheme: 'primary',
-      secondary: {
-        background: '{surface.200}',
-        hoverBackground: '{surface.300}',
-        textColor: '{surface.700}',
-        borderColor: '{surface.300}',
-        hoverBorderColor: '{surface.400}',
-      },
-    },
-    inputtext: {
-      background: '{surface.0}',
-      borderColor: '{surface.300}',
-      hoverBorderColor: '{primary.500}',
-      focusBorderColor: '{primary.500}',
-      color: '{textColor}',
-      placeholderColor: '{mutedTextColor}',
-      disabledBackground: '{disabledColor}',
-      disabledBorderColor: '{disabledColor}',
-      invalidBorderColor: '{danger.500}',
-    },
-    panel: {
-      background: '{surface.50}',
-      borderColor: '{surface.200}',
-      headerBackground: '{surface.100}',
-      headerBorderColor: '{surface.200}',
-      headerTextColor: '{textColor}',
-      contentBackground: '{surface.50}',
-      contentBorderColor: '{surface.200}',
-      textColor: '{textColor}',
-    },
-    card: {
-      background: '{surface.0}',
-      borderColor: '{surface.200}',
-      shadow:
-        '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
-      titleColor: '{surface.900}',
-      subtitleColor: '{surface.700}',
-      contentColor: '{textColor}',
-      footerBackground: '{surface.50}',
-      footerBorderColor: '{surface.200}',
-    },
-  },
-});
+    activeBackground: '{surface.200}'
+  }
+})

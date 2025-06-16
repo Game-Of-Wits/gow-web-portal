@@ -1,5 +1,5 @@
-import { setupZoneTestEnv } from "jest-preset-angular/setup-env/zone";
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone'
 
-setupZoneTestEnv();
+setupZoneTestEnv()
 
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom'
