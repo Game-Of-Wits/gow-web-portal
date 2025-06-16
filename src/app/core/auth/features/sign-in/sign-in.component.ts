@@ -5,6 +5,9 @@ import { SignInFormComponent } from './components/sign-in-form/sign-in-form.comp
 @Component({
   selector: 'gow-sign-in',
   imports: [SignInFormComponent],
-  templateUrl: './sign-in.component.html'
+  template: `
+    <h2 class="text-3xl font-bold text-primary mb-4">Ingresa a tu cuenta de GoW</h2>
+    <gow-sign-in-form></gow-sign-in-form>
+  `
 })
 export class SignInPageComponent {}
