@@ -9,7 +9,7 @@ import { Router, RouterLink } from '@angular/router'
 
 import type { FirebaseError } from '@angular/fire/app'
 
-import { AuthService } from '../../../../services/auth/auth.service'
+import { AuthService } from '@core/auth/services/auth/auth.service'
 
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
@@ -18,8 +18,8 @@ import { Toast } from 'primeng/toast'
 
 import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
 
-import { TextFieldComponent } from '../../../../../../shared/ui/text-field/text-field.component'
-import { PasswordValidators } from '../../../../../../shared/ui/text-field/validators/PasswordValidators'
+import { TextFieldComponent } from '@shared/ui/text-field/text-field.component'
+import { PasswordValidators } from '@shared/ui/text-field/validators/PasswordValidators'
 
 interface SignInForm {
   email: FormControl<string>
