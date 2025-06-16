@@ -1,0 +1,134 @@
+import { Component, inject, signal } from '@angular/core'
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms'
+import { Router, RouterLink } from '@angular/router'
+
+import { AuthService } from '../../../../services/auth/auth.service'
+
+import { MessageService } from 'primeng/api'
+import { ButtonModule } from 'primeng/button'
+import { Ripple } from 'primeng/ripple'
+import { Toast } from 'primeng/toast'
+
+import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
+
+import { FirebaseError } from '@angular/fire/app'
+import { TextFieldComponent } from '../../../../../../shared/ui/components/text-field/text-field.component'
+import { PasswordValidators } from '../../../../../../shared/ui/components/text-field/validators/PasswordValidators'
+
+interface SignInForm {
+  email: FormControl<string>
+  password: FormControl<string>
+}
+
+const signInErrorMessages: {
+  [code: string]: { summary: string; message: string }
+} = {
+  'auth/invalid-email': {
+    summary: 'Correo erroneo',
+    message: 'El correo ingresado no es válido.'
+  },
+  'auth/user-disabled': {
+    summary: 'Usuario deshabilitado',
+    message: 'La cuenta ha sido deshabilitada.'
+  },
+  'auth/too-many-requests': {
+    summary: 'Muchas solicitudes',
+    message: 'Demaciados intentos de inicio de sesión. Intentelo más tarde.'
+  }
+} as const
+
+@Component({
+  selector: 'gow-sign-in-form',
+  templateUrl: './sign-in-form.component.html',
+  imports: [
+    LucideAngularModule,
+    ButtonModule,
+    Toast,
+    Ripple,
+    RouterLink,
+    ReactiveFormsModule,
+    TextFieldComponent
+  ],
+  providers: [MessageService]
+})
+export class SignInFormComponent {
+  private authService = inject(AuthService)
+  private router = inject(Router)
+  private toastService = inject(MessageService)
+
+  public isValidIcon = CircleCheckBig
+  public isNoValidIcon = Circle
+
+  public signInLoading = signal<boolean>(false)
+  public signInCredentials = new FormGroup<SignInForm>({
+    email: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email]
+    }),
+    password: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(12),
+        PasswordValidators.hasLowercase(),
+        PasswordValidators.hasCapitalLetter(),
+        PasswordValidators.hasSpecialSymbols(),
+        PasswordValidators.hasNumber()
+      ]
+    })
+  })
+
+  public signIn() {
+    if (this.signInCredentials.invalid) return
+
+    this.signInLoading.set(true)
+
+    const email = this.signInCredentials.get('email')!.value.trim()
+    const password = this.signInCredentials.get('password')!.value.trim()
+
+    this.authService.signIn(email, password).subscribe({
+      complete: () => {
+        this.router.navigate(['/w/general'])
+      },
+      error: (err: FirebaseError) => {
+        this.signInLoading.set(false)
+        this.signInCredentials.reset({ email: '', password: '' })
+
+        if (err.code in signInErrorMessages) {
+          this.showSignInErrorToast(
+            signInErrorMessages[err.code].summary,
+            signInErrorMessages[err.code].message
+          )
+
+          return
+        }
+
+        this.showSignInErrorToast(
+          'Error inesperado',
+          'Ha ocurrido un fallo al iniciar sesión, vuelva a intentarlo de nuevo'
+        )
+      }
+    })
+  }
+
+  public invalidPasswordValidation(validationKey: string) {
+    return (
+      this.signInCredentials.pristine ||
+      this.signInCredentials.get('password')?.value === '' ||
+      this.signInCredentials.get('password')?.hasError(validationKey)
+    )
+  }
+
+  public showSignInErrorToast(summary: string, message: string) {
+    this.toastService.add({
+      severity: 'error',
+      summary: summary,
+      detail: message
+    })
+  }
+}

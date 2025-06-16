@@ -1,0 +1,26 @@
+<div class="flex flex-col gap-1 relative">
+  @if (inputLabel().trim()) {
+    <label [for]="inputId()">{{ inputLabel() }}</label>
+  }
+
+  <input
+    pInputText
+    [type]="inputType() === 'password' ? passwordVisible ? 'text' : 'password' : inputType()"
+    [id]="inputId()"
+    [value]="value()"
+    [placeholder]="inputPlaceholder()"
+    [disabled]="inputDisabled()"
+    (input)="handleInput($event)"
+    [class]="inputType() === 'password' ? 'pr-4' : ''"
+  />
+
+  @if (inputType() === 'password') {
+    <button pButton (click)="showPasswordToggle()" class="bottom-0 right-0 absolute bg-transparent text-gray-400 border-none">
+      @if (passwordVisible) {
+        <i-lucide pButtonIcon [img]="passwordIconNotVisible"></i-lucide>
+      } @else {
+        <i-lucide pButtonIcon [img]="visiblePasswordIcon"></i-lucide>
+      }
+    </button>
+  }
+</div>

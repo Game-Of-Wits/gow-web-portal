@@ -1,0 +1,107 @@
+<form
+  class="flex flex-col gap-4"
+  [formGroup]="signInCredentials"
+  (ngSubmit)="signIn()"
+>
+  <div class="flex flex-col gap-3">
+    <gow-text-field
+      label="Correo electrónico"
+      [id]="'email'"
+      type="email"
+      placeholder="Ingresa tu correo electrónico"
+      formControlName="email"
+    />
+
+    <div class="flex flex-col gap-2">
+      <gow-text-field
+        [id]="'password'"
+        label="Contraseña"
+        type="password"
+        placeholder="Ingresa tu contraseña"
+        formControlName="password"
+      />
+
+      <ul class="text-gray-500 flex flex-col gap-1.5 text-base">
+        <li
+          class="flex gap-x-1 items-center"
+          [class.text-primary-600]="!invalidPasswordValidation('minlength')"
+        >
+          @if (invalidPasswordValidation("minlength")) {
+            <i-lucide [img]="isNoValidIcon" class="size-5.5"></i-lucide>
+          } @else {
+            <i-lucide [img]="isValidIcon" class="size-5.5"></i-lucide>
+          }
+          <span>Mínimo 12 caracteres</span>
+        </li>
+        <li
+          class="flex gap-x-1 items-center"
+          [class.text-primary-600]="!invalidPasswordValidation('hasNumber')"
+        >
+          @if (invalidPasswordValidation("hasNumber")) {
+            <i-lucide [img]="isNoValidIcon" class="size-5.5"></i-lucide>
+          } @else {
+            <i-lucide [img]="isValidIcon" class="size-5.5"></i-lucide>
+          }
+          <span>Mínimo un número</span>
+        </li>
+        <li
+          class="flex gap-x-1 items-center"
+          [class.text-primary-600]="
+            !invalidPasswordValidation('hasCapitalLetter')
+          "
+        >
+          @if (invalidPasswordValidation("hasCapitalLetter")) {
+            <i-lucide [img]="isNoValidIcon" class="size-5.5"></i-lucide>
+          } @else {
+            <i-lucide [img]="isValidIcon" class="size-5.5"></i-lucide>
+          }
+          <span>Mínimo una mayuscula</span>
+        </li>
+        <li
+          class="flex gap-x-1 items-center"
+          [class.text-primary-600]="!invalidPasswordValidation('hasLowercase')"
+        >
+          @if (invalidPasswordValidation("hasLowercase")) {
+            <i-lucide [img]="isNoValidIcon" class="size-5.5"></i-lucide>
+          } @else {
+            <i-lucide [img]="isValidIcon" class="size-5.5"></i-lucide>
+          }
+          <span>Mínimo una minuscula</span>
+        </li>
+        <li
+          class="flex gap-x-1 items-center"
+          [class.text-primary-600]="
+            !invalidPasswordValidation('hasSpecialSymbols')
+          "
+        >
+          @if (invalidPasswordValidation("hasSpecialSymbols")) {
+            <i-lucide [img]="isNoValidIcon" class="size-5.5"></i-lucide>
+          } @else {
+            <i-lucide [img]="isValidIcon" class="size-5.5"></i-lucide>
+          }
+          <span>Mínimo un caracter especial (/, #, %, !, etc.)</span>
+        </li>
+      </ul>
+    </div>
+
+    <a
+      routerLink="/auth/forgot-password"
+      class="text-primary hover:underline font-bold text-base w-fit"
+    >
+      ¿Olvidaste tu contraseña?
+    </a>
+  </div>
+
+  <button
+    pButton
+    pRipple
+    size="large"
+    [loading]="signInLoading()"
+    [disabled]="signInCredentials.invalid"
+    type="submit"
+  >
+    Ingresar
+  </button>
+</form>
+
+<p-toast position="bottom-center"></p-toast>

@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
-import { LandingHeroComponent } from './ui/landing-hero/landing-hero.component';
+import { LandingHeroComponent } from './ui/landing-hero/landing-hero.component'
 
 @Component({
   selector: 'gow-landing-page',
   imports: [LandingHeroComponent],
-  templateUrl: './landing.component.html',
+  templateUrl: './landing.component.html'
 })
 export class LandingPageComponent {}
