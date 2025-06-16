@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
 import { Toast } from 'primeng/toast'
 
-import { TextFieldComponent } from '../../../../../../shared/ui/components/text-field/text-field.component'
+import { TextFieldComponent } from '../../../../../../shared/ui/text-field/text-field.component'
 
 const passwordResetErrorMessages: {
   [code: string]: { summary: string; message: string }
