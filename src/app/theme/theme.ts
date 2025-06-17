@@ -75,7 +75,6 @@ export const GoWTheme = definePreset(Aura, {
       950: '#78350F',
       contrastColor: getContrastColor('#F59E0B')
     },
-    primaryColor: '{primary.500}',
     surface: {
       0: '#FFFFFF',
       50: '#FAFAFA',
@@ -90,6 +89,9 @@ export const GoWTheme = definePreset(Aura, {
       900: '#212121',
       950: '#121212'
     },
+    primaryColor: '{primary.500}',
+    surfaceGround: '#FDFDFD',
+
     textColor: '{surface.800}',
     mutedTextColor: '{surface.600}',
 
