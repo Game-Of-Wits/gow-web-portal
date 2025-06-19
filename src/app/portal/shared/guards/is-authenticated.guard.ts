@@ -7,11 +7,14 @@ export const isAuthenticatedGuard: CanActivateFn = async () => {
   const authService = inject(AuthService)
   const router = inject(Router)
 
-  const user = await authService.getAuthUser()
+  try {
+    const user = await authService.getAuthUser()
 
-  if (user) {
-    return true
-  } else {
+    if (user) return true
+
+    router.navigate(['/'])
+    return false
+  } catch {
     router.navigate(['/'])
     return false
   }
