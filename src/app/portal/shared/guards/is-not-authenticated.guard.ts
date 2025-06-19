@@ -1,10 +1,10 @@
 import { inject } from '@angular/core'
 import { CanActivateFn, Router } from '@angular/router'
 
-import { AuthService } from '~/auth/services/auth.service'
+import { UserService } from '~/shared/services/user.service'
 
 export const isNotAuthenticatedGuard: CanActivateFn = async () => {
-  const authService = inject(AuthService)
+  const authService = inject(UserService)
   const router = inject(Router)
 
   try {

@@ -20,8 +20,4 @@ export class AuthService {
   public sendPasswordReset(email: string) {
     return from(sendPasswordResetEmail(this.fireAuth, email))
   }
-
-  public getAuthUser() {
-    return firstValueFrom(authState(this.fireAuth).pipe(take(1)))
-  }
 }
