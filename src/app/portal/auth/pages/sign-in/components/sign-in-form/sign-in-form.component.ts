@@ -9,7 +9,7 @@ import { Router, RouterLink } from '@angular/router'
 
 import type { FirebaseError } from '@angular/fire/app'
 
-import { AuthService } from '@core/auth/services/auth/auth.service'
+import { AuthService } from '~/auth/services/auth.service'
 
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
@@ -18,8 +18,8 @@ import { Toast } from 'primeng/toast'
 
 import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
 
-import { TextFieldComponent } from '@shared/ui/text-field/text-field.component'
-import { PasswordValidators } from '@shared/ui/text-field/validators/PasswordValidators'
+import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
+import { PasswordValidators } from '~/shared/components/ui/text-field/validators/PasswordValidators'
 
 interface SignInForm {
   email: FormControl<string>
@@ -94,7 +94,7 @@ export class SignInFormComponent {
 
     this.authService.signIn(email, password).subscribe({
       complete: () => {
-        this.router.navigate(['/w/general'])
+        this.router.navigate(['/p/general'])
       },
       error: (err: FirebaseError) => {
         this.signInLoading.set(false)

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 
-import { LandingHeroComponent } from './ui/landing-hero/landing-hero.component'
+import { LandingHeroComponent } from './sections/landing-hero/landing-hero.component'
 
 @Component({
   selector: 'gow-landing-page',

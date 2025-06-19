@@ -1,0 +1,37 @@
+<button
+  class="flex items-center justify-center size-10 bg-white rounded-full cursor-pointer"
+  (click)="menu.toggle($event)"
+>
+  <i-lucide [img]="defaultAvatar" class="size-5 text-primary"></i-lucide>
+</button>
+
+<p-menu
+  #menu
+  [model]="profileMenuOptions"
+  [popup]="true"
+  styleClass="max-w-[350px] w-full mt-2"
+>
+  <ng-template #start>
+    <div class="inline-flex items-center gap-3 p-4">
+      <img
+        src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png"
+        alt="Avatar"
+        width="80"
+        height="80"
+        class="rounded-full"
+      />
+
+      <div class="flex flex-col">
+        <p class="text-lg font-bold leading-tight">
+          Emerzon Javier Kolki Martinez
+        </p>
+        <span class="text-base text-gray-400">Profesor</span>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #item let-item>
+    <span class="inline-flex items-center gap-2 py-2 p-menu-item-link">
+      <span class="ml-2">{{ item.label }}</span>
+    </span>
+  </ng-template>
+</p-menu>

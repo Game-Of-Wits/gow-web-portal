@@ -3,14 +3,14 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 
 import type { FirebaseError } from '@angular/fire/app'
 
-import { AuthService } from '@core/auth/services/auth/auth.service'
+import { AuthService } from '~/auth/services/auth.service'
+
+import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
 import { Toast } from 'primeng/toast'
-
-import { TextFieldComponent } from '@shared/ui/text-field/text-field.component'
 
 const passwordResetErrorMessages: {
   [code: string]: { summary: string; message: string }

@@ -1,0 +1,26 @@
+@if (sidebarStore.isOpen()) {
+  <aside
+    class="max-w-[300px] w-full overflow-hidden flex flex-col p-4 border-r-2 border-primary-600 h-[calc(100vh-65px)] sticky top-[65px]"
+  >
+    <gow-portal-sidebar-link href="/p/general">
+      <i-lucide icon [img]="generalIcon" class="size-[28px]" /> General
+    </gow-portal-sidebar-link>
+    <gow-portal-sidebar-paper>
+      <i-lucide icon [img]="classroomsIcon" class="size-[28px]" />
+      Aulas
+      <a
+        actions
+        pButton
+        routerLink="/p/classrooms/create"
+        class="cursor-pointer transition-colors hover:bg-primary-500 hover:text-white rounded-md size-7 inline-flex items-center justify-center"
+      >
+        <i-lucide
+          icon
+          pButtonIcon
+          [img]="addClassroomIcon"
+          class="size-[24px]"
+        />
+      </a>
+    </gow-portal-sidebar-paper>
+  </aside>
+}

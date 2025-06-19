@@ -17,13 +17,15 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions'
 import { getMessaging, provideMessaging } from '@angular/fire/messaging'
 import { getStorage, provideStorage } from '@angular/fire/storage'
 
+import { provideStore } from '@ngrx/store'
+
 import { providePrimeNG } from 'primeng/config'
 
 import { routes } from './app.routes'
 
 import { environment } from '../environments/environment'
 
-import { GoWTheme } from './theme/theme'
+import { GoWTheme } from '~/shared/theme'
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(withFetch()),
-
+    provideStore(),
     // PrimeNG
     providePrimeNG({
       theme: {
@@ -47,7 +49,6 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
-
     // Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),

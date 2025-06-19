@@ -1,0 +1,26 @@
+<nav
+  class="h-[65px] bg-primary-600 sticky top-0 flex items-center justify-between pl-5 pr-7 z-50"
+>
+  <div class="flex gap-5">
+    <button class="cursor-pointer" (click)="sidebarStore.toggle()">
+      <i-lucide
+        [img]="sidebarStore.isOpen() ? closePortalSidebar : openPortalSidebar"
+        class="text-white hover:bg-transparent size-[32px]"
+      ></i-lucide>
+    </button>
+
+    <a routerLink="/p/general" class="flex gap-2 items-center text-white">
+      <img
+        ngSrc="/assets/images/logo-white.svg"
+        width="30"
+        height="30"
+        class="aspect-square"
+        priority
+      />
+
+      <p class="text-2xl font-bold">Game of Wits</p>
+    </a>
+  </div>
+
+  <gow-profile-menu-button />
+</nav>
