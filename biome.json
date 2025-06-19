@@ -213,7 +213,7 @@
           "style": {
             "noParameterAssign": "error",
             "noVar": "error",
-            "useBlockStatements": "error",
+            "useBlockStatements": "off",
             "useConst": "error",
             "useDefaultSwitchClause": "error"
           },
