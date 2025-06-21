@@ -1,22 +1,14 @@
 import { inject } from '@angular/core'
 import { CanActivateFn, Router } from '@angular/router'
 
-import { UserService } from '~/shared/services/user.service'
+import { AuthStore } from '../store/auth.store'
 
 export const isNotAuthenticatedGuard: CanActivateFn = async () => {
-  const authService = inject(UserService)
+  const authStore = inject(AuthStore)
   const router = inject(Router)
 
-  try {
-    const user = await authService.getAuthUser()
+  if (!authStore.isAuth() && authStore.authUser() === null) return true
 
-    if (user) {
-      router.navigate(['/p/general'])
-      return false
-    }
-
-    return true
-  } catch {
-    return true
-  }
+  router.navigate(['/p/general'])
+  return false
 }

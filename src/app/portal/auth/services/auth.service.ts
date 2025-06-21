@@ -3,7 +3,8 @@ import { Injectable, inject } from '@angular/core'
 import {
   Auth,
   sendPasswordResetEmail,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut
 } from '@angular/fire/auth'
 
 import { from } from 'rxjs'
@@ -18,5 +19,9 @@ export class AuthService {
 
   public sendPasswordReset(email: string) {
     return from(sendPasswordResetEmail(this.fireAuth, email))
+  }
+
+  public signOut() {
+    return from(signOut(this.fireAuth))
   }
 }

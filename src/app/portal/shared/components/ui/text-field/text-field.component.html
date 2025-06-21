@@ -15,7 +15,7 @@
   />
 
   @if (inputType() === 'password') {
-    <button pButton (click)="showPasswordToggle()" class="bottom-0 right-0 absolute bg-transparent text-gray-400 border-none">
+    <button type="button" pButton (click)="showPasswordToggle()" class="bottom-0 right-0 absolute bg-transparent text-gray-400 border-none">
       @if (passwordVisible) {
         <i-lucide pButtonIcon [img]="passwordIconNotVisible"></i-lucide>
       } @else {

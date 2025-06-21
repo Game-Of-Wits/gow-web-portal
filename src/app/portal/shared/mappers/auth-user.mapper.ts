@@ -1,11 +1,16 @@
 import { AuthUserModel } from '~/shared/models/AuthUser'
 
+import { TeacherProfileModel } from '../models/TeacherProfile'
+import { UserModel } from '../models/User'
+
 export class AuthUserMapper {
-  static toModel(authUser: any): AuthUserModel {
+  static toModel(user: UserModel, profile: TeacherProfileModel): AuthUserModel {
     return {
-      email: authUser.email,
-      id: authUser.uid,
-      photoURL: authUser.photoURL
+      id: user.id,
+      email: user.email,
+      photoUrl: user.photoUrl,
+      lastName: profile.lastName,
+      firstName: profile.firstName
     }
   }
 }

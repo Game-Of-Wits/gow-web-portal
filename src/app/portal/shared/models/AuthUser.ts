@@ -1,5 +1,7 @@
 export interface AuthUserModel {
   id: string
   email: string | null
-  photoURL: string | null
+  photoUrl: string | null
+  firstName: string
+  lastName: string
 }
