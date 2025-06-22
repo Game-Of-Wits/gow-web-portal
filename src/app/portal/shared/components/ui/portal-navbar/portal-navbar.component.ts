@@ -2,6 +2,8 @@ import { NgOptimizedImage } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
+import { LocalStorageService } from '~/shared/services/local-storage.service'
+
 import { SidebarStateStore } from '~/shared/store/sidebar.store'
 
 import { ProfileMenuButtonComponent } from '~/shared/components/profile-menu-button/profile-menu-button.component'
@@ -23,8 +25,17 @@ import {
   ]
 })
 export class PortalNavbarComponent {
+  private readonly localStorageService = inject(LocalStorageService)
   readonly sidebarStore = inject(SidebarStateStore)
 
   readonly closePortalSidebar = PanelLeftClose
   readonly openPortalSidebar = PanelLeftOpen
+
+  public onToggleSidebar() {
+    this.sidebarStore.toggle()
+
+    if (this.sidebarStore.isOpen())
+      this.localStorageService.setValue('open-sidebar', 'true')
+    else this.localStorageService.removeValue('open-sidebar')
+  }
 }
