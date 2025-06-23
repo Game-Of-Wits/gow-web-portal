@@ -29,4 +29,5 @@
 
 body {
   font-family: var(--font-body);
+  background-color: var(--p-surface-ground);
 }
