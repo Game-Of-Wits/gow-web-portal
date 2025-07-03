@@ -1,0 +1,29 @@
+<div class="flex flex-wrap justify-start gap-4">
+  @for (classroom of classrooms(); track classroom.id) {
+    <a
+      routerLink="/p/s/{{ classroom.schoolId }}/classroom/{{ classroom.id }}"
+      class="w-[320px] h-[160px] rounded-lg flex bg-primary-50 overflow-hidden cursor-pointer group"
+    >
+      <div class="bg-primary-600 w-[32px] relative">
+        <div
+          class="absolute top-4 -right-6 p-2.5 bg-primary-600 text-white rounded-lg group-hover:bg-primary-500 transition-colors"
+        >
+          <i-lucide [img]="classroomIcon" class="size-[24px]" />
+        </div>
+      </div>
+      <div class="flex-1 pt-[18px] pl-[32px] pr-4">
+        <p class="text-xl">{{ classroom.name }}</p>
+        <p class="text-primary-600">
+          {{ getGradeYearInfo(classroom.gradeYearId) }}
+        </p>
+      </div>
+    </a>
+  }
+
+  <a
+    routerLink="/p/s/{{ defaultSchoolStore.school()?.id }}/classroom/create"
+    class="w-[320px] h-[160px] transition-colors rounded-lg flex items-center justify-center bg-primary-500 hover:bg-primary-600 cursor-pointer"
+  >
+    <i-lucide [img]="addIcon" class="size-[40px] text-white" />
+  </a>
+</div>

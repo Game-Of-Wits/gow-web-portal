@@ -1,14 +1,11 @@
 import { Component, inject } from '@angular/core'
 import { RouterLink } from '@angular/router'
-
+import { House, LucideAngularModule, Plus, School } from 'lucide-angular'
 import { LocalStorageService } from '~/shared/services/local-storage.service'
-
+import { DefaultSchoolStore } from '~/shared/store/default-school.store'
 import { SidebarStateStore } from '~/shared/store/sidebar.store'
-
 import { PortalSidebarLinkComponent } from './ui/portal-sidebar-link.component'
 import { PortalSidebarPaperComponent } from './ui/portal-sidebar-paper.component'
-
-import { House, LucideAngularModule, Plus, School } from 'lucide-angular'
 
 @Component({
   selector: 'gow-portal-sidebar',
@@ -21,10 +18,11 @@ import { House, LucideAngularModule, Plus, School } from 'lucide-angular'
   ]
 })
 export class PortalSidebarComponent {
-  readonly sidebarStore = inject(SidebarStateStore)
-  readonly localStorage = inject(LocalStorageService)
+  public readonly sidebarStore = inject(SidebarStateStore)
+  public readonly localStorage = inject(LocalStorageService)
+  public readonly defaultSchoolStore = inject(DefaultSchoolStore)
 
-  readonly generalIcon = House
-  readonly classroomsIcon = School
-  readonly addClassroomIcon = Plus
+  public readonly generalIcon = House
+  public readonly classroomsIcon = School
+  public readonly addClassroomIcon = Plus
 }

@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core'
+import type { FirebaseError } from '@angular/fire/app'
 import {
   FormControl,
   FormGroup,
@@ -6,54 +7,27 @@ import {
   Validators
 } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
-
-import { tap } from 'rxjs'
-
-import type { FirebaseError } from '@angular/fire/app'
-
-import { AuthService } from '~/auth/services/auth.service'
-import { UserService } from '~/shared/services/user.service'
-
-import { AuthStore } from '~/shared/store/auth.store'
-
-import { AuthUserMapper } from '~/shared/mappers/auth-user.mapper'
-import { UserMapper } from '~/shared/mappers/user.mapper'
-
+import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
 import { Toast } from 'primeng/toast'
-
-import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
-
+import { tap } from 'rxjs'
+import { AuthService } from '~/auth/services/auth.service'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { PasswordValidators } from '~/shared/components/ui/text-field/validators/PasswordValidators'
+import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { AuthUserMapper } from '~/shared/mappers/auth-user.mapper'
+import { UserMapper } from '~/shared/mappers/user.mapper'
+import { UserService } from '~/shared/services/user.service'
+import { AuthStore } from '~/shared/store/auth.store'
 
 interface SignInForm {
   email: FormControl<string>
   password: FormControl<string>
 }
 
-const signInErrorMessages: {
-  [code: string]: { summary: string; message: string }
-} = {
-  'auth/invalid-email': {
-    summary: 'Correo erroneo',
-    message: 'El correo ingresado no es válido.'
-  },
-  'auth/user-disabled': {
-    summary: 'Usuario deshabilitado',
-    message: 'La cuenta ha sido deshabilitada.'
-  },
-  'auth/too-many-requests': {
-    summary: 'Muchas solicitudes',
-    message: 'Demaciados intentos de inicio de sesión. Intentelo más tarde.'
-  },
-  'auth/permission-denied': {
-    summary: 'Acceso no autorizado',
-    message: 'Solo se permite el acceso a cuentas que sean de profesores.'
-  }
-} as const
+const signInErrorMessages = commonErrorMessages
 
 @Component({
   selector: 'gow-sign-in-form',

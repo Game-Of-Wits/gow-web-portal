@@ -1,7 +1,5 @@
-import { Component } from '@angular/core'
-
 import { NgOptimizedImage } from '@angular/common'
-
+import { Component } from '@angular/core'
 import { RouterLink, RouterOutlet } from '@angular/router'
 
 @Component({

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-
 import { LandingHeroComponent } from './sections/landing-hero/landing-hero.component'
 
 @Component({

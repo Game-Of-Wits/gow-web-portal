@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-
 import { SignInFormComponent } from './components/sign-in-form/sign-in-form.component'
 
 @Component({

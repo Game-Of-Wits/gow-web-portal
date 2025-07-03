@@ -1,12 +1,10 @@
 import { Injectable, inject } from '@angular/core'
-
 import {
   Auth,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut
 } from '@angular/fire/auth'
-
 import { from } from 'rxjs'
 
 @Injectable({ providedIn: 'root' })

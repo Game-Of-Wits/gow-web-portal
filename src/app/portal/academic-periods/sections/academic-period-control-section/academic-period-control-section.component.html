@@ -1,0 +1,75 @@
+<section>
+  <h3 class="text-primary-500 text-[1.3rem] mb-[10px] font-bold">
+    {{ defaultSchoolStore.school()?.name }} - Periodo Académico
+  </h3>
+
+  @if (!activeAcademicPeriodLoading()) {
+    @if (activeAcademicPeriod() !== null) {
+      <div class="flex justify-between items-center">
+        <p class="text-3xl leading-none">
+          {{ activeAcademicPeriod()!.name }}· Semana
+          {{ weekAndDayDiff()!.week }}· Día {{ weekAndDayDiff()!.day }}
+        </p>
+
+        <button
+          class="group cursor-pointer flex items-center gap-1.5"
+          (click)="onShowStopAcademicPeriodConfimation($event)"
+        >
+          <div
+            class="transition-colors bg-danger-400 group-hover:bg-danger-500 size-10 rounded-full flex items-center justify-center"
+          >
+            <i-lucide
+              [img]="stopAcademicPeriod"
+              class="size-4.5 text-white fill-white"
+            />
+          </div>
+
+          <span
+            class="group-hover:text-danger-500 text-[1.2rem] text-danger-400 font-bold"
+          >
+            Finalizar
+          </span>
+        </button>
+      </div>
+
+      <p-confirmdialog [draggable]="false" [closable]="false" />
+      <p-toast position="bottom-center" />
+    } @else {
+      <button
+        class="cursor-pointer flex items-center gap-2"
+        (click)="onShowStartAcademicPeriodDialog()"
+      >
+        <div
+          class="bg-primary-500 size-10 rounded-full flex items-center justify-center"
+        >
+          <i-lucide
+            [img]="startAcademicPeriod"
+            class="size-4.5 ml-[0.5px] text-white fill-white"
+          />
+        </div>
+        <span class="text-[1.2rem] font-bold text-primary-500">
+          Empezar periodo
+        </span>
+      </button>
+
+      <gow-start-academic-period-dialog
+        [show]="showStartAcademicPeriodDialog()"
+        [schoolId]="defaultSchoolStore.school()?.id"
+        (close)="onCloseStartAcademicPeriodDialog()"
+        (success)="onSuccessStartAcademicPeriod($event)"
+      />
+    }
+  } @else {
+    <div class="flex items-center gap-2 h-[42px]">
+      <p-progress-spinner
+        ariaLabel="loading"
+        strokeWidth="5"
+        [style]="{ width: '42px', height: '42px' }"
+      ></p-progress-spinner>
+
+      <span class="text-gray-400 text-lg">
+        Buscando sí se encuentra un periodo activo...
+      </span>
+    </div>
+  }
+</section>

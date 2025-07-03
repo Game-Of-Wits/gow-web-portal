@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "Venus Rising";
+  src: url("/assets/fonts/Venus Rising V1.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/assets/fonts/CenturyGothic-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-display: swap;
+}

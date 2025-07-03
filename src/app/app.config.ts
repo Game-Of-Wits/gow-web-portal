@@ -1,13 +1,10 @@
 import { provideHttpClient, withFetch } from '@angular/common/http'
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core'
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
-import { provideRouter } from '@angular/router'
-
 import {
-  ScreenTrackingService,
-  UserTrackingService,
   getAnalytics,
-  provideAnalytics
+  provideAnalytics,
+  ScreenTrackingService,
+  UserTrackingService
 } from '@angular/fire/analytics'
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app'
 import { getAuth, provideAuth } from '@angular/fire/auth'
@@ -16,16 +13,16 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore'
 import { getFunctions, provideFunctions } from '@angular/fire/functions'
 import { getMessaging, provideMessaging } from '@angular/fire/messaging'
 import { getStorage, provideStorage } from '@angular/fire/storage'
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { provideRouter } from '@angular/router'
 
 import { provideStore } from '@ngrx/store'
 
 import { providePrimeNG } from 'primeng/config'
-
-import { routes } from './app.routes'
+import { GoWTheme } from '~/shared/theme'
 
 import { environment } from '../environments/environment'
-
-import { GoWTheme } from '~/shared/theme'
+import { routes } from './app.routes'
 
 export const appConfig: ApplicationConfig = {
   providers: [

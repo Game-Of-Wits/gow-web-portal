@@ -1,6 +1,5 @@
 import { definePreset } from '@primeng/themes'
 import Aura from '@primeng/themes/aura'
-
 import { getContrastColor } from './utils'
 
 export const GoWTheme = definePreset(Aura, {

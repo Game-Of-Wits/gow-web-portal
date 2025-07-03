@@ -1,16 +1,12 @@
 import { NgOptimizedImage } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { Router } from '@angular/router'
-
-import { AuthService } from '~/auth/services/auth.service'
-
-import { AuthStore } from '~/shared/store/auth.store'
-
+import { LucideAngularModule, User } from 'lucide-angular'
 import { type MenuItem, MessageService } from 'primeng/api'
 import { Menu } from 'primeng/menu'
 import { Toast } from 'primeng/toast'
-
-import { LucideAngularModule, User } from 'lucide-angular'
+import { AuthService } from '~/auth/services/auth.service'
+import { AuthStore } from '~/shared/store/auth.store'
 
 @Component({
   selector: 'gow-profile-menu-button',

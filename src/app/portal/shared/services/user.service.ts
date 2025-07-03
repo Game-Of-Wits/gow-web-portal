@@ -1,19 +1,15 @@
 import { Injectable, inject } from '@angular/core'
-
 import { Auth, authState } from '@angular/fire/auth'
 import {
   DocumentReference,
-  Firestore,
   doc,
   docData,
+  Firestore,
   getDoc
 } from '@angular/fire/firestore'
-
-import { TeacherProfileModel } from '../models/TeacherProfile'
-
-import { UserMapper } from '../mappers/user.mapper'
-
 import { firstValueFrom, map, take } from 'rxjs'
+import { UserMapper } from '../mappers/user.mapper'
+import { TeacherProfileModel } from '../models/TeacherProfile'
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

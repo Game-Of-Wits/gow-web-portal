@@ -1,10 +1,8 @@
 import { Component, forwardRef, input, signal } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-
+import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 import { ButtonModule } from 'primeng/button'
 import { InputTextModule } from 'primeng/inputtext'
-
-import { Eye, EyeOff, LucideAngularModule } from 'lucide-angular'
 
 @Component({
   selector: 'gow-text-field',

@@ -1,8 +1,10 @@
 <main>
   <gow-portal-navbar></gow-portal-navbar>
 
-  <div>
+  <div class="flex">
     <gow-portal-sidebar></gow-portal-sidebar>
-    <router-outlet></router-outlet>
+    <div class="flex-1">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </main>

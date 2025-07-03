@@ -1,5 +1,4 @@
 import { AuthUserModel } from '~/shared/models/AuthUser'
-
 import { TeacherProfileModel } from '../models/TeacherProfile'
 import { UserModel } from '../models/User'
 

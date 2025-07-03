@@ -1,5 +1,4 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
-
 import { AuthUserModel } from '~/shared/models/AuthUser'
 
 type AuthState = {

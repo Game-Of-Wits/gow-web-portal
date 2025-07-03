@@ -1,0 +1,48 @@
+<p-dialog
+  header="Iniciar periodo académico"
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ 'max-width': '400px', width: '100%' }"
+>
+  <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-1.5">
+      <gow-text-field
+        id="academic-period-name"
+        label="Nombre"
+        [formControl]="newAcademicPeriodName"
+      />
+
+      @if (newAcademicPeriodName.touched && newAcademicPeriodName.invalid) {
+        <p class="text-danger-400 text-sm">
+          @if (newAcademicPeriodName.hasError('required')) {
+            Es requerido
+          }
+          @if (newAcademicPeriodName.hasError('minlength')) {
+            Mínimo 3 caracteres
+          }
+        </p>
+      }
+    </div>
+
+    <div class="flex gap-2 justify-end">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        (click)="onCloseDialog()"
+        [outlined]="true"
+      />
+
+      <p-button
+        label="Iniciar"
+        severity="primary"
+        (click)="createAcademicPeriod()"
+        [loading]="isLoading()"
+      />
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast position="bottom-center" />

@@ -1,35 +1,15 @@
 import { Component, Input, inject, signal } from '@angular/core'
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
-
 import type { FirebaseError } from '@angular/fire/app'
-
-import { AuthService } from '~/auth/services/auth.service'
-
-import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
-
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
 import { Toast } from 'primeng/toast'
+import { AuthService } from '~/auth/services/auth.service'
+import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
+import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 
-const passwordResetErrorMessages: {
-  [code: string]: { summary: string; message: string }
-} = {
-  'auth/invalid-email': {
-    summary: 'Correo electrónico invalido',
-    message: 'El correo electrónico no es valido.'
-  },
-  'auth/missing-email': {
-    summary: 'Correo electrónico requerido',
-    message:
-      'El correo electrónico es requerido para enviar la solicitud de recuperación de contraseña.'
-  },
-  'auth/too-many-requests': {
-    summary: 'Muchas solicitudes',
-    message:
-      'Demasiados intentos de recuperación de contraseña. Intentar más tarde.'
-  }
-} as const
+const passwordResetErrorMessages = commonErrorMessages
 
 @Component({
   selector: 'gow-password-reset-form',

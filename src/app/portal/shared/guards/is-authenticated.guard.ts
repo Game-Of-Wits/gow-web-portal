@@ -1,13 +1,9 @@
 import { inject } from '@angular/core'
 import { CanActivateFn, Router } from '@angular/router'
-
-import type { TeacherProfileModel } from '../models/TeacherProfile'
-
-import { AuthStore } from '~/shared/store/auth.store'
-
 import { UserService } from '~/shared/services/user.service'
-
+import { AuthStore } from '~/shared/store/auth.store'
 import { AuthUserMapper } from '../mappers/auth-user.mapper'
+import type { TeacherProfileModel } from '../models/TeacherProfile'
 
 export const isAuthenticatedGuard: CanActivateFn = async () => {
   const authStore = inject(AuthStore)

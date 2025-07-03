@@ -1,18 +1,14 @@
 import { NgOptimizedImage } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { RouterLink } from '@angular/router'
-
-import { LocalStorageService } from '~/shared/services/local-storage.service'
-
-import { SidebarStateStore } from '~/shared/store/sidebar.store'
-
-import { ProfileMenuButtonComponent } from '~/shared/components/profile-menu-button/profile-menu-button.component'
-
 import {
   LucideAngularModule,
   PanelLeftClose,
   PanelLeftOpen
 } from 'lucide-angular'
+import { ProfileMenuButtonComponent } from '~/shared/components/profile-menu-button/profile-menu-button.component'
+import { LocalStorageService } from '~/shared/services/local-storage.service'
+import { SidebarStateStore } from '~/shared/store/sidebar.store'
 
 @Component({
   selector: 'gow-portal-navbar',

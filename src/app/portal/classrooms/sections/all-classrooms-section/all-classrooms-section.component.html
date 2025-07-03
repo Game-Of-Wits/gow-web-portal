@@ -1,0 +1,23 @@
+<section class="w-full">
+  <h3 class="text-primary-500 text-[1.3rem] mb-[10px] font-bold">Aulas</h3>
+
+  @if (!allClassroomsLoading()) {
+    @if (allClassrooms() !== null && allClassrooms()?.length !== 0) {
+      <gow-classroom-cards [classrooms]="allClassrooms()!" />
+    } @else {
+      <div class="text-lg text-center">
+        No tienes ninguna clase asociada o entregada
+      </div>
+    }
+  } @else {
+    <div class="flex items-center justify-center h-24">
+      <p-progress-spinner
+        ariaLabel="loading"
+        strokeWidth="5"
+        [style]="{ width: '60px', height: '60px' }"
+      ></p-progress-spinner>
+    </div>
+  }
+</section>
+
+<p-toast position="top-right" />
