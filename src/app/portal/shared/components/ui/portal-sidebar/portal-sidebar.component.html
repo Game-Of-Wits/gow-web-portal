@@ -23,6 +23,29 @@
           class="size-[24px]"
         />
       </a>
+
     </gow-portal-sidebar-paper>
+
+    <div class="pl-5.5 flex flex-col">
+      @if (!isClassroomsLoading()) {
+        @for (classroom of classrooms(); track classroom.id) {
+          <gow-classroom-sidebar-link
+            [classroomId]="classroom.id"
+            [classroomName]="classroom.name"
+            [schoolId]="classroom.schoolId"
+          />
+        } @empty {
+          <p-message severity="secondary">No tienes ninguna clase en tu propiedad</p-message>
+        }
+      } @else {
+        <div class="flex justify-center py-2">
+          <p-progress-spinner
+            ariaLabel="loading"
+            strokeWidth="3"
+            [style]="{ width: '50px', height: '50px' }"
+          ></p-progress-spinner>
+        </div>
+      }
+    </div>
   </aside>
 }

@@ -25,7 +25,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router'
       class="px-[16px] py-[10px] rounded-xl text-base leading-none gap-2.5 flex items-center transition-colors text-dark hover:bg-surface-100"
     >
       <ng-content select="[icon]"></ng-content>
-      <span class="leading-none text-base">
+      <span class="leading-none text-base text-ellipsis text-nowrap">
         <ng-content></ng-content>
       </span>
     </a>
