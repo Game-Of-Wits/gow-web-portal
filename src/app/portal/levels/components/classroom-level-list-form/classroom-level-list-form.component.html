@@ -1,0 +1,32 @@
+<div class="flex flex-col gap-2">
+  @if (levelListForm.controls.length > 0) {
+    <div class="flex flex-col gap-1.5">
+      @for (levelForm of levelListForm.controls; track position; let position = $index) {
+        <gow-classroom-level-list-form-item
+          [levelForm]="levelForm"
+          [position]="position"
+          (delete)="onDeleteLevelForm($event)"
+        />
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    [disabled]="disabled()"
+    class="bg-white rounded-lg border-2 hover:bg-info-50 text-base border-info-500 text-info-500 cursor-pointer py-2 font-semibold transition-colors disabled:border-info-100 disabled:text-info-100 disabled:cursor-not-allowed disabled:hover:bg-white"
+    (click)="onOpenAddLevelFormDialog()"
+  >
+    Añadir nivel
+  </button>
+</div>
+
+<gow-level-form-dialog
+  buttonText="Añadir"
+  headerTitle="Añadir nivel"
+  [position]="levelFormSelected().position"
+  [minRequiredPoints]="levelFormSelected().minRequiredPoints"
+  [show]="showAddLevelFormDialog()"
+  (close)="onCloseLevelFormDialog()"
+  (success)="onAddLevelForm($event)"
+/>

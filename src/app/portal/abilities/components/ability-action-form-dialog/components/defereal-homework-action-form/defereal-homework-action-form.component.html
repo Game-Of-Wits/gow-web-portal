@@ -1,0 +1,40 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Unidad de tiempo"
+      placeholder="Selecciona una unidad de tiempo"
+      [options]="abilityUnitTimeOptions"
+      [enableClear]="false"
+      [focusColor]="colorScheme()"
+      formControlName="unitTime"
+    />
+
+    @if (unitTimeControl?.invalid && unitTimeControl?.touched) {
+      @if (hasErrorValidation(unitTimeControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+  <div class="flex flex-col gap-1">
+    <gow-number-field
+      label="Tiempo a modificar"
+      placeholder="Ingrese la cantidad de tiempo a modificar"
+      [focusColor]="colorScheme()"
+      formControlName="time"
+    />
+
+    @if (timeControl?.invalid && timeControl?.touched) {
+      @if (hasErrorValidation(timeControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      } @else if (hasErrorValidation(timeControl, "min")) {
+        <p class="text-sm text-red-500">
+          Mínimo {{ timeControl?.errors?.["min"].min }} el tiempo a modificar
+        </p>
+      } @else if (hasErrorValidation(timeControl, "max")) {
+        <p class="text-sm text-red-500">
+          Máximo {{ timeControl?.errors?.["max"].max }} el tiempo a modificar
+        </p>
+      }
+    }
+  </div>
+</form>

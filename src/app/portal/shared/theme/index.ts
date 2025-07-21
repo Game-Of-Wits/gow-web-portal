@@ -1,8 +1,8 @@
 import { definePreset } from '@primeng/themes'
 import Aura from '@primeng/themes/aura'
-import { getContrastColor } from './utils'
+import { getContrastColor } from '../utils/getContrastColor'
 
-export const GoWTheme = definePreset(Aura, {
+export const gowThemeConfig = {
   semantic: {
     primary: {
       50: '#FFF4E9',
@@ -116,4 +116,6 @@ export const GoWTheme = definePreset(Aura, {
     hoverBackground: '{surface.100}',
     activeBackground: '{surface.200}'
   }
-})
+}
+
+export const GoWTheme = definePreset(Aura, gowThemeConfig)

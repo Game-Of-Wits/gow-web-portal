@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-2">
+  @if (penaltyListForm.controls.length > 0) {
+    <div class="flex flex-col gap-1.5">
+      @for (
+        penalty of penaltyListForm.controls;
+        track position;
+        let position = $index
+      ) {
+        <gow-penalty-list-form-item
+          [penaltyForm]="penalty"
+          [position]="position"
+          (edit)="onOpenEditPenaltyFormDialog($event)"
+          (delete)="onDeletePenaltyForm($event)"
+        />
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    class="bg-white rounded-lg border-2 hover:bg-info-50 text-base border-info-500 text-info-500 cursor-pointer py-2 font-semibold transition-colors disabled:border-info-100 disabled:text-info-100 disabled:cursor-not-allowed disabled:hover:bg-white"
+    (click)="onOpenAddPenaltyFormDialog()"
+  >
+    Añadir penalización
+  </button>
+</div>
+
+<gow-penalty-form-dialog
+  buttonText="Añadir"
+  headerTitle="Añadir penalización"
+  [position]="penaltyFormSelected().position"
+  [show]="showAddPenaltyFormDialog()"
+  (close)="onClosePenaltyFormDialog()"
+  (success)="onAddPenaltyForm($event)"
+/>
+
+<gow-penalty-form-dialog
+  buttonText="Editar"
+  headerTitle="Editar penalización"
+  [penaltyForm]="penaltyFormSelected().form"
+  [position]="penaltyFormSelected().position"
+  [show]="showEditPenaltyFormDialog()"
+  (close)="onClosePenaltyFormDialog()"
+  (success)="onEditPenaltyForm($event)"
+/>

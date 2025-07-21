@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core'
-import { RouterLink } from '@angular/router'
+import { RouterLink, RouterLinkActive } from '@angular/router'
 import { House, LucideAngularModule, Plus, School } from 'lucide-angular'
 import { LocalStorageService } from '~/shared/services/local-storage.service'
 import { DefaultSchoolStore } from '~/shared/store/default-school.store'
@@ -10,8 +10,15 @@ import { PortalSidebarPaperComponent } from './ui/portal-sidebar-paper.component
 @Component({
   selector: 'gow-portal-sidebar',
   templateUrl: './portal-sidebar.component.html',
+  styles: `
+    .add-classroom-link-active {
+      background-color: var(--p-primary-500);
+      color: white;
+    }
+  `,
   imports: [
     RouterLink,
+    RouterLinkActive,
     LucideAngularModule,
     PortalSidebarLinkComponent,
     PortalSidebarPaperComponent

@@ -1,0 +1,46 @@
+<div class="flex flex-col gap-2">
+  @if (characterListForm.controls.length > 0) {
+    <div class="flex flex-col gap-1.5">
+      @for (character of characterListForm.controls; track position; let position = $index) {
+        <gow-character-list-item
+          [formCharacter]="character"
+          [position]="position"
+          (edit)="onOpenEditCharacterDialog($event)"
+          (delete)="onDeleteCharacterForm($event)"
+        />
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    class="bg-white rounded-lg border-2 hover:bg-danger-50 text-base border-danger-500 text-danger-500 cursor-pointer py-2 font-semibold transition-colors disabled:text-danger-100 disabled:border-danger-100 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+    [disabled]="teamOptions().length === 0"
+    (click)="onOpenAddCharacterDialog()"
+  >
+    Añadir personaje
+  </button>
+</div>
+
+<gow-character-form-dialog
+  headerTitle="Añadir personaje"
+  buttonText="Añadir"
+  [buttonIcon]="addIcon"
+  [position]="characterFormSelected().position"
+  [show]="showAddCharacterFormDialog()"
+  [teams]="teamOptions()"
+  (close)="onCloseCharacterForm()"
+  (success)="onAddCharacterForm($event)"
+/>
+
+<gow-character-form-dialog
+  headerTitle="Editar personaje"
+  buttonText="Editar"
+  [buttonIcon]="editIcon"
+  [characterForm]="characterFormSelected().form"
+  [position]="characterFormSelected().position"
+  [show]="showEditCharacterFormDialog()"
+  [teams]="teamOptions()"
+  (close)="onCloseCharacterForm()"
+  (success)="onEditCharacterForm($event)"
+/>

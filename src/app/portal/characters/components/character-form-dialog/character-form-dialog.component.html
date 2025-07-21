@@ -1,0 +1,99 @@
+@if (characterForm; as characterFormGroup) {
+  <ng-template #closeButtonIcon>
+    <button class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer" (click)="onCloseDialog()">
+      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+    </button>
+  </ng-template>
+
+  <p-dialog
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closeIconTemplate]="closeButtonIcon"
+    [style]="{ 'max-width': '500px', width: '100%' }"
+    [formGroup]="characterFormGroup"
+  >
+    <ng-template #header>
+      <span class="font-bold text-xl">{{ headerTitle() }}</span>
+    </ng-template>
+
+    <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
+          <gow-text-field
+            label="Nombre"
+            focusColor="danger"
+            placeholder="Ingresar nombre del equipo"
+            formControlName="name"
+          />
+
+          @if (characterNameControl?.touched && characterNameControl?.invalid) {
+            @if (hasErrorValidation(characterNameControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(characterNameControl, "minlength")) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{ characterNameControl?.errors?.["minlength"].requiredLength }}
+                caracteres
+              </p>
+            } @else if (hasErrorValidation(characterNameControl, "maxlength")) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{ characterNameControl?.errors?.["maxlength"].requiredLength }}
+                caracteres
+              </p>
+            }
+          }
+        </div>
+        <div class="flex flex-col gap-1">
+          <gow-select-field
+            label="Equipo"
+            focusColor="danger"
+            placeholder="Selecciona un equipo"
+            formControlName="teamName"
+            [options]="teamOptions()"
+          />
+
+          @if (characterTeamNameControl?.touched && characterTeamNameControl?.invalid) {
+            @if (hasErrorValidation(characterTeamNameControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (
+              hasErrorValidation(characterTeamNameControl, "minlength")
+            ) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{
+                  characterTeamNameControl?.errors?.["minlength"]
+                    ?.requiredLength
+                }}
+                caracteres
+              </p>
+            } @else if (
+              hasErrorValidation(characterTeamNameControl, "maxlength")
+            ) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{
+                  characterTeamNameControl?.errors?.["maxlength"]
+                    ?.requiredLength
+                }}
+                caracteres
+              </p>
+            }
+          }
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="onSubmitCharacterForm()"
+        [disabled]="characterFormGroup.invalid"
+        class="flex gap-1.5 py-2 px-3 rounded-lg bg-danger-500 disabled:bg-danger-100 text-white self-start disabled:cursor-not-allowed cursor-pointer"
+      >
+        <i-lucide [img]="buttonIcon()" />
+        {{ buttonText() }}
+      </button>
+    </div>
+  </p-dialog>
+}

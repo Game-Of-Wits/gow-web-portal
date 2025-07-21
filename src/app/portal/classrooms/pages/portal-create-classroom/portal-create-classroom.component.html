@@ -1,0 +1,355 @@
+<section class="flex justify-center pt-[25px] pb-[70px] w-full">
+  <form
+    class="max-w-[700px] w-full flex flex-col gap-3.5"
+    [formGroup]="classroomForm"
+    (ngSubmit)="onCreateClassroom()"
+  >
+    <gow-page-header
+      subtitle="Aulas"
+      principalTitle="Iniciar nueva aula"
+      defaultBackPath="/p/general"
+    >
+      <button
+        type="submit"
+        [disabled]="classroomForm.invalid"
+        class="px-3 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 disabled:bg-primary-100 text-white cursor-pointer flex items-center gap-1.5 disabled:cursor-not-allowed"
+      >
+        <i-lucide [img]="addClassroomIcon" class="size-5" />
+
+        Crear
+      </button>
+    </gow-page-header>
+
+    <div class="flex flex-col gap-1.5">
+      <h2 class="text-xl font-semibold">Información general</h2>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1">
+          <gow-text-field
+            label="Nombre"
+            placeholder="Ingrese el nombre del aula"
+            formControlName="name"
+          />
+
+          @if (
+            classroomNameControl?.touched &&
+            classroomNameControl?.invalid
+          ) {
+            @if (hasErrorValidation(classroomNameControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(classroomNameControl, "minlength")) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{
+                  classroomNameControl?.errors?.["minlength"].requiredLength
+                }}
+                caracteres
+              </p>
+            } @else if (hasErrorValidation(classroomNameControl, "maxlength")) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{
+                  classroomNameControl?.errors?.["minlength"]
+                    .requiredLength
+                }}
+                caracteres
+              </p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <gow-select-field
+            label="Grado escolar"
+            placeholder="Seleccione el grado escolar del aula"
+            [options]="schoolGradeYearOptions()"
+            formControlName="gradeYearId"
+          />
+        </div>
+
+        @if (
+          classroomGradeYearControl?.touched &&
+          classroomGradeYearControl?.invalid
+        ) {
+          @if (hasErrorValidation(classroomGradeYearControl, "required")) {
+            <p class="text-red-500 text-sm">Es requerido</p>
+          } @else if (
+            hasErrorValidation(classroomGradeYearControl, "minlength") &&
+            hasErrorValidation(classroomGradeYearControl, "maxlength")
+          ) {
+            <p class="text-red-500 text-sm">El año escolar es invalido</p>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2.5" formGroupName="experiences">
+      <h2 class="text-2xl font-bold text-gray-800">Experiencias educativas</h2>
+
+      <div class="flex flex-col gap-2" formGroupName="SHADOW_WARFARE">
+        <h3 class="text-[1.3rem] font-semibold text-gray-700">
+          Guerra de sombas
+        </h3>
+
+        <div class="flex flex-col gap-1.5" formGroupName="teams">
+          <div class="flex items-center gap-1.5">
+            <h4 class="text-[1.2rem] font-semibold">Equipos iniciales</h4>
+
+            @if (
+              (shadowWarfareTeamsFormGroup?.touched || shadowWarfareTeamsFormGroup?.dirty) &&
+              shadowWarfareTeamsFormGroup?.invalid
+            ) {
+              @if (
+                hasErrorValidation(shadowWarfareTeamsFormGroup, 'noEqualTeamNames') &&
+                !firstTeamNameControl?.invalid &&
+                !secondTeamNameControl?.invalid
+              ) {
+                <span class="text-red-500 text-sm">El nombre de los equipos no pueden ser identicos</span>
+              }
+            }
+          </div>
+
+          <div class="flex gap-2">
+            <div class="flex flex-col gap-1 flex-1">
+              <gow-text-field
+                label="Nombre del equipo #1"
+                placeholder="Ingrese el nombre del equipo #1"
+                class="flex-1"
+                focusColor="danger"
+                formControlName="firstTeamName"
+              />
+
+              @if (
+                (firstTeamNameControl?.touched || firstTeamNameControl?.dirty) &&
+                firstTeamNameControl?.invalid
+              ) {
+                @if (
+                  hasErrorValidation(firstTeamNameControl, "minlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Mínimo 2 caracteres
+                  </p>
+                } @else if (
+                  hasErrorValidation(firstTeamNameControl, "maxlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Máximo 30 caracteres
+                  </p>
+                }
+              }
+            </div>
+
+            <div class="flex flex-col gap-1 flex-1">
+              <gow-text-field
+                label="Nombre del equipo #2"
+                placeholder="Ingrese el nombre del equipo #2"
+                class="flex-1"
+                focusColor="danger"
+                formControlName="secondTeamName"
+              />
+
+              @if (
+                (secondTeamNameControl?.touched || secondTeamNameControl?.dirty) &&
+                secondTeamNameControl?.invalid
+              ) {
+                @if (
+                  hasErrorValidation(secondTeamNameControl, "minlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Mínimo 2 caracteres
+                  </p>
+                } @else if (
+                  hasErrorValidation(secondTeamNameControl, "maxlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Máximo 30 caracteres
+                  </p>
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div>
+            <h4 class="text-[1.2rem] font-semibold">Personaje</h4>
+          </div>
+
+          <div class="flex gap-2" formGroupName="character">
+            <div class="flex flex-col gap-1 flex-1">
+              <gow-number-field
+                label="Puntos de vida base"
+                focusColor="danger"
+                placeholder="Puntos de vida base"
+                formControlName="healthPointBase"
+              />
+
+              @if (
+                healthPointBaseControl?.touched &&
+                healthPointBaseControl?.invalid
+              ) {
+                @if (hasErrorValidation(healthPointBaseControl, "required")) {
+                  <p class="text-red-500 text-sm">Es requerido</p>
+                } @else if (
+                  hasErrorValidation(healthPointBaseControl, "min")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Mínimo
+                    {{ healthPointBaseControl?.errors?.["min"].min }} de
+                    puntos de vida base
+                  </p>
+                }
+              }
+            </div>
+
+            <div class="flex flex-col gap-1 flex-1">
+              <gow-number-field
+                label="Limite de habilidades"
+                focusColor="danger"
+                placeholder="Ingrese el limite de habilidades por personaje"
+                formControlName="limitAbilities"
+              />
+
+              @if (
+                limitAbilitiesControl?.touched &&
+                limitAbilitiesControl?.invalid
+              ) {
+                @if (hasErrorValidation(limitAbilitiesControl, "required")) {
+                  <p class="text-red-500 text-sm">Es requerido</p>
+                } @else if (hasErrorValidation(limitAbilitiesControl, "min")) {
+                  <p class="text-red-500 text-sm">
+                    Mínimo
+                    {{ limitAbilitiesControl?.errors?.["min"].min }}
+                    habilidades
+                  </p>
+                } @else if (hasErrorValidation(limitAbilitiesControl, "max")) {
+                  <p class="text-red-500 text-sm">
+                    Máximo
+                    {{ limitAbilitiesControl?.errors?.["max"].max }}
+                    habilidades
+                  </p>
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5">
+            <h4 class="text-[1.2rem] font-semibold">Personajes iniciales</h4>
+          </div>
+
+          <gow-initial-character-list-form
+            [characterListForm]="initialCharactersFormArray"
+            [teamOptions]="teamNameOptions()"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5">
+            <h4 class="text-[1.2rem] font-semibold">Habilidades iniciales</h4>
+
+            @if (
+              initialAbilitiesFormArray.invalid && (initialAbilitiesFormArray.dirty || initialAbilitiesFormArray.touched)
+            ) {
+              @if (hasErrorValidation(initialAbilitiesFormArray, "minlength")) {
+                <span class="text-sm text-red-500">Mínimo una habilidad inicial</span>
+              } @else if (hasErrorValidation(initialAbilitiesFormArray, "noEqualNames")) {
+                <span class="text-sm text-red-500">El nombre de las habilidades no puede ser igual</span>
+              }
+            }
+          </div>
+
+          <gow-initial-experience-ability-list-form
+            [abilityListForm]="initialAbilitiesFormArray"
+            [experience]="shadowWarfareExperience"
+            [abilityUsage]="abilityUsage"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2" formGroupName="MASTERY_ROAD">
+        <h3 class="text-[1.3rem] font-semibold text-gray-700">
+          Camino de la Maestría
+        </h3>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5">
+            <h4 class="text-[1.2rem] font-semibold">Niveles</h4>
+
+            @if (masteryRoadLevelsFormGroup?.invalid && masteryRoadLevelsFormGroup?.touched) {
+              @if (hasErrorValidation(masteryRoadLevelsFormGroup, "noEqualNames")) {
+                <span class="text-sm text-red-500">El nombre de los niveles no puede ser igual</span>
+              } @else if (hasErrorValidation(masteryRoadLevelsFormGroup, "noEqualPrimaryColors")) {
+                <span class="text-sm text-red-500">El color de los niveles no puede ser igual</span>
+              }
+            }
+          </div>
+
+          <div class="flex flex-col gap-3" formGroupName="levels">
+            <div class="flex flex-col gap-1" formGroupName="initialLevel">
+              <label>Nivel inicial</label>
+
+              <div class="flex items-center gap-2.5 w-full">
+                <p-color-picker
+                  class="[&_input]:size-[40px] [&_input]:outline-info-400 outline-2 outline-gray-300 rounded-lg"
+                  format="hex"
+                  formControlName="primaryColor"
+                  pTooltip="Color principal"
+                  tooltipPosition="bottom"
+                />
+
+                <gow-text-field
+                  placeholder="Ingrese el nombre del nivel inicial"
+                  class="w-fit flex-1"
+                  focusColor="info"
+                  formControlName="name"
+                />
+              </div>
+
+
+              @if (
+                initialLevelNameControl?.touched &&
+                initialLevelNameControl?.invalid
+              ) {
+                @if (hasErrorValidation(initialLevelNameControl, "required")) {
+                  <p class="text-red-500 text-sm">Es requerido</p>
+                } @else if (
+                  hasErrorValidation(initialLevelNameControl, "minlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Mínimo {{ initialLevelNameControl?.errors?.["minlength"].requiredLength }} caracteres
+                  </p>
+                } @else if (
+                  hasErrorValidation(initialLevelNameControl, "maxlength")
+                ) {
+                  <p class="text-red-500 text-sm">
+                    Máximo {{ initialLevelNameControl?.errors?.["maxlength"].requiredLength }} caracteres
+                  </p>
+                }
+              }
+            </div>
+
+            <gow-classroom-level-list-form [levelListForm]="levelsFormArray" [disabled]="initialLevelFormGroup?.invalid ?? false" />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-1.5">
+            <h4 class="text-[1.2rem] font-semibold">Penalizaciones</h4>
+
+            @if (penaltiesFormArray.invalid && (penaltiesFormArray.touched || penaltiesFormArray.dirty)) {
+              @if (hasErrorValidation(penaltiesFormArray, "minlength")) {
+                <span class="text-sm text-red-500">Mínimo una penalización</span>
+              } @else if (hasErrorValidation(penaltiesFormArray, "noEqualNames")) {
+                <span class="text-sm text-red-500">El nombre de las penalizaciones no puede ser igual</span>
+              }
+            }
+          </div>
+
+          <gow-penalty-list-form [penaltyListForm]="penaltiesFormArray" />
+        </div>
+      </div>
+    </div>
+  </form>
+</section>

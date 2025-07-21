@@ -1,0 +1,19 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Objetivo"
+      placeholder="Seleccione el objetivo a revivir"
+      [options]="abilityTargetOptions"
+      formControlName="target"
+      [enableClear]="false"
+      [scrollHeight]="70"
+      [focusColor]="colorScheme()"
+    />
+
+    @if (targetControl?.invalid && targetControl?.touched) {
+      @if (hasErrorValidation(targetControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+</form>

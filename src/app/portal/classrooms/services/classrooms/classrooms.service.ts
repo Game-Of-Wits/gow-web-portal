@@ -4,6 +4,7 @@ import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable } from 'rxjs'
 import { ClassroomMapper } from '~/classrooms/mappers/classroom.mapper'
 import type { ClassroomModel } from '~/classrooms/models/Classroom.model'
+import { CreateClassroomModel } from '~/classrooms/models/CreateClassroom.model'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { AuthStore } from '~/shared/store/auth.store'
 
@@ -21,5 +22,9 @@ export class ClassroomsService {
     return this.classroomRepository
       .getAllClassrooms(authUser.id)
       .pipe(map(classsroom => ClassroomMapper.toListModels(classsroom)))
+  }
+
+  public async createClassroom(data: CreateClassroomModel): Promise<void> {
+    console.log(data)
   }
 }

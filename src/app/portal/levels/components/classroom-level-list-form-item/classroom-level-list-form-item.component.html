@@ -1,0 +1,24 @@
+<div
+  class="py-2 px-4 rounded-xl flex justify-between w-full border"
+  style="background-color: {{ levelForm.value.primaryColor }}; color: {{
+    contrastColor()
+  }}; border-color: {{ contrastColor() }};"
+>
+  <div class="flex gap-2 items-center">
+    <i-lucide [img]="levelIcon" class="size-[28px]" />
+    <p class="text-lg">{{ levelForm.value.name }}</p>
+  </div>
+
+  <div class="flex gap-2 items-center">
+    <p class="text-xl font-bold">[{{ levelForm.value.requiredPoints }}]</p>
+    <div class="flex gap-0.5 items-center">
+      <button
+        type="button"
+        (click)="onDeleteForm()"
+        class="inline-flex cursor-pointer p-2 rounded-lg"
+      >
+        <i-lucide [img]="deleteIcon" class="fill-white size-[18px]" />
+      </button>
+    </div>
+  </div>
+</div>

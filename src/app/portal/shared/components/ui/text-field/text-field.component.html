@@ -1,17 +1,19 @@
-<div class="flex flex-col gap-1 relative">
+<label class="flex flex-col gap-1 relative">
   @if (inputLabel().trim()) {
-    <label [for]="inputId()">{{ inputLabel() }}</label>
+    <span>
+      {{ inputLabel() }}
+    </span>
   }
 
   <input
     pInputText
     [type]="inputType() === 'password' ? passwordVisible ? 'text' : 'password' : inputType()"
-    [id]="inputId()"
     [value]="value()"
     [placeholder]="inputPlaceholder()"
     [disabled]="inputDisabled()"
     (input)="handleInput($event)"
-    [class]="inputType() === 'password' ? 'pr-4' : ''"
+    class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden {{ focusColorMap[focusColor()] }}"
+    [class.pr-4]="inputType() === 'password'"
   />
 
   @if (inputType() === 'password') {
@@ -23,4 +25,4 @@
       }
     </button>
   }
-</div>
+</label>

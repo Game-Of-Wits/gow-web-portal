@@ -1,0 +1,6 @@
+export enum AbilityLevelScope {
+  PREV_LEVEL = 'PREV_LEVEL',
+  ALL_PREV_LEVELS = 'ALL_PREV_LEVELS',
+  NEXT_LEVEL = 'NEXT_LEVEL',
+  ALL_NEXT_LEVELS = 'ALL_NEXT_LEVELS'
+}

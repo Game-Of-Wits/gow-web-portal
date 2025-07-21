@@ -1,0 +1,80 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ 'max-width': '550px', width: '100%', border: '0px', overflow: 'hidden' }"
+>
+  <ng-template #header>
+    <div class="flex justify-between items-center w-full">
+      <span class="font-bold text-xl">{{ headerTitle() }}</span>
+
+      <button
+        class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
+        type="button"
+        (click)="onCloseDialog()"
+      >
+        <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-3">
+    @if (abilityActionTypeControl.value === null || !abilityActionsUsed().includes(abilityActionTypeControl.value)) {
+      <div class="flex flex-col gap-1">
+        <gow-select-field
+          label="Tipo de acción"
+          placeholder="Seleccione el tipo de acción"
+          [enableClear]="false"
+          [scrollHeight]="abilityActionForm == null ? 180 : abilityActionForm.value.type == classroomAbilityActionType ? 120 : 150"
+          [options]="availableActionOptions()"
+          [formControl]="abilityActionTypeControl"
+          [focusColor]="colorScheme()"
+        />
+
+        @if (abilityActionTypeControl.invalid && abilityActionTypeControl.touched) {
+          @if (hasErrorValidation(abilityActionTypeControl, "required")) {
+            <p class="text-sm text-red-500">Es requerido</p>
+          }
+        }
+      </div>
+    }
+
+    @if (abilityActionForm; as actionForm) {
+      @if (isAscensionActionForm(actionForm)) {
+        <gow-ascension-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isTheftActionForm(actionForm)) {
+        <gow-theft-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isRevealActionForm(actionForm)) {
+        <gow-reveal-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isHealthActionForm(actionForm)) {
+        <gow-health-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isReviveActionForm(actionForm)) {
+        <gow-revive-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isDeferralHomeworkActionForm(actionForm)) {
+        <gow-defereal-homework-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isClassroomActionForm(actionForm)) {
+        <p-message severity="warn">
+          <ng-template #icon>
+              <i-lucide [img]="infoIcon" class="size-[18px]" />
+          </ng-template>
+          <span>Esta acción no se puede utilizar junto con otras acciones, por lo que eliminará todas las acciones que tengas registradas actualmente y las reemplazará únicamente por esta.</span>
+        </p-message>
+      }
+
+      <button
+        type="button"
+        [disabled]="abilityActionForm == null || abilityActionForm.invalid"
+        (click)="onSubmitAbilityAction()"
+        class="w-full py-3 rounded-xl text-white cursor-pointer disabled:cursor-not-allowed {{ dialogColorScheme[colorScheme()].buttonColorClass }}"
+      >
+        {{ buttonText() }}
+      </button>
+    } @else {
+      <div class="h-[200px] w-full flex items-center justify-center border border-dashed border-gray-400 rounded-xl text-gray-500">
+        <p>Tipo de acción no seleccionado</p>
+      </div>
+    }
+  </div>
+</p-dialog>

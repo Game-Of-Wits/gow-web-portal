@@ -1,0 +1,41 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Objetivo"
+      placeholder="Selecciona el objetivo a robar habilidades"
+      [options]="abilityTheftTargetOptions"
+      [enableClear]="false"
+      formControlName="target"
+      [focusColor]="colorScheme()"
+    />
+
+    @if (targetControl?.invalid && targetControl?.touched) {
+      @if (hasErrorValidation(targetControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+  <div class="flex flex-col gap-1">
+    <gow-number-field
+      label="Cantidad de habilidades"
+      placeholder="Ingrese la cantidad de habilidades que se robara"
+      formControlName="numberOfAbilities"
+      [focusColor]="colorScheme()"
+    />
+
+    @if (
+      numberOfAbilitiesControl?.invalid && numberOfAbilitiesControl?.touched
+    ) {
+      @if (hasErrorValidation(numberOfAbilitiesControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      } @else if (hasErrorValidation(numberOfAbilitiesControl, "min")) {
+        <p class="text-sm text-red-500">Mínimo debes robar una habilidad</p>
+      } @else if (hasErrorValidation(numberOfAbilitiesControl, "max")) {
+        <p class="text-sm text-red-500">
+          Puedes robar máximo
+          {{ numberOfAbilitiesControl?.errors?.["max"].max }} habilidades
+        </p>
+      }
+    }
+  </div>
+</form>

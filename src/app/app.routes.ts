@@ -2,6 +2,7 @@ import { Routes } from '@angular/router'
 import { AuthLayoutComponent } from '~/auth/layouts/auth-layout/auth-layout.component'
 import { ForgotPasswordPageComponent } from '~/auth/pages/forgot-password/forgot-password.component'
 import { SignInPageComponent } from '~/auth/pages/sign-in/sign-in.component'
+import { PortalCreateClassroomPageComponent } from '~/classrooms/pages/portal-create-classroom/portal-create-classroom.component'
 import { getDefaultSchoolGuard } from '~/shared/guards/default-school.guard'
 import { isAuthenticatedGuard } from '~/shared/guards/is-authenticated.guard'
 import { isNotAuthenticatedGuard } from '~/shared/guards/is-not-authenticated.guard'
@@ -38,6 +39,15 @@ export const routes: Routes = [
       {
         path: 'general',
         component: PortalGeneralPageComponent
+      },
+      {
+        path: 's/:schoolId',
+        children: [
+          {
+            path: 'classroom/create',
+            component: PortalCreateClassroomPageComponent
+          }
+        ]
       }
     ]
   }

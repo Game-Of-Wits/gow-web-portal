@@ -1,0 +1,26 @@
+<label>
+  <div
+    class="flex items-center justify-center relative rounded-xl aspect-square border-2"
+    style="width: {{ size() }}px; height: {{ size() }}px; background-color: {{
+      value()
+    }}; border-color: {{ contrastColorText() }};"
+  >
+    <span class="text-3xl font-bold" style="color: {{ contrastColorText() }};">
+      GOW
+    </span>
+
+    <i-lucide
+      [img]="paletteIcon"
+      class="size-6 absolute bottom-1 right-1"
+      style="color: {{ contrastColorText() }};"
+    />
+
+    <input
+      type="color"
+      (input)="handleInput($event)"
+      [disabled]="inputDisabled()"
+      [value]="value()"
+      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+    />
+  </div>
+</label>

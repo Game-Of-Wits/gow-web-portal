@@ -1,0 +1,5 @@
+export enum AbilityTarget {
+  YOURSELF = 'YOURSELF',
+  CLASSMATE = 'CLASSMATE',
+  RANDOM_ENEMY = 'RANDOM_ENEMY'
+}

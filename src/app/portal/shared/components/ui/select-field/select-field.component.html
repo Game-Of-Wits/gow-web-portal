@@ -1,0 +1,21 @@
+<label class="flex flex-col gap-1">
+  <span>
+    {{ selectLabel().trim() && selectLabel() }}
+  </span>
+
+  <p-select
+    class="w-full"
+    [style.--focus-color]="focusColorMap[focusColor()]"
+    [options]="selectOptions()"
+    [placeholder]="selectPlaceholder()"
+    [disabled]="selectDisabled() || isLoading()"
+    [showClear]="enableClearButton()"
+    [ngModel]="value()"
+    (onChange)="handleSelectChange($event)"
+    optionLabel="name"
+    [emptyMessage]="emptyMessage()"
+    [virtualScroll]="selectVirtualScroll()"
+    [virtualScrollItemSize]="selectVirtualScrollItemSize()"
+    scrollHeight="{{ selectScrollHeight() }}px"
+  />
+</label>

@@ -1,0 +1,50 @@
+<div class="flex flex-col gap-2">
+  @if (abilityActionListForm.controls.length > 0) {
+    <div class="flex flex-col gap-1.5">
+      @for (
+        abilityAction of abilityActionListForm.controls;
+        track position;
+        let position = $index
+      ) {
+        <gow-ability-action-list-form-item
+          [abilityActionForm]="abilityAction"
+          [position]="position"
+          (delete)="onDeleteAbilityActionForm($event)"
+          (edit)="onOpenEditAbilityActionFormDialog($event)"
+        />
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    class="rounded-lg border-2 text-base cursor-pointer py-2 font-semibold transition-colors {{ isClassroomActionActive() ? 'bg-danger-50 text-danger-300 hover:bg-danger-400 hover:text-white border-danger-300 hover:border-danger-400' : 'border-danger-500 bg-white text-danger-500 hover:bg-danger-50' }}"
+    (click)="onOpenAddAbilityActionFormDialog()"
+  >
+    {{ isClassroomActionActive() ? "Permitir más acciones" : "Añadir acción" }}
+  </button>
+</div>
+
+<gow-ability-action-form-dialog
+  headerTitle="Añadir acción"
+  colorScheme="danger"
+  buttonText="Añadir"
+  [abilityActionListForm]="abilityActionListForm"
+  [abilityActionForm]="abilityActionFormSelected().form"
+  [position]="abilityActionFormSelected().position"
+  [show]="showAddAbilityActionFormDialog()"
+  (close)="onCloseAbilityActionForm()"
+  (success)="onAddAbilityActionForm($event)"
+/>
+
+<gow-ability-action-form-dialog
+  headerTitle="Editar acción"
+  colorScheme="danger"
+  buttonText="Editar"
+  [abilityActionListForm]="abilityActionListForm"
+  [abilityActionForm]="abilityActionFormSelected().form"
+  [position]="abilityActionFormSelected().position"
+  [show]="showEditAbilityActionFormDialog()"
+  (close)="onCloseAbilityActionForm()"
+  (success)="onEditAbilityActionForm($event)"
+/>

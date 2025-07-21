@@ -1,0 +1,69 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-3">
+  <div class="flex flex-col gap-1">
+    <gow-number-field
+      label="Habilidades a dar..."
+      placeholder="Ingrese la cantidad de habilidades a dar"
+      [focusColor]="colorScheme()"
+      formControlName="given"
+    />
+
+    @if (givenControl?.invalid && givenControl?.touched) {
+      @if (hasErrorValidation(givenControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      } @else if (hasErrorValidation(givenControl, "max")) {
+        <p class="text-sm text-red-500">
+          Máximo puedes dar
+          {{ takenControl?.errors?.["max"].max }} habilidades
+        </p>
+      } @else if (hasErrorValidation(givenControl, "min")) {
+        <p class="text-sm text-red-500">
+          Mínimio puedes dar
+          {{ takenControl?.errors?.["min"].min }} habilidades
+        </p>
+      }
+    }
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <gow-number-field
+      label="Habilidades a recibir..."
+      placeholder="Ingrese la cantidad de habilidades a recibir"
+      [focusColor]="colorScheme()"
+      formControlName="taken"
+    />
+
+    @if (takenControl?.invalid && takenControl?.touched) {
+      @if (hasErrorValidation(takenControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      } @else if (hasErrorValidation(takenControl, "max")) {
+        <p class="text-sm text-red-500">
+          Máximo puedes recibir
+          {{ takenControl?.errors?.["max"].max }} habilidades
+        </p>
+      } @else if (hasErrorValidation(takenControl, "min")) {
+        <p class="text-sm text-red-500">
+          Mínimio puedes recibir
+          {{ takenControl?.errors?.["min"].min }} habilidades
+        </p>
+      }
+    }
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Alcance (Habilidades a recibir)"
+      placeholder="Seleccione el alcance de las habilidades a recibir"
+      formControlName="takenLevelScope"
+      [options]="abilityLevelScopeOptions"
+      [focusColor]="colorScheme()"
+      [enableClear]="false"
+      [scrollHeight]="70"
+    />
+
+    @if (takenLevelScopeControl?.invalid && takenLevelScopeControl?.touched) {
+      @if (hasErrorValidation(takenLevelScopeControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+</form>

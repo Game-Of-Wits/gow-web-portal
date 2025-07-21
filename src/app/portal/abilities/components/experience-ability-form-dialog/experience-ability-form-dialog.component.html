@@ -1,0 +1,124 @@
+@if (abilityForm; as abilityFormGroup) {
+  <p-dialog
+    [header]="headerTitle()"
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    [style]="{ 'max-width': '700px', width: '100%', 'padding-bottom': '10px', border: '0', overflow: 'hidden' }"
+    [formGroup]="abilityFormGroup"
+  >
+    <ng-template #header>
+      <div class="flex justify-between items-center w-full">
+        <span class="font-bold text-xl">{{ headerTitle() }}</span>
+
+        <div class="flex gap-2 items-center">
+          <button
+            type="button"
+            class="flex transition-colors rounded-lg bg-danger-500 hover:bg-danger-600 px-3 py-1.5 items-center gap-1.5 text-white cursor-pointer disabled:bg-danger-100 disabled:cursor-not-allowed"
+            [disabled]="abilityFormGroup.invalid"
+            (click)="onSubmitAbilityForm()"
+          >
+            <i-lucide [img]="buttonIcon()" class="size-[18px]" />
+            {{ buttonText() }}
+          </button>
+
+          <button
+            class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
+            type="button"
+            (click)="this.onClose.emit()"
+          >
+            <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
+          <gow-text-field
+            label="Nombre"
+            placeholder="Ingresa el nombre de la habilidad"
+            formControlName="name"
+          />
+
+          @if (nameControl?.invalid && nameControl?.touched) {
+            @if (hasErrorValidation(nameControl, "required")) {
+              <p class="text-sm text-red-500">Es requerido</p>
+            } @else if (hasErrorValidation(nameControl, "minlength")) {
+              <p class="text-sm text-red-500">Mínimo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+            } @else if (hasErrorValidation(nameControl, "maxlength")) {
+              <p class="text-sm text-red-500">Máximo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <gow-select-field
+            label="Tipo"
+            placeholder="Selecciona el tipo de habilidad"
+            [options]="abilityTypeOptions"
+            [enableClear]="false"
+            formControlName="type"
+            [scrollHeight]="170"
+          />
+
+          @if (typeControl?.invalid && typeControl?.touched) {
+            @if (hasErrorValidation(typeControl, "required")) {
+              <p class="text-sm text-red-500">Es requerido</p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1" formGroupName="usage">
+          <gow-select-field
+            label="Horario de uso"
+            placeholder="Seleccione el horario de uso"
+            [options]="abilityClassShiftOptions"
+            [enableClear]="false"
+            formControlName="shift"
+            [scrollHeight]="150"
+          />
+
+          @if (usageShiftControl?.invalid && usageShiftControl?.touched) {
+            @if (hasErrorValidation(usageShiftControl, "required")) {
+              <p class="text-sm text-red-500">Es requerido</p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <gow-textarea-field
+            formControlName="description"
+            label="Descripción"
+            placeholder="Ingresa la descripción de la habilidad"
+            [rows]="4"
+          />
+
+          @if (descriptionControl?.invalid && descriptionControl?.touched) {
+            @if (hasErrorValidation(descriptionControl, "required")) {
+              <p class="text-sm text-red-500">Es requerido</p>
+            } @else if (hasErrorValidation(descriptionControl, "minlength")) {
+              <p class="text-sm text-red-500">Mínimo {{ descriptionControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+            } @else if (hasErrorValidation(descriptionControl, "maxlength")) {
+              <p class="text-sm text-red-500">Máximo {{ descriptionControl?.errors?.["maxlength"].requiredLength }} caracteres</p>
+            }
+          }
+        </div>
+
+        <div class="content-[''] mx-[50px] my-3 h-1 bg-danger-500"></div>
+
+        <div class="flex flex-col gap-1">
+          <span>Acciones</span>
+          <gow-ability-action-list-form
+            [abilityActionListForm]="abilityActionsFormArray"
+            [isClassroomAction]="isClassroomActionActive()"
+            [onSetIsClassroomAction]="onSetIsClassroomAction.bind(this)"
+          />
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+}

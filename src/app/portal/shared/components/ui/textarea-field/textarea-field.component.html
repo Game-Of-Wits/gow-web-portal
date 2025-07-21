@@ -1,0 +1,18 @@
+<label class="flex flex-col gap-1">
+  @if (textareaLabel().trim()) {
+    <span>{{ textareaLabel() }}</span>
+  }
+
+  <textarea
+    pTextarea
+    [rows]="textareaRows()"
+    [value]="value()"
+    [placeholder]="textareaPlaceholder()"
+    [disabled]="textareaDisabled()"
+    [autoResize]="enableAutoResize()"
+    (input)="handleInput($event)"
+    class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden resize-none {{
+      focusColorMap[focusColor()]
+    }}"
+  ></textarea>
+</label>

@@ -1,0 +1,40 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Modificador"
+      placeholder="Ingresa"
+      [options]="abilityModifierOptions"
+      [focusColor]="colorScheme()"
+      [enableClear]="false"
+      formControlName="modifier"
+    />
+
+    @if (modifierControl?.invalid && modifierControl?.touched) {
+      @if (hasErrorValidation(modifierControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+  <div class="flex flex-col gap-1">
+    <gow-number-field
+      label="Puntos de vida a modificar"
+      placeholder="Ingrese la cantidad de puntos de vida a modificar"
+      formControlName="healthPoints"
+    />
+
+    @if (healthPointsControl?.invalid && healthPointsControl?.touched) {
+      @if (hasErrorValidation(healthPointsControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      } @else if (hasErrorValidation(healthPointsControl, "min")) {
+        <p class="text-sm text-red-500">
+          Mínimo debe ser {{ healthPointsControl?.errors?.["min"].min }} punto
+          de vida
+        </p>
+      } @else if (hasErrorValidation(healthPointsControl, "max")) {
+        <p class="text-sm text-red-500">
+          Máximo {{ healthPointsControl?.errors?.["max"].max }} puntos de vida
+        </p>
+      }
+    }
+  </div>
+</form>

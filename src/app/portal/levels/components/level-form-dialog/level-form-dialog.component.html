@@ -1,0 +1,81 @@
+@if (levelForm; as levelFormGroup) {
+  <ng-template #closeButtonIcon>
+    <button
+      class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
+      (click)="onClose.emit()"
+    >
+      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+    </button>
+  </ng-template>
+
+  <p-dialog
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closeIconTemplate]="closeButtonIcon"
+    [formGroup]="levelFormGroup"
+    [style]="{
+      'max-width': '500px',
+      width: '100%',
+    }"
+  >
+    <ng-template #header>
+      <span class="font-bold text-xl">{{ headerTitle() }}</span>
+    </ng-template>
+
+    <div class="flex flex-col gap-4">
+    <div class="flex items-start gap-4">
+      <div class="flex flex-col gap-2">
+        <gow-level-primary-color-picker formControlName="primaryColor" />
+      </div>
+      <div class="flex flex-col flex-1 w-full gap-2">
+        <div class="flex flex-col gap-1">
+          <gow-text-field
+            label="Nombre"
+            placeholder="Ingrese el nombre del nivel"
+            focusColor="info"
+            formControlName="name"
+          />
+
+          @if (nameControl?.invalid && nameControl?.touched) {
+            @if (hasErrorValidation(nameControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(nameControl, "minlength")) {
+              <p class="text-red-500 text-sm">Mínimo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+            } @else if (hasErrorValidation(nameControl, "maxlength")) {
+              <p class="text-red-500 text-sm">Máximo {{ nameControl?.errors?.["maxlength"].requiredLength }} caracteres</p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <gow-number-field
+            label="Puntaje requerido (Mínimo: {{ minRequiredPoints }})"
+            placeholder="Ingrese el puntaje requerido"
+            focusColor="info"
+            formControlName="requiredPoints"
+          />
+
+          @if (requiredPointsControl?.invalid && requiredPointsControl?.touched) {
+            @if (hasErrorValidation(requiredPointsControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(requiredPointsControl, "outOfPointLimit")) {
+              <p class="text-red-500 text-sm">Mínimo {{ requiredPointsControl?.errors?.["outOfPointLimit"].min }} de puntaje</p>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+      <button
+        type="button"
+        (click)="onSubmitLevelForm()"
+        [disabled]="levelFormGroup.invalid"
+        class="gap-1.5 py-3 rounded-lg bg-info-500 disabled:bg-info-100 text-white self-start disabled:cursor-not-allowed cursor-pointer w-full text-center"
+      >
+        {{ buttonText() }}
+      </button>
+    </div>
+  </p-dialog>
+}

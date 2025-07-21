@@ -1,0 +1,30 @@
+<div
+  class="text-white py-2 px-4 rounded-xl flex justify-between w-full bg-danger-500"
+>
+  <div class="flex gap-1.5 items-center">
+    <i-lucide [img]="abilityActionIcon" class="fill-white size-[28px]" />
+    <p class="text-base">
+      {{ abilityActionTypeFormats[abilityActionForm.value.type!] }}
+    </p>
+  </div>
+
+  <div class="flex gap-0.5 items-center">
+    @if (abilityActionForm.value.type !== classroomAbilityActionType) {
+      <button
+        type="button"
+        (click)="onEditForm()"
+        class="inline-flex cursor-pointer p-2 hover:bg-danger-400 rounded-lg"
+      >
+        <i-lucide [img]="editIcon" class="fill-white size-[18px]" />
+      </button>
+    }
+
+    <button
+      type="button"
+      (click)="onDeleteForm()"
+      class="inline-flex cursor-pointer p-2 hover:bg-danger-400 rounded-lg"
+    >
+      <i-lucide [img]="deleteIcon" class="fill-white size-[18px]" />
+    </button>
+  </div>
+</div>

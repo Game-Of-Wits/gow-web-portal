@@ -73,5 +73,3 @@ export class PasswordResetFormComponent {
     this.toastService.add({ severity: 'error', summary, detail: message })
   }
 }
-
-// 1234REWQasdf$#@!

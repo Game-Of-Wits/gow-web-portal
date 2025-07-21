@@ -1,0 +1,51 @@
+<div class="flex flex-col gap-2">
+  @if (abilityListForm.controls.length > 0) {
+    <div class="flex flex-col gap-1.5">
+      @for (
+        ability of abilityListForm.controls;
+        track position;
+        let position = $index
+      ) {
+        <gow-ability-list-form-item
+          [abilityForm]="ability"
+          [position]="position"
+          (delete)="onDeleteAbilityForm($event)"
+          (edit)="onOpenEditAbilityFormDialog($event)"
+        />
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    class="bg-white rounded-lg border-2 hover:bg-danger-50 text-base border-danger-500 text-danger-500 cursor-pointer py-2 font-semibold transition-colors"
+    (click)="onOpenAddAbilityFormDialog()"
+  >
+    Añadir habilidad
+  </button>
+</div>
+
+<gow-experience-ability-form-dialog
+  headerTitle="Añadir habilidad (Guerra de Sombras)"
+  buttonText="Añadir"
+  [buttonIcon]="addIcon"
+  [experience]="experience()"
+  [abilityUsage]="abilityUsage()"
+  [position]="abilityFormSelected().position"
+  [show]="showAddAbilityFormDialog()"
+  (close)="onCloseAddAbilityForm()"
+  (success)="onAddAbilityForm($event)"
+/>
+
+<gow-experience-ability-form-dialog
+  headerTitle="Editar habilidad (Guerra de Sombras)"
+  buttonText="Editar"
+  [buttonIcon]="editIcon"
+  [experience]="experience()"
+  [abilityUsage]="abilityUsage()"
+  [abilityForm]="abilityFormSelected().form"
+  [position]="abilityFormSelected().position"
+  [show]="showEditAbilityFormDialog()"
+  (close)="onCloseAddAbilityForm()"
+  (success)="onEditAbilityForm($event)"
+/>

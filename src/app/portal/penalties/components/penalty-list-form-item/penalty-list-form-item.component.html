@@ -1,0 +1,25 @@
+<div
+  class="py-2 px-4 rounded-xl flex text-white justify-between w-full bg-info-600"
+>
+  <div class="flex gap-2 items-center">
+    <i-lucide [img]="penaltyIcon" class="size-[28px]" />
+    <p class="text-lg">{{ penaltyForm.value.name }}</p>
+  </div>
+
+  <div class="flex gap-0.5 items-center">
+    <button
+      type="button"
+      (click)="onEditForm()"
+      class="inline-flex cursor-pointer p-2 rounded-lg hover:bg-info-500"
+    >
+      <i-lucide [img]="editIcon" class="fill-white size-[18px]" />
+    </button>
+    <button
+      type="button"
+      (click)="onDeleteForm()"
+      class="inline-flex cursor-pointer p-2 rounded-lg hover:bg-info-500"
+    >
+      <i-lucide [img]="deleteIcon" class="fill-white size-[18px]" />
+    </button>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Objetivo"
+      placeholder="Selecciona el objetivo a revelar"
+      [options]="abilityTargetOptions"
+      [enableClear]="false"
+      [focusColor]="colorScheme()"
+      formControlName="target"
+    />
+
+    @if (targetControl?.invalid && (targetControl?.touched || targetControl?.dirty)) {
+      @if (hasErrorValidation(targetControl, "required")) {
+        <p class="text-sm text-red-500">Es requerido</p>
+      }
+    }
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <div class="flex items-center gap-1.5">
+      <p>Información a revelar</p>
+
+      @if (informationControl?.invalid && (informationControl?.touched || informationControl?.dirty)) {
+        @if (hasErrorValidation(informationControl, "required")) {
+          <p class="text-sm text-red-500">Es requerido</p>
+        } @else if (hasErrorValidation(informationControl, "minimumOneDiscoveryInformationActive")) {
+          <p class="text-sm text-red-500">
+            Mínimo uno de estos datos debe estar activo
+          </p>
+        }
+      }
+    </div>
+
+    <div class="flex flex-wrap gap-4">
+      @for (information of discoveryInformationOptions; track position; let position = $index) {
+        @if (getDiscoveryInformationControl(information.value); as informationControl) {
+          <label class="flex items-center flex-col gap-2 px-1">
+            <div class="p-6 rounded-xl flex items-center justify-center cursor-pointer {{ informationControl.value && 'shadow-lg outline outline-gray-100' }}">
+              <i-lucide [img]="information.icon" class="size-[25px] {{ information.filled && 'fill-gray-800' }}" />
+            </div>
+
+            <span class="text-base {{ informationControl.value && 'font-bold' }}">{{ information.name }}</span>
+
+            <input
+              type="checkbox"
+              class="hidden"
+              [formControl]="informationControl"
+            />
+          </label>
+        }
+      }
+    </div>
+  </div>
+</form>

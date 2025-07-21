@@ -1,0 +1,17 @@
+<label class="flex flex-col gap-1 relative">
+  <span>
+    {{ inputLabel().trim() && inputLabel() }}
+  </span>
+
+  <input
+    pInputText
+    [pKeyFilter]="inputType()"
+    [value]="value()"
+    [placeholder]="inputPlaceholder()"
+    [disabled]="inputDisabled()"
+    (input)="handleInput($event)"
+    class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden {{
+      focusColorMap[inputFocusColor()]
+    }}"
+  />
+</label>
