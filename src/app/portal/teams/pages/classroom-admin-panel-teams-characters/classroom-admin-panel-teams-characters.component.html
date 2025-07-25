@@ -1,0 +1,74 @@
+<section class="px-[26px] py-4.5 flex flex-col gap-4">
+  <div class="flex flex-col gap-3">
+    <gow-section-title color="danger">Equipos</gow-section-title>
+    <div class="flex flex-wrap gap-2.5">
+      @if (!isTeamsLoading()) {
+        @for (team of teams(); track team.id) {
+          <button
+            class="bg-danger-100 rounded-xl text-danger-500 italic w-[220px] h-[120px] text-lg font-bold cursor-pointer"
+          >
+            {{ team.name }}
+          </button>
+        }
+
+        <button
+          class="bg-danger-500 hover:bg-danger-600 rounded-xl text-white w-[220px] h-[120px] text-lg flex items-center justify-center cursor-pointer"
+        >
+          <i-lucide [img]="addIcon" class="size-[34px] text-white" />
+        </button>
+      } @else {
+        <div class="h-[120px] flex justify-center items-center gap-2">
+          <p-progress-spinner
+            ariaLabel="loading"
+            strokeWidth="4"
+            [style]="{ width: '42px', height: '42px' }"
+          ></p-progress-spinner>
+          <span>Cargando...</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <gow-section-title color="danger">Personajes</gow-section-title>
+
+    <p-table
+      [value]="characters()"
+      [loading]="isCharactersLoading() || isTeamsLoading()"
+      [scrollable]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Equipo</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-character>
+        <tr>
+          <td>{{ character.id }}</td>
+          <td>{{ character.name }}</td>
+          <td>{{ getTeamName(character.teamId) }}</td>
+          <td class="flex items-center gap-1.5">
+            <button
+              pButton
+              severity="danger"
+              [rounded]="true"
+              [disabled]="true"
+            >
+              <i-lucide pButtonIcon [img]="deleteIcon" />
+            </button>
+
+            <button pButton severity="info" [rounded]="true" [disabled]="true">
+              <i-lucide pButtonIcon [img]="editIcon" />
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<p-toast position="top-right" />

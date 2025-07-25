@@ -7,7 +7,6 @@ import { ClassroomAdminPanelAbiltiesPageComponent } from '~/classrooms/pages/cla
 import { ClassroomAdminPanelHomeworksPageComponent } from '~/classrooms/pages/classroom-admin-panel-homeworks/classroom-admin-panel-homeworks.component'
 import { ClassroomAdminPanelLevelsPageComponent } from '~/classrooms/pages/classroom-admin-panel-levels/classroom-admin-panel-levels.component'
 import { ClassroomAdminPanelOverviewPageComponent } from '~/classrooms/pages/classroom-admin-panel-overview/classroom-admin-panel-overview.component'
-import { ClassroomAdminPanelTeamsCharactersPageComponent } from '~/classrooms/pages/classroom-admin-panel-teams-characters/classroom-admin-panel-teams-characters.component'
 import { PortalCreateClassroomPageComponent } from '~/classrooms/pages/portal-create-classroom/portal-create-classroom.component'
 import { ClassroomAdminPanelPenaltiesPageComponent } from '~/penalties/pages/classroom-admin-panel-penalties/classroom-admin-panel-penalties.component'
 import { getDefaultSchoolGuard } from '~/shared/guards/default-school.guard'
@@ -18,6 +17,7 @@ import { LandingPageComponent } from '~/shared/pages/landing/landing.component'
 import { PortalGeneralPageComponent } from '~/shared/pages/portal-general/portal-general.component'
 import { ClassroomAdminPanelStudentDetailsPageComponent } from '~/students/pages/classroom-admin-panel-student-details/classroom-admin-panel-student-details.component'
 import { ClassroomAdminPanelStudentsPageComponent } from '~/students/pages/classroom-admin-panel-students/classroom-admin-panel-students.component'
+import { ClassroomAdminPanelTeamsCharactersPageComponent } from '~/teams/pages/classroom-admin-panel-teams-characters/classroom-admin-panel-teams-characters.component'
 
 export const routes: Routes = [
   {
