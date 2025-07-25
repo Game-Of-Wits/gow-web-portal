@@ -13,4 +13,8 @@ export class StudentProfileMapper {
       phoneNumber: profile.phoneNumber
     }
   }
+
+  static toListModel(profiles: StudentProfileDbModel[]): StudentProfileModel[] {
+    return profiles.map(this.toModel)
+  }
 }

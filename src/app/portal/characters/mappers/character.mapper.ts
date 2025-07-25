@@ -9,6 +9,7 @@ export class CharacterMapper {
       id: character.id,
       name: character.name,
       teamId: character.team.id,
+      classroomId: character.classroom.id,
       abilityIds
     }
   }

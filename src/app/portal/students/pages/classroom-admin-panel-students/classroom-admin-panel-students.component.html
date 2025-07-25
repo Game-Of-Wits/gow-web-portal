@@ -1,0 +1,50 @@
+@if (!isStudentsLoading()) {
+  <section class="px-[26px] pt-[14px] pb-[6px]">
+    <button pButton class="mb-2.5 rounded-xl">
+      <i-lucide pButtonIcon [img]="addIcon" />
+      <span pButtonLabel>Añadir estudiante</span>
+    </button>
+
+    <p-table
+      [value]="studentProfiles()"
+      [loading]="isStudentsLoading()"
+      [scrollable]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>ID</th>
+          <th>Nombre(s)</th>
+          <th>Apellidos</th>
+          <th>Número telef́onico</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-student>
+        <tr
+          class="hover:bg-gray-50 transition-colors cursor-pointer"
+          [routerLink]="student.id"
+        >
+          <td>{{ student.id }}</td>
+          <td>{{ student.firstName }}</td>
+          <td>{{ student.lastName }}</td>
+          <td>{{ student.phoneNumber }}</td>
+          <td class="flex items-center gap-1.5">
+            <button
+              pButton
+              severity="danger"
+              [rounded]="true"
+              [disabled]="true"
+            >
+              <i-lucide pButtonIcon [img]="deleteIcon" />
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+} @else {
+  <gow-classroom-admin-panel-loading />
+}
+
+<p-toast position="top-right" />

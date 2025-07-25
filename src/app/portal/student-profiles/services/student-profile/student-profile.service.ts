@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
+import { map, Observable } from 'rxjs'
 import { StudentProfileMapper } from '~/student-profiles/mappers/student-profile.mapper'
 import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { StudentProfileRepository } from '~/student-profiles/repositories/student-profile.repository'
@@ -16,5 +17,13 @@ export class StudentProfileService {
     if (studentProfile === null)
       throw new ErrorResponse('student-profile-not-exist')
     return StudentProfileMapper.toModel(studentProfile)
+  }
+
+  public getAllStudentProfilesByClassroomId(
+    classroomId: string
+  ): Observable<StudentProfileModel[]> {
+    return this.studentProfileRepository
+      .getAllByClassroomId(classroomId)
+      .pipe(map(profiles => StudentProfileMapper.toListModel(profiles)))
   }
 }

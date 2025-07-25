@@ -17,6 +17,7 @@ import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classro
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
+import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { ActiveClassSessionPanelComponent } from './panels/active-class-session-panel/active-class-session-panel.component'
 import { MasteryRoadExperiencePanelComponent } from './panels/experiences/mastery-road-experience-panel/mastery-road-experience-panel.component'
 import { ShadowWarfareExperiencePanelComponent } from './panels/experiences/shadow-warfare-experience-panel/shadow-warfare-experience-panel.component'
@@ -58,6 +59,7 @@ export class ClassroomAdminPanelOverviewPageComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly toastService = inject(MessageService)
 
+  public students = signal<StudentProfileModel[]>([])
   public isLoading = signal<boolean>(false)
 
   ngOnInit(): void {

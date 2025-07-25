@@ -2,7 +2,7 @@ export interface ShadowWarfareStudentPeriodState {
   id: string
   firstName: string
   lastName: string
-  heathPoints: number
+  healthPoints: number
   characterId: string
   teamId: string
 }

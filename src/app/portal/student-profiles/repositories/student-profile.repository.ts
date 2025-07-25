@@ -1,5 +1,15 @@
 import { Injectable, inject } from '@angular/core'
-import { collection, doc, Firestore, getDoc } from '@angular/fire/firestore'
+import {
+  collection,
+  doc,
+  Firestore,
+  getDoc,
+  getDocs,
+  query,
+  where
+} from '@angular/fire/firestore'
+import { from, map, Observable } from 'rxjs'
+import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { StudentProfileDbModel } from '../models/StudentProfileDb.model'
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +29,32 @@ export class StudentProfileRepository {
       id: studentProfileSnapshot.id,
       ...studentProfileSnapshot.data()
     } as StudentProfileDbModel
+  }
+
+  public getAllByClassroomId(
+    classroomId: string
+  ): Observable<StudentProfileDbModel[]> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const studentsQuery = query(
+      this.getCollectionRef(),
+      where('classrooms', 'array-contains', classroomRef)
+    )
+
+    return from(getDocs(studentsQuery)).pipe(
+      map(snapshot =>
+        snapshot.docs.map(
+          doc =>
+            ({
+              id: doc.id,
+              ...doc.data()
+            }) as StudentProfileDbModel
+        )
+      )
+    )
   }
 
   private getCollectionRef() {

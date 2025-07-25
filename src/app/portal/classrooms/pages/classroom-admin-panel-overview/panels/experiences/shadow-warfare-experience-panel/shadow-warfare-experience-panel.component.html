@@ -18,10 +18,9 @@
     <div class="flex-1 w-full">
       <h2 class="text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
 
-      <p-table [value]="students()" [loading]="isStudentsLoading()" [scrollable]="true" scrollHeight="400px" [style]="{ height: '500px' }">
+      <p-table [value]="students()" [loading]="isStudentsLoading() || isCharactersLoading() || isTeamsLoading()" [scrollable]="true" scrollHeight="400px" [style]="{ height: '500px' }">
         <ng-template #header>
           <tr>
-            <th>ID</th>
             <th>Nombre completo</th>
             <th>Personaje</th>
             <th>Equipo</th>
@@ -32,10 +31,9 @@
 
         <ng-template #body let-student>
           <tr>
-            <td>{{ student.id }}</td>
             <td>{{ student.firstName }} {{ student.lastName }}</td>
-            <td>{{ student.characterId }}</td>
-            <td>{{ student.teamId }}</td>
+            <td>{{ getCharacterName(student.characterId) }}</td>
+            <td>{{ getTeamName(student.teamId) }}</td>
             <td>{{ student.healthPoints }}</td>
             <td></td>
           </tr>

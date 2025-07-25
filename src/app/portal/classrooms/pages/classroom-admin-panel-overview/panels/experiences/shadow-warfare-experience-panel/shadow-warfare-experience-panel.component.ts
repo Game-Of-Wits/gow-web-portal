@@ -1,6 +1,7 @@
 import { NgOptimizedImage } from '@angular/common'
 import {
   Component,
+  computed,
   inject,
   OnDestroy,
   OnInit,
@@ -18,12 +19,17 @@ import { Subject, takeUntil } from 'rxjs'
 import { AbilityUseCardComponent } from '~/abilities/components/ability-use-card/ability-use-card.component'
 import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
 import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.service'
+import { CharacterModel } from '~/characters/models/Character.model'
+import { CharacterService } from '~/characters/services/character/character.service'
+import { ExperienceSessionModel } from '~/class-sessions/models/ExperienceSession.model'
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfareStudentPeriodState'
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
+import { TeamModel } from '~/teams/models/Team.model'
+import { TeamService } from '~/teams/services/team/team.service'
 
 const abilityUsesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
@@ -34,6 +40,14 @@ const studentsErrorMessages: ErrorMessages = {
 }
 
 const endOfExperienceSessionErrorMessages: ErrorMessages = {
+  ...commonErrorMessages
+}
+
+const charactersLoadingErrorMessages: ErrorMessages = {
+  ...commonErrorMessages
+}
+
+const teamsLoadingErrorMessages: ErrorMessages = {
   ...commonErrorMessages
 }
 
@@ -63,6 +77,8 @@ export class ShadowWarfareExperiencePanelComponent
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
   private readonly abilityUseService = inject(AbilityUseService)
+  private readonly characterService = inject(CharacterService)
+  private readonly teamService = inject(TeamService)
 
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
@@ -75,11 +91,41 @@ export class ShadowWarfareExperiencePanelComponent
   public isAbilityUsesLoading = signal<boolean>(true)
   public abilityUses = signal<AbilityUseModel[]>([])
 
+  public isCharactersLoading = signal<boolean>(true)
+  public characters = signal<CharacterModel[]>([])
+
+  public isTeamsLoading = signal<boolean>(true)
+  public teams = signal<TeamModel[]>([])
+
+  public readonly charactersMap = computed(
+    () =>
+      new Map(
+        this.characters().map(character => [character.id, character.name])
+      )
+  )
+
+  public readonly teamsMap = computed(
+    () => new Map(this.teams().map(team => [team.id, team.name]))
+  )
+
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
 
   ngOnInit(): void {
-    this.loadStudents()
-    this.loadAbilityUses()
+    const classroomId = this.context.classroom()?.id ?? null
+    const academicPeriodId = this.context.academicPeriod()?.id ?? null
+    const experienceSession = this.context.experienceSession()
+
+    if (
+      classroomId === null ||
+      academicPeriodId === null ||
+      experienceSession === null
+    )
+      return
+
+    this.loadAllTeams(classroomId)
+    this.loadAllCharacters(classroomId)
+    this.loadStudents({ classroomId, academicPeriodId })
+    this.loadAbilityUses(experienceSession)
   }
 
   ngOnDestroy(): void {
@@ -110,11 +156,45 @@ export class ShadowWarfareExperiencePanelComponent
       })
   }
 
-  private loadAbilityUses() {
-    const experienceSession = this.context.experienceSession()
+  public getCharacterName(characterId: string): string | null {
+    return this.charactersMap().get(characterId) ?? null
+  }
 
-    if (experienceSession === null) return
+  public getTeamName(teamId: string): string | null {
+    return this.teamsMap().get(teamId) ?? null
+  }
 
+  private loadAllTeams(classroomId: string) {
+    this.isTeamsLoading.set(true)
+
+    this.teamService.getAllTeamsByClassroom(classroomId).subscribe({
+      next: teams => {
+        this.teams.set(teams)
+        this.isTeamsLoading.set(false)
+      },
+      error: err => {
+        const error = err as ErrorResponse
+        this.onShowTeamsLoadingErrorMessage(error.code)
+      }
+    })
+  }
+
+  private loadAllCharacters(classroomId: string) {
+    this.isCharactersLoading.set(true)
+
+    this.characterService.getAllCharactersByClassroom(classroomId).subscribe({
+      next: characters => {
+        this.characters.set(characters)
+        this.isCharactersLoading.set(false)
+      },
+      error: err => {
+        const error = err as ErrorResponse
+        this.onShowCharactersLoadingErrorMessage(error.code)
+      }
+    })
+  }
+
+  private loadAbilityUses(experienceSession: ExperienceSessionModel) {
     this.isAbilityUsesLoading.set(true)
 
     this.abilityUseService
@@ -135,12 +215,13 @@ export class ShadowWarfareExperiencePanelComponent
       })
   }
 
-  private loadStudents() {
-    const classroomId = this.context.classroom()?.id ?? null
-    const academicPeriodId = this.context.academicPeriod()?.id ?? null
-
-    if (classroomId === null || academicPeriodId === null) return
-
+  private loadStudents({
+    classroomId,
+    academicPeriodId
+  }: {
+    classroomId: string
+    academicPeriodId: string
+  }) {
     this.isStudentsLoading.set(true)
 
     this.studentPeriodStateService
@@ -169,6 +250,16 @@ export class ShadowWarfareExperiencePanelComponent
 
   private onShowAbilityUsesLoadingErrorMessage(code: string) {
     const { summary, message } = abilityUsesErrorMessages[code]
+    this.toastService.add({ summary, detail: message })
+  }
+
+  private onShowCharactersLoadingErrorMessage(code: string) {
+    const { summary, message } = charactersLoadingErrorMessages[code]
+    this.toastService.add({ summary, detail: message })
+  }
+
+  private onShowTeamsLoadingErrorMessage(code: string) {
+    const { summary, message } = teamsLoadingErrorMessages[code]
     this.toastService.add({ summary, detail: message })
   }
 }

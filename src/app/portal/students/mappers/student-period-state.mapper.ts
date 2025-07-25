@@ -65,7 +65,7 @@ export class StudentPeriodStateMapper {
       firstName: studentProfile.firstName,
       teamId: shadowWarfareExperience.team.id,
       characterId: shadowWarfareExperience.character.id,
-      heathPoints: shadowWarfareExperience.healthPoints
+      healthPoints: shadowWarfareExperience.healthPoints
     }
   }
 
