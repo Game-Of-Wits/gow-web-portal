@@ -1,7 +1,7 @@
 import { AbilityFormData } from '~/abilities/models/AbilityFormData.model'
 import { CharacterFormData } from '~/characters/models/CharacterFormData.model'
 import { LevelModel } from '~/levels/models/Level.model'
-import { PenaltyModel } from '~/penalties/models/Penalty.model'
+import { PenaltyFormData } from '~/penalties/models/PenaltyFormData.model'
 
 export interface CreateClassroomModel {
   name: string
@@ -32,5 +32,5 @@ export interface CreateClassroomMasteryRoadExperienceModel {
     initialLevel: LevelModel
     list: LevelModel[]
   }
-  penalties: PenaltyModel[]
+  penalties: PenaltyFormData[]
 }
