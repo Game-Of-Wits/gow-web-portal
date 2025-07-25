@@ -28,7 +28,9 @@ import type { CreateAcademicPeriod } from '../models/CreateAcademicPeriod.model'
 @Injectable({ providedIn: 'root' })
 export class AcademicPeriodRespository {
   private readonly firestore = inject(Firestore)
-  private readonly collectionName = 'academic_periods'
+
+  private static readonly collectionName = 'academic_periods'
+  private readonly collectionName = AcademicPeriodRespository.collectionName
 
   public getByIdObserve(
     academicPeriodId: string
@@ -156,5 +158,9 @@ export class AcademicPeriodRespository {
       where('endedAt', '==', null),
       limit(1)
     ) as Query<AcademicPeriodDbModel>
+  }
+
+  public static getRefById(db: Firestore, id: string) {
+    return doc(db, `${AcademicPeriodRespository.collectionName}/${id}`)
   }
 }

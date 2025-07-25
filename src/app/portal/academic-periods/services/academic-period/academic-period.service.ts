@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { Timestamp } from '@angular/fire/firestore'
+import { FirestoreError, Timestamp } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable, take } from 'rxjs'
@@ -14,17 +14,44 @@ export class AcademicPeriodService {
 
   public getSchoolActiveAcademicPeriod(
     schoolId: string
-  ): Observable<AcademicPeriodModel | null> {
+  ): Observable<AcademicPeriodModel> {
     return this.academicPeriodRepository
       .getSchoolActiveAcademicPeriod(schoolId)
       .pipe(
         take(1),
-        map(academicPeriods =>
-          academicPeriods[0] !== null
-            ? AcademicPeriodMapper.toModel(academicPeriods[0])
-            : null
-        )
+        map(academicPeriods => {
+          if (academicPeriods[0] === null || academicPeriods[0] === undefined)
+            throw new ErrorResponse('active-academic-period-not-exist')
+
+          return AcademicPeriodMapper.toModel(academicPeriods[0])
+        })
       )
+  }
+
+  public async verifySchoolHasActiveAcademicPeriod(
+    schoolId: string
+  ): Promise<boolean> {
+    try {
+      return this.academicPeriodRepository.existsSchoolActiveAcademicPeriod(
+        schoolId
+      )
+    } catch (err) {
+      const error = err as FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async verifyAcademicPeriodIsActive(
+    academicPeriodId: string
+  ): Promise<boolean> {
+    try {
+      const academicPeriod =
+        await this.academicPeriodRepository.getById(academicPeriodId)
+      return academicPeriod?.endedAt === null
+    } catch (err) {
+      const error = err as FirestoreError
+      throw new ErrorResponse(error.code)
+    }
   }
 
   public async endOfAcademicPeriod(
@@ -68,7 +95,7 @@ export class AcademicPeriodService {
           data.schoolId
         )
     } catch (err) {
-      const error = err as ErrorResponse
+      const error = err as FirestoreError
       throw new ErrorResponse(error.code)
     }
 

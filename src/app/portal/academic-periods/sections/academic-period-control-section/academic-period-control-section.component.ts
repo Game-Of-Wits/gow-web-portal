@@ -100,11 +100,9 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
       .getSchoolActiveAcademicPeriod(this.defaultSchoolStore.school()!.id)
       .subscribe({
         next: activeAcademicPeriod => {
-          if (!activeAcademicPeriod) return
-
           this.activeAcademicPeriod.set(activeAcademicPeriod)
           this.weekAndDayDiff.set(
-            getWeekAndDayDifference(activeAcademicPeriod.startedAt!)
+            getWeekAndDayDifference(activeAcademicPeriod.startedAt)
           )
         },
         complete: () => {
@@ -112,6 +110,9 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
         },
         error: err => {
           const error = err as ErrorResponse
+
+          if (error.code === 'active-academic-period-not-exist') return
+
           this.onShowErrorMessage(error.code)
         }
       })

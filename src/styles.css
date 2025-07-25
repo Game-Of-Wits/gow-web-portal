@@ -58,6 +58,10 @@
   --color-warning-900: var(--p-warning-900);
   --color-warning-950: var(--p-warning-950);
   --color-warning-contrast: var(--p-warning-contrast-color);
+
+  --color-background-white: var(--p-surface-ground);
+
+  --color-black: #2e2d2c;
 }
 
 * {
@@ -67,6 +71,18 @@
 body {
   font-family: var(--font-body);
   background-color: var(--p-surface-ground);
+  color: var(--color-black);
+}
+
+.p-tablist-tab-list {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  background: var(--color-background-white);
+  border-style: solid;
+  border-color: var(--p-tabs-tablist-border-color);
+  border-width: var(--p-tabs-tablist-border-width);
+  padding-left: 26px;
 }
 
 @keyframes p-progressspinner-color {

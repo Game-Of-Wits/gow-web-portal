@@ -1,5 +1,5 @@
-import { AbilityModel } from '~/abilities/models/Ability.model'
-import { CharacterModel } from '~/characters/models/Character.model'
+import { AbilityFormData } from '~/abilities/models/AbilityFormData.model'
+import { CharacterFormData } from '~/characters/models/CharacterFormData.model'
 import { LevelModel } from '~/levels/models/Level.model'
 import { PenaltyModel } from '~/penalties/models/Penalty.model'
 
@@ -23,8 +23,8 @@ export interface CreateClassroomShadowWarfareExperienceModel {
     healthPointBase: number
     limitAbilities: number
   }
-  initialCharacters: CharacterModel[]
-  initialAbilities: AbilityModel[]
+  initialCharacters: CharacterFormData[]
+  initialAbilities: AbilityFormData[]
 }
 
 export interface CreateClassroomMasteryRoadExperienceModel {

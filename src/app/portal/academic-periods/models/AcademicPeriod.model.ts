@@ -3,6 +3,6 @@ export interface AcademicPeriodModel {
   name: string
   classSessionIds: string[]
   endedAt: Date | null
-  startedAt: Date | null
+  startedAt: Date
   schoolId: string
 }

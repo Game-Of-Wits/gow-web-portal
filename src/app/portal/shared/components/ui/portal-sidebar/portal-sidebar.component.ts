@@ -59,7 +59,6 @@ export class PortalSidebarComponent implements OnInit {
     this.isClassroomsLoading.set(true)
     this.classroomService.getAllClassrooms().subscribe({
       next: classrooms => {
-        console.log(classrooms)
         this.classrooms.set(classrooms)
         this.isClassroomsLoading.set(false)
       },

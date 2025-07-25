@@ -7,7 +7,6 @@ export class AcademicPeriodMapper {
     academicPeriod: AcademicPeriodDbModel
   ): AcademicPeriodModel {
     const endedAt = academicPeriod.endedAt as Timestamp | null
-    const startedAt = academicPeriod.startedAt as Timestamp | null
     const classSessionIds = academicPeriod.classSessions.map(
       classSessionId => classSessionId.id
     )
@@ -15,9 +14,9 @@ export class AcademicPeriodMapper {
     return {
       id: academicPeriod.id,
       classSessionIds,
-      endedAt: endedAt?.toDate() ?? null,
       name: academicPeriod.name,
-      startedAt: startedAt?.toDate() ?? null,
+      endedAt: endedAt?.toDate() ?? null,
+      startedAt: academicPeriod.startedAt.toDate(),
       schoolId: academicPeriod.school.id
     }
   }

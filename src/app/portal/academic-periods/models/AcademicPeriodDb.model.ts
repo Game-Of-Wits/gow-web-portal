@@ -5,7 +5,7 @@ export interface AcademicPeriodDbModel {
   name: string
   classSessions: DocumentReference[]
   endedAt: Timestamp | null
-  startedAt: Timestamp | null
+  startedAt: Timestamp
   school: DocumentReference
 }
 

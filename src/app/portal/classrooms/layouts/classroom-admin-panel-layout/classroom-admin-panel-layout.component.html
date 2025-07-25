@@ -1,0 +1,63 @@
+<section class="flex justify-between items-end w-full">
+  <div class="flex flex-col px-[26px] pt-[14px] pb-[6px]">
+    <span class="text-lg text-gray-400">Aulas</span>
+
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <i-lucide [img]="classroomIcon" class="size-[30px]" />
+
+        @if (!isClassroomLoading()) {
+          @if (context.classroom(); as classroom) {
+            <h1 class="text-3xl font-bold leading-none">
+              {{ classroom.name }}
+            </h1>
+          }
+        } @else {
+          <p-skeleton width="22rem" height="2.2rem" borderRadius="12px" />
+        }
+      </div>
+
+      <button class="cursor-pointer p-1.5 rounded-full hover:bg-gray-100 transition-colors">
+        <i-lucide [img]="optionsIcon" class="size-6 text-gray-600" />
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (!isClassroomLoading()) {
+  @if (context.classroom(); as classroom) {
+    <p-tabs
+      [value]="activeTab()"
+      class="bg-background-white"
+    >
+      <p-tablist>
+        @for (tab of navigationTabs; track tab.route) {
+         <p-tab
+            [value]="tab.route"
+            [routerLink]="tab.route"
+            class="flex items-center !gap-2 py-2.5 px-0 bg-background-white"
+          >
+            <i-lucide [img]="tab.icon" class="size-[20px]" />
+            <span>{{ tab.label }}</span>
+          </p-tab>
+        }
+      </p-tablist>
+    </p-tabs>
+
+    <router-outlet></router-outlet>
+  }
+} @else {
+  <div class="flex items-center gap-[16px] py-2.5 pl-4.5 border-b border-gray-400">
+    <p-skeleton height="1rem" width="4.5rem" />
+    <p-skeleton height="1rem" width="7.25rem" />
+    <p-skeleton height="1rem" width="11.94rem" />
+    <p-skeleton height="1rem" width="4.94rem" />
+    <p-skeleton height="1rem" width="5.25rem" />
+    <p-skeleton height="1rem" width="7.69rem" />
+    <p-skeleton height="1rem" width="9.06rem" />
+  </div>
+
+  <gow-classroom-admin-panel-loading />
+}
+
+<p-toast position="bottom-center" />

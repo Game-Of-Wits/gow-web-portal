@@ -1,0 +1,101 @@
+<section class="px-[26px] py-4.5">
+  <div class="flex justify-between items-center mb-3.5">
+    <div class="flex items-center gap-3">
+      <h1 class="text-3xl font-bold">Camino de la Maestria</h1>
+
+      <button pButton severity="secondary" size="small" class="rounded-full">
+        <i-lucide pButtonIcon [img]="optionsIcon" class="size-4.5" />
+      </button>
+    </div>
+
+    <button
+      pButton
+      severity="danger"
+      class="rounded-xl"
+      [loading]="isExperienceSessionEndingLoading()"
+      (click)="onEndOfExperienceSession()"
+    >
+      <i-lucide pButtonIcon [img]="stopIcon" class="fill-white" />
+      <span pButtonLabel>Concluir experiencia</span>
+    </button>
+  </div>
+
+  <div class="flex items-start gap-3 h-fit">
+    <div class="flex-1 w-full">
+      <h2 class="text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
+
+      <p-table
+        [value]="students()"
+        [loading]="isStudentsLoading()"
+        [scrollable]="true"
+        scrollHeight="400px"
+        [style]="{ height: '500px' }"
+      >
+        <ng-template #header>
+          <tr>
+            <th>ID</th>
+            <th>Nombre completo</th>
+            <th>Personaje</th>
+            <th>Equipo</th>
+            <th>Puntos de vida</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-student>
+          <tr>
+            <td>{{ student.id }}</td>
+            <td>{{ student.firstName }} {{ student.lastName }}</td>
+            <td>{{ student.characterId }}</td>
+            <td>{{ student.teamId }}</td>
+            <td>{{ student.healthPoints }}</td>
+            <td></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div>
+      <h2 class="text-lg text-gray-700 font-bold mb-2">Habilidades usadas</h2>
+
+      <div class="flex flex-col gap-3 w-[400px]">
+        @if (!isAbilityUsesLoading()) {
+          @for (
+            abilityUse of abilityUses();
+            track position;
+            let position = $index
+          ) {
+            <gow-ability-use-card
+              [abilityUse]="abilityUse"
+              colorScheme="danger"
+            />
+          } @empty {
+            <div class="flex flex-col gap-4 items-center h-full mt-[60px]">
+              <img
+                ngSrc="/assets/images/ability-uses-empty.png"
+                priority
+                width="800"
+                height="678"
+                class="w-[280px] aspect-[1.18]"
+              />
+              <span class="text-gray-700 text-center w-2/3"
+                >Ningún estudiante ha usado alguna de sus habilidades</span
+              >
+            </div>
+          }
+        } @else {
+          <div class="flex flex-col gap-1 items-center h-full mt-[60px]">
+            <p-progress-spinner
+              ariaLabel="loading"
+              strokeWidth="4"
+              [style]="{ width: '50px', height: '50px' }"
+            ></p-progress-spinner>
+            <span class="text-gray-400 text-center">Cargando...</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<p-toast position="top-right" />

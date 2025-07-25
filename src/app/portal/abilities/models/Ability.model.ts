@@ -12,6 +12,7 @@ import { AbilityUsageInterval } from './AbilityUsageInterval.model'
 import { DiscoveryInformation } from './DiscoveryInformation.model'
 
 export interface AbilityModel {
+  id: string
   name: string
   description: string
   type: AbilityType

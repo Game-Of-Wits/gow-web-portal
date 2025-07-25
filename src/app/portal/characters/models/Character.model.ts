@@ -1,4 +1,6 @@
 export interface CharacterModel {
+  id: string
   name: string
-  teamName: string
+  teamId: string
+  abilityIds: string[]
 }
