@@ -21,6 +21,7 @@ export interface AbilityModel {
     shift: AbilityClassShift
     interval: AbilityUsageInterval
   }
+  actions: AbilityActionModel[]
   experience: EducationalExperience
   isInitial: boolean
 }

@@ -10,7 +10,12 @@ export class AbilityMapper {
       isInitial: ability.isInitial,
       name: ability.name,
       type: ability.type,
-      usage: ability.usage
+      usage: ability.usage,
+      actions: []
     }
+  }
+
+  static toListModel(abilities: AbilityDbModel[]): AbilityModel[] {
+    return abilities.map(AbilityMapper.toModel)
   }
 }

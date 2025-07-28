@@ -1,0 +1,101 @@
+@if (levelId() != null) {
+  <p-dialog
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    [style]="{
+      'max-width': '600px',
+      width: '100%',
+      'max-height': '60vh',
+      height: '100%',
+    }"
+  >
+    <ng-template #header>
+      <div class="flex justify-between items-center w-full">
+        <span class="font-bold text-xl">Añadir habilidad</span>
+
+        <div class="flex gap-2 items-center">
+          <p-button
+            [disabled]="selectedAbilityControl.invalid"
+            (click)="onSelectAbilityToLevel()"
+            label="Seleccionar"
+            severity="info"
+            size="small"
+            [loading]="isAddAbilityToLevelLoading()"
+          />
+
+          <button
+            class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
+            type="button"
+            (click)="onCloseDialog()"
+          >
+            <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    @if (!isAbilitiesLoading()) {
+      <div class="flex flex-col gap-4 h-full">
+        <div class="h-full flex flex-col scroll-auto">
+          @for (ability of abilities(); track ability.id) {
+            <label
+              class="flex items-center justify-between py-3 px-3.5 rounded-lg cursor-pointer border-4 transition-[border-color] {{
+                selectedAbilityControl.value == ability.id
+                  ? 'border-info-500'
+                  : 'border-transparent'
+              }}"
+            >
+              <div class="flex items-center gap-2">
+                <i-lucide
+                  [img]="abilityIcon"
+                  class="text-info-500 fill-info-500 size-6 text-lg"
+                />
+
+                <span class="text-info-500 text-lg">{{ ability.name }}</span>
+              </div>
+
+              <span class="text-info-500 text-lg italic">{{
+                abilityTypeFormats[ability.type]
+              }}</span>
+
+              <input
+                type="radio"
+                [value]="ability.id"
+                [formControl]="selectedAbilityControl"
+                class="hidden"
+              />
+            </label>
+          } @empty {
+            <div
+              class="w-full h-full flex justify-center items-center rounded-2xl border-2 border-gray-300 border-dashed"
+            >
+              <span class="text-gray-500"> La clase no tiene habilidades </span>
+            </div>
+          }
+        </div>
+
+        <p-button
+          size="large"
+          styleClass="w-full rounded-xl"
+          severity="info"
+          [disabled]="abilities().length == 0"
+        >
+          <span pButtonLabel>Añadir una habilidad</span>
+          <i-lucide pButtonIcon [img]="addIcon" />
+        </p-button>
+      </div>
+    } @else {
+      <div class="h-full w-full flex flex-col">
+        <p-progress-spinner
+          ariaLabel="loading"
+          strokeWidth="4"
+          [style]="{ width: '42px', height: '42px' }"
+        ></p-progress-spinner>
+        <span class="text-lg text-gray-300">Cargando abilidades...</span>
+      </div>
+    }
+  </p-dialog>
+}

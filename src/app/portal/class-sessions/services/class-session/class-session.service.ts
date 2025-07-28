@@ -116,7 +116,7 @@ export class ClassSessionService {
     if (!isActiveAcademicPeriod)
       throw new ErrorResponse('academic-period-not-active')
 
-    const classroom = await this.classroomService.getAsyncClassroomById(
+    const classroom = await this.classroomService.getClassroomByIdAsync(
       data.classroomId
     )
 

@@ -10,6 +10,7 @@ import {
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { LucideAngularModule, X } from 'lucide-angular'
+import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { levelForm } from '~/levels/forms'
 import { LevelForm } from '~/levels/models/LevelForm.model'
@@ -22,6 +23,7 @@ import { LevelPrimaryColorPickerComponent } from '../level-primary-color-picker/
   templateUrl: './level-form-dialog.component.html',
   imports: [
     DialogModule,
+    ButtonModule,
     TextFieldComponent,
     NumberFieldComponent,
     LevelPrimaryColorPickerComponent,
@@ -34,11 +36,13 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
 
   @Input() levelForm?: FormGroup<LevelForm> | null = null
   @Input() minRequiredPoints!: number
+  @Input() maxRequiredPoints?: number | null = null
 
   public levelFormPosition = input.required<number>({ alias: 'position' })
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
   public buttonText = input.required<string>({ alias: 'buttonText' })
+  public isLoading = input<boolean>(false, { alias: 'isLoading' })
 
   public onClose = output<void>({ alias: 'close' })
   public onSuccess = output<{
@@ -62,7 +66,7 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
       const currentMinRequiredPoints = changes['minRequiredPoints'].currentValue
 
       this.levelForm = levelForm({
-        max: null,
+        max: this.maxRequiredPoints ?? null,
         min: currentMinRequiredPoints
       })
     }

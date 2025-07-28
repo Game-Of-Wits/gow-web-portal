@@ -1,5 +1,15 @@
 import { Injectable, inject } from '@angular/core'
-import { collection, doc, Firestore, getDoc } from '@angular/fire/firestore'
+import {
+  collection,
+  doc,
+  Firestore,
+  getDoc,
+  getDocs,
+  query,
+  where
+} from '@angular/fire/firestore'
+import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
+import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { AbilityDbModel } from '../models/AbilityDb.model'
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +29,33 @@ export class AbilityRepository {
       id: abilitySnapshot.id,
       ...abilitySnapshot.data()
     } as AbilityDbModel
+  }
+
+  public async getAllByClassroomIdAndExperienceAsync(
+    classroomId: string,
+    experience: EducationalExperience
+  ): Promise<AbilityDbModel[]> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const abilitiesQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef),
+      where('experience', '==', experience),
+      where('isInitial', '==', false)
+    )
+
+    const abilitiesSnapshot = await getDocs(abilitiesQuery)
+
+    return abilitiesSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data()
+        }) as AbilityDbModel
+    )
   }
 
   private getCollectionRef() {

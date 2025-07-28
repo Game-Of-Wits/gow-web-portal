@@ -1,0 +1,32 @@
+<div class="flex flex-col gap-1">
+  @if (!isLevelAbilitiesLoading()) {
+    <div class="flex flex-col">
+      @for (ability of _abilities(); track ability.id) {
+        <gow-level-ability-list-item
+          [ability]="ability"
+          (remove)="onRemoveAbility($event)"
+        />
+      } @empty {
+        <p class="gap-2 text-gray-500 pt-1 pb-2">Sin habilidades asignadas</p>
+      }
+    </div>
+
+    <p-button
+      severity="info"
+      styleClass="rounded-lg"
+      (click)="onOpenAddAbilityToLevelForm()"
+    >
+      <span pButtonLabel>Añadir habilidades</span>
+      <i-lucide [img]="addIcon" pButtonIcon />
+    </p-button>
+  } @else {
+    <div class="flex items-center gap-2.5">
+      <p-progress-spinner
+        ariaLabel="loading"
+        strokeWidth="3"
+        [style]="{ width: '42px', height: '42px' }"
+      ></p-progress-spinner>
+      <span class="text-gray-500">Cargando las habilidades del nivel</span>
+    </div>
+  }
+</div>

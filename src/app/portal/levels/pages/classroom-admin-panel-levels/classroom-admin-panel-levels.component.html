@@ -1,0 +1,57 @@
+@if (!isLevelsLoading()) {
+  <div class="w-full max-w-4xl mx-auto p-4 flex flex-col gap-1">
+    @for (level of levels(); track level.id; let position = $index) {
+      <gow-level-item-dropdown
+        [level]="level"
+        [loadLevelAbilities]="loadLevelAbilitiesMap().get(level.id) ?? null"
+        (selectLevelToAddAbility)="onOpenAddAbilityToLevelDialog($event)"
+        (uploadLoadLevelAbilities)="onUpdateLoadLevelAbilities($event)"
+      />
+
+      @if (isValidCreateLevelBetweenLevels(
+        level.requiredPoints,
+        levels().at(position + 1)?.requiredPoints ?? null
+      )) {
+        <div
+          class="content-[''] h-1.5 bg-info-100 w-full hover:bg-info-500 hover:outline-2 transition-all cursor-pointer outline-info-400 overflow-visible relative group"
+          (click)="onOpenCreateLevelDialog(position + 1)"
+        >
+          <button class="bg-info-500 size-5.5 text-white items-center justify-center rounded-full cursor-pointer hidden group-hover:flex absolute -right-2 -top-2">
+            <i-lucide [img]="addIcon" class="size-4" />
+          </button>
+        </div>
+      }
+    } @empty {
+      <div
+        class="content-[''] h-1.5 bg-info-100 w-full hover:bg-info-500 hover:outline-2 transition-all cursor-pointer outline-info-400 overflow-visible relative group"
+        (click)="onOpenCreateLevelDialog(0)"
+      >
+        <button class="bg-info-500 size-5.5 text-white items-center justify-center rounded-full cursor-pointer hidden group-hover:flex absolute -right-2 -top-2">
+          <i-lucide [img]="addIcon" class="size-4" />
+        </button>
+      </div>
+
+      <p class="text-center text-lg py-4 text-gray-400">No se ha encontrado ninguna clase</p>
+    }
+  </div>
+
+  <gow-add-ability-to-level-dialog
+    [show]="showAddAbilityToLevelDialog()"
+    [levelId]="levelIdSelectedToAddAbility()"
+    (close)="onCloseAddAbilityToLevelDialog()"
+    (success)="onAddAbilityToLoadLevelAbilities($event)"
+  />
+
+  <gow-level-form-dialog
+    buttonText="Crear"
+    headerTitle="Crear nivel"
+    [show]="showCreateLevel()"
+    [minRequiredPoints]="createLevelData().minPoints"
+    [maxRequiredPoints]="createLevelData().maxPoints"
+    [position]="createLevelData().position"
+    (close)="onCloseAddLevelDialog()"
+    (success)="onCreateLevel($event)"
+  />
+} @else {
+  <gow-classroom-admin-panel-loading />
+}

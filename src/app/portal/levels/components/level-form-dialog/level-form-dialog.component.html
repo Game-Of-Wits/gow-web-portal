@@ -16,7 +16,7 @@
     [closeIconTemplate]="closeButtonIcon"
     [formGroup]="levelFormGroup"
     [style]="{
-      'max-width': '500px',
+      'max-width': '600px',
       width: '100%',
     }"
   >
@@ -27,7 +27,7 @@
     <div class="flex flex-col gap-4">
     <div class="flex items-start gap-4">
       <div class="flex flex-col gap-2">
-        <gow-level-primary-color-picker formControlName="primaryColor" />
+        <gow-level-primary-color-picker formControlName="primaryColor" [size]="150" />
       </div>
       <div class="flex flex-col flex-1 w-full gap-2">
         <div class="flex flex-col gap-1">
@@ -51,7 +51,7 @@
 
         <div class="flex flex-col gap-1">
           <gow-number-field
-            label="Puntaje requerido (Mínimo: {{ minRequiredPoints }})"
+              label="Puntaje requerido (Mínimo: {{ minRequiredPoints }} - Máximo: {{ maxRequiredPoints == null ? 'ninguno' : maxRequiredPoints }})"
             placeholder="Ingrese el puntaje requerido"
             focusColor="info"
             formControlName="requiredPoints"
@@ -69,10 +69,12 @@
     </div>
 
       <button
+        pButton
         type="button"
         (click)="onSubmitLevelForm()"
         [disabled]="levelFormGroup.invalid"
-        class="gap-1.5 py-3 rounded-lg bg-info-500 disabled:bg-info-100 text-white self-start disabled:cursor-not-allowed cursor-pointer w-full text-center"
+        [loading]="isLoading()"
+        severity="info"
       >
         {{ buttonText() }}
       </button>

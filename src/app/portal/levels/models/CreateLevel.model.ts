@@ -1,8 +1,6 @@
-export interface LevelModel {
-  id: string
+export interface CreateLevelModel {
   name: string
   requiredPoints: number
   primaryColor: string
   classroomId: string
-  abilityIds: string[]
 }

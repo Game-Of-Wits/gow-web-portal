@@ -1,0 +1,68 @@
+<div class="flex gap-4 p-2.5">
+  <div
+    class="size-[45px] rounded-lg content-[''] bg-white shadow-md"
+    style="background-color: {{ level().primaryColor }};"
+  ></div>
+
+  <div class="flex flex-col gap-2.5 flex-1">
+    <div class="flex justify-between">
+      <div class="flex items-center gap-2.5">
+        <span>{{ level().name }}</span>
+        <p-tag
+          severity="info"
+          [value]="
+            level().requiredPoints == 0
+              ? 'Inicial'
+              : level().requiredPoints.toString()
+          "
+        ></p-tag>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-0.5">
+          <button
+            pButton
+            [text]="true"
+            severity="primary"
+            rounded
+            [disabled]="true"
+          >
+            <i-lucide pButtonIcon class="text-primary-500" [img]="editIcon" />
+          </button>
+
+          @if (level().requiredPoints > 0) {
+            <button
+              pButton
+              [text]="true"
+              severity="danger"
+              rounded
+              [disabled]="true"
+            >
+              <i-lucide
+                pButtonIcon
+                class="text-danger-500"
+                [img]="deleteIcon"
+              />
+            </button>
+          }
+        </div>
+
+        <button class="cursor-pointer" (click)="onToggleShowAbilities()">
+          <i-lucide
+            class="text-info-500 size-9"
+            [img]="isLevelAbilitiesShowing() ? upIcon : downIcon"
+          />
+        </button>
+      </div>
+    </div>
+
+    @if (isLevelAbilitiesShowing()) {
+      <gow-level-abilities-list
+        [levelId]="level().id"
+        [abilities]="loadLevelAbilities()"
+        (updateAbilities)="onSetLevelAbilities($event)"
+        (selectLevelToAddAbility)="onSetSelectLevelToAddAbility($event)"
+      />
+    }
+  </div>
+</div>

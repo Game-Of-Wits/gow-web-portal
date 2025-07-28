@@ -20,7 +20,7 @@ export class ClassroomsService {
       .pipe(map(classroom => ClassroomMapper.toModel(classroom)))
   }
 
-  public async getAsyncClassroomById(
+  public async getClassroomByIdAsync(
     classroomId: string
   ): Promise<ClassroomModel | null> {
     try {
