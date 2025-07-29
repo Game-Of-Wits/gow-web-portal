@@ -12,7 +12,6 @@
     >
       <ng-template #header>
         <tr>
-          <th>ID</th>
           <th>Penalización</th>
           <th>Puntos a descontar</th>
           <th>Acciones</th>
@@ -21,10 +20,13 @@
 
       <ng-template #body let-penalty>
         <tr>
-          <td>{{ penalty.id }}</td>
           <td>{{ penalty.name }}</td>
           <td>{{ penalty.reducePoints }}</td>
           <td class="flex items-center gap-1.5">
+            <button pButton severity="info" [rounded]="true" [disabled]="true">
+              <i-lucide pButtonIcon [img]="editIcon" />
+            </button>
+
             <button
               pButton
               severity="danger"
@@ -32,10 +34,6 @@
               [disabled]="true"
             >
               <i-lucide pButtonIcon [img]="deleteIcon" />
-            </button>
-
-            <button pButton severity="info" [rounded]="true" [disabled]="true">
-              <i-lucide pButtonIcon [img]="editIcon" />
             </button>
           </td>
         </tr>

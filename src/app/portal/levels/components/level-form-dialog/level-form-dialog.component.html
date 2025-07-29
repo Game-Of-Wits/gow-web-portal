@@ -61,7 +61,15 @@
             @if (hasErrorValidation(requiredPointsControl, "required")) {
               <p class="text-red-500 text-sm">Es requerido</p>
             } @else if (hasErrorValidation(requiredPointsControl, "outOfPointLimit")) {
-              <p class="text-red-500 text-sm">Mínimo {{ requiredPointsControl?.errors?.["outOfPointLimit"].min }} de puntaje</p>
+              <p class="text-red-500 text-sm">
+                Mínimo {{ requiredPointsControl?.errors?.["outOfPointLimit"].min }} de puntaje
+              </p>
+
+              @if (requiredPointsControl?.errors?.["outOfPointLimit"].max != null) {
+                <p class="text-red-500 text-sm">
+                  Máximo {{ requiredPointsControl?.errors?.["outOfPointLimit"].max }} de puntaje
+                </p>
+              }
             }
           }
         </div>

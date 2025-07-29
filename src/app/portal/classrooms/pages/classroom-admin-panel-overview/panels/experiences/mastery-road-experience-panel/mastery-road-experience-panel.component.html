@@ -33,22 +33,18 @@
       >
         <ng-template #header>
           <tr>
-            <th>ID</th>
             <th>Nombre completo</th>
-            <th>Personaje</th>
-            <th>Equipo</th>
-            <th>Puntos de vida</th>
+            <th>Nivel</th>
+            <th>Puntaje</th>
             <th>Acciones</th>
           </tr>
         </ng-template>
 
         <ng-template #body let-student>
           <tr>
-            <td>{{ student.id }}</td>
             <td>{{ student.firstName }} {{ student.lastName }}</td>
-            <td>{{ student.characterId }}</td>
-            <td>{{ student.teamId }}</td>
-            <td>{{ student.healthPoints }}</td>
+            <td>{{ getLevelName(student.levelId) }}</td>
+            <td>{{ student.progressPoints }}</td>
             <td></td>
           </tr>
         </ng-template>

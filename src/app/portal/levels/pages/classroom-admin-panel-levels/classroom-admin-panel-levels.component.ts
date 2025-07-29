@@ -76,13 +76,12 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   }
 
   public onOpenCreateLevelDialog(position: number) {
-    let minPoints: number = 0
+    let minPoints = 0
     let maxPoints: number | null = null
 
     minPoints = (this.levels().at(position - 1)?.requiredPoints ?? 0) + 1
 
-    if (position < this.levels().length - 1)
-      maxPoints = this.levels().at(position + 1)?.requiredPoints ?? null
+    maxPoints = this.levels().at(position)?.requiredPoints ?? null
 
     this.showCreateLevel.set(true)
     this.createLevelData.set({
@@ -165,7 +164,7 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   ) {
     if (nextRequiredPoints === null) return true
 
-    return currentRequiredPoints - nextRequiredPoints > 1
+    return nextRequiredPoints - currentRequiredPoints > 1
   }
 
   private loadLevels(classroomId: string) {

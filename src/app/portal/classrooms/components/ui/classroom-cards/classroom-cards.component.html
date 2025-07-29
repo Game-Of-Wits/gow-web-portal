@@ -1,7 +1,7 @@
 <div class="flex flex-wrap justify-start gap-4">
   @for (classroom of classrooms(); track classroom.id) {
     <a
-      routerLink="/p/s/{{ classroom.schoolId }}/classroom/{{ classroom.id }}"
+      routerLink="/p/s/{{ classroom.schoolId }}/c/{{ classroom.id }}"
       class="w-[320px] h-[160px] rounded-lg flex bg-primary-50 overflow-hidden cursor-pointer group"
     >
       <div class="bg-primary-600 w-[32px] relative">

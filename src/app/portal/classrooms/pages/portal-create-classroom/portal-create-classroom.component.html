@@ -15,7 +15,6 @@
         class="px-3 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 disabled:bg-primary-100 text-white cursor-pointer flex items-center gap-1.5 disabled:cursor-not-allowed"
       >
         <i-lucide [img]="addClassroomIcon" class="size-5" />
-
         Crear
       </button>
     </gow-page-header>
@@ -39,20 +38,11 @@
               <p class="text-red-500 text-sm">Es requerido</p>
             } @else if (hasErrorValidation(classroomNameControl, "minlength")) {
               <p class="text-red-500 text-sm">
-                Mínimo
-                {{
-                  classroomNameControl?.errors?.["minlength"].requiredLength
-                }}
-                caracteres
+                Mínimo 3 caracteres
               </p>
             } @else if (hasErrorValidation(classroomNameControl, "maxlength")) {
               <p class="text-red-500 text-sm">
-                Máximo
-                {{
-                  classroomNameControl?.errors?.["minlength"]
-                    .requiredLength
-                }}
-                caracteres
+                Máximo 50 caracteres
               </p>
             }
           }
@@ -218,15 +208,11 @@
                   <p class="text-red-500 text-sm">Es requerido</p>
                 } @else if (hasErrorValidation(limitAbilitiesControl, "min")) {
                   <p class="text-red-500 text-sm">
-                    Mínimo
-                    {{ limitAbilitiesControl?.errors?.["min"].min }}
-                    habilidades
+                    Mínimo una habilidad
                   </p>
                 } @else if (hasErrorValidation(limitAbilitiesControl, "max")) {
                   <p class="text-red-500 text-sm">
-                    Máximo
-                    {{ limitAbilitiesControl?.errors?.["max"].max }}
-                    habilidades
+                    Máximo 10 habilidades
                   </p>
                 }
               }

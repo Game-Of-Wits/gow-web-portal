@@ -1,6 +1,7 @@
 import { NgOptimizedImage } from '@angular/common'
 import {
   Component,
+  computed,
   inject,
   OnDestroy,
   OnInit,
@@ -20,6 +21,7 @@ import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
 import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.service'
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
+import { LevelModel } from '~/levels/models/Level.model'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
@@ -64,17 +66,25 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
-  public isStudentsLoading = signal<boolean>(false)
-  public students = signal<MasteryRoadStudentPeriodState[]>([])
-
   public isExperienceSessionEndingLoading = signal<boolean>(false)
+
+  public isStudentsLoading = signal<boolean>(true)
+  public students = signal<MasteryRoadStudentPeriodState[]>([])
 
   public isAbilityUsesLoading = signal<boolean>(true)
   public abilityUses = signal<AbilityUseModel[]>([])
 
+  public levels = signal<LevelModel[]>([])
+  public isLevelsLoading = signal<boolean>(true)
+
+  public readonly levelsMap = computed(
+    () => new Map(this.levels().map(level => [level.id, level.name]))
+  )
+
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
 
   ngOnInit(): void {
+    this.loadLevels()
     this.loadStudents()
     this.loadAbilityUses()
   }
@@ -82,6 +92,10 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  public getLevelName(levelId: string): string | null {
+    return this.levelsMap().get(levelId) ?? null
   }
 
   public onEndOfExperienceSession() {
@@ -152,6 +166,24 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
           this.onShowStudentsLoadingErrorMessage(error.code)
         }
       })
+  }
+
+  private loadLevels() {
+    this.isLevelsLoading.set(true)
+
+    setTimeout(() => {
+      this.levels.set([
+        {
+          id: '1TbKYXAqJMel5TQVFlSt',
+          classroomId: 'hin6KfWOYnKbDRkuPd1B',
+          name: 'Aldeano',
+          abilityIds: [],
+          primaryColor: '#143AF6',
+          requiredPoints: 0
+        }
+      ])
+      this.isLevelsLoading.set(false)
+    }, 200)
   }
 
   private onShowStudentsLoadingErrorMessage(code: string) {

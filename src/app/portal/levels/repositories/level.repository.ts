@@ -9,6 +9,7 @@ import {
   Firestore,
   getDoc,
   getDocs,
+  orderBy,
   query,
   updateDoc,
   where
@@ -54,13 +55,15 @@ export class LevelRepository {
 
     return from(getDocs(levelsQuery)).pipe(
       map(snapshot =>
-        snapshot.docs.map(
-          doc =>
-            ({
-              id: doc.id,
-              ...doc.data()
-            }) as LevelDbModel
-        )
+        snapshot.docs
+          .map(
+            doc =>
+              ({
+                id: doc.id,
+                ...doc.data()
+              }) as LevelDbModel
+          )
+          .sort((a, b) => a.requiredPoints - b.requiredPoints)
       )
     )
   }
