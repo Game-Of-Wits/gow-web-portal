@@ -56,6 +56,10 @@ export class ClassroomRepository {
     return collectionData<ClassroomDbModel>(classroomsQuery, { idField: 'id' })
   }
 
+  public getRefById(id: string) {
+    return doc(this.firestore, `${this.collectionName}/${id}`)
+  }
+
   private getClassroomsRef() {
     return collection(this.firestore, this.collectionName)
   }

@@ -4,21 +4,32 @@ import {
   Input,
   input,
   OnInit,
-  output
+  output,
+  signal
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { LucideAngularModule, X } from 'lucide-angular'
+import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { penaltyForm } from '~/penalties/forms/penaltyForm'
 import { PenaltyForm } from '~/penalties/models/PenaltyForm.model'
 import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 
+export type PenaltyFormSubmit = {
+  result: {
+    id: number | string
+    form: FormGroup<PenaltyForm>
+  }
+  onFinish: () => void
+}
+
 @Component({
   selector: 'gow-penalty-form-dialog',
   templateUrl: './penalty-form-dialog.component.html',
   imports: [
     DialogModule,
+    ButtonModule,
     TextFieldComponent,
     NumberFieldComponent,
     ReactiveFormsModule,
@@ -30,16 +41,15 @@ export class PenaltyFormDialogComponent implements OnInit {
 
   @Input() penaltyForm?: FormGroup<PenaltyForm> | null = null
 
-  public penaltyFormPosition = input.required<number>({ alias: 'position' })
+  public penaltyFormId = input.required<number | string>({ alias: 'id' })
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
   public buttonText = input.required<string>({ alias: 'buttonText' })
 
+  public formLoading = signal<boolean>(false)
+
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<{
-    position: number
-    form: FormGroup<PenaltyForm>
-  }>({
+  public onSuccess = output<PenaltyFormSubmit>({
     alias: 'success'
   })
 
@@ -64,16 +74,23 @@ export class PenaltyFormDialogComponent implements OnInit {
 
     if (!penaltyForm || penaltyForm.invalid) return
 
+    this.formLoading.set(true)
+
     this.onSuccess.emit({
-      position: this.penaltyFormPosition(),
-      form: penaltyForm
+      result: {
+        id: this.penaltyFormId(),
+        form: penaltyForm
+      },
+      onFinish: () => {
+        this.onCloseDialog()
+      }
     })
-    this.onCloseDialog()
   }
 
   public onCloseDialog() {
-    this.onClose.emit()
     this.penaltyForm = penaltyForm()
+    this.onClose.emit()
+    this.formLoading.set(false)
   }
 
   get nameControl(): AbstractControl<string> | null {

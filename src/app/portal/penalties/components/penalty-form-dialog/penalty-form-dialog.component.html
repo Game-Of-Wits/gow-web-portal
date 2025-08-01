@@ -1,10 +1,11 @@
 @if (penaltyForm; as penaltyFormGroup) {
   <ng-template #closeButtonIcon>
     <button
-      class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
-      (click)="onClose.emit()"
+      class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer group"
+      (click)="onCloseDialog()"
+      [disabled]="formLoading()"
     >
-      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700 group-disabled:text-gray-700/50" />
     </button>
   </ng-template>
 
@@ -69,14 +70,17 @@
         </div>
       </div>
 
-      <button
+      <p-button
         type="button"
         (click)="onSubmitPenaltyForm()"
         [disabled]="penaltyFormGroup.invalid"
-        class="gap-1.5 py-3 rounded-lg bg-info-500 disabled:bg-info-100 text-white self-start disabled:cursor-not-allowed cursor-pointer w-full text-center"
+        [loading]="formLoading()"
+        severity="info"
+        size="large"
+        styleClass="w-full rounded-lg"
       >
         {{ buttonText() }}
-      </button>
+      </p-button>
     </div>
   </p-dialog>
 }

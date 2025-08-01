@@ -1,6 +1,12 @@
 @if (!isPenaltiesLoading()) {
   <section class="px-[26px] pt-[14px] pb-[6px]">
-    <button pButton severity="info" class="mb-2.5 rounded-xl">
+    <button
+      pButton
+      severity="info"
+      class="mb-2.5 rounded-xl"
+      (click)="onOpenCreatePenaltyDialog()"
+      [disabled]="deletingPenaltyLoading()"
+    >
       <i-lucide pButtonIcon [img]="addIcon" />
       <span pButtonLabel>Añadir penalización</span>
     </button>
@@ -23,23 +29,51 @@
           <td>{{ penalty.name }}</td>
           <td>{{ penalty.reducePoints }}</td>
           <td class="flex items-center gap-1.5">
-            <button pButton severity="info" [rounded]="true" [disabled]="true">
+            <p-button
+              severity="info"
+              [rounded]="true"
+              (click)="onOpenEditPenaltyDialog(penalty)"
+              [disabled]="deletingPenaltyLoading()"
+              styleClass="aspect-square"
+            >
               <i-lucide pButtonIcon [img]="editIcon" />
-            </button>
+            </p-button>
 
-            <button
-              pButton
+            <p-button
               severity="danger"
               [rounded]="true"
-              [disabled]="true"
+              (click)="onShowDeletePenaltyConfirmation(penalty.id, $event)"
+              [disabled]="deletingPenaltyLoading()"
+              styleClass="aspect-square"
             >
               <i-lucide pButtonIcon [img]="deleteIcon" />
-            </button>
+            </p-button>
           </td>
         </tr>
       </ng-template>
     </p-table>
   </section>
+
+  <gow-penalty-form-dialog
+    buttonText="Añadir"
+    headerTitle="Añadir penalización"
+    [id]="penaltyFormSelected().id"
+    [show]="showCreatePenalty()"
+    (close)="onCloseDialog()"
+    (success)="onCreatePenalty($event)"
+  />
+
+  <gow-penalty-form-dialog
+    buttonText="Editar"
+    headerTitle="Editar penalización"
+    [id]="penaltyFormSelected().id"
+    [penaltyForm]="penaltyFormSelected().form"
+    [show]="showEditPenalty()"
+    (close)="onCloseDialog()"
+    (success)="onEditPenalty($event)"
+  />
+
+  <p-confirmdialog [draggable]="false" [closable]="false" />
 } @else {
   <gow-classroom-admin-panel-loading />
 }

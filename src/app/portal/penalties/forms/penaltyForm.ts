@@ -1,9 +1,12 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { PenaltyForm } from '../models/PenaltyForm.model'
 
-export const penaltyForm = (): FormGroup<PenaltyForm> => {
+export const penaltyForm = (defaultValues?: {
+  name: string
+  reducePoints: number
+}): FormGroup<PenaltyForm> => {
   return new FormGroup<PenaltyForm>({
-    name: new FormControl('', {
+    name: new FormControl(defaultValues?.name ?? '', {
       nonNullable: true,
       validators: [
         Validators.required,
@@ -11,7 +14,7 @@ export const penaltyForm = (): FormGroup<PenaltyForm> => {
         Validators.maxLength(50)
       ]
     }),
-    reducePoints: new FormControl(1, {
+    reducePoints: new FormControl(defaultValues?.reducePoints ?? 1, {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)]
     })

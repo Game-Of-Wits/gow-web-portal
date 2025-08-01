@@ -1,7 +1,10 @@
 import { Component, Input, signal } from '@angular/core'
 import { FormArray, FormGroup } from '@angular/forms'
 import { PenaltyForm } from '~/penalties/models/PenaltyForm.model'
-import { PenaltyFormDialogComponent } from '../penalty-form-dialog/penalty-form-dialog.component'
+import {
+  PenaltyFormDialogComponent,
+  PenaltyFormSubmit
+} from '../penalty-form-dialog/penalty-form-dialog.component'
 import { PenaltyListFormItemComponent } from '../penalty-list-form-item/penalty-list-form-item.component'
 
 @Component({
@@ -51,17 +54,14 @@ export class PenaltyListFormComponent {
     })
   }
 
-  public onAddPenaltyForm(data: {
-    position: number
-    form: FormGroup<PenaltyForm>
-  }) {
-    this.penaltyListForm.push(data.form)
+  public onAddPenaltyForm(result: PenaltyFormSubmit) {
+    this.penaltyListForm.push(result.result.form)
+    result.onFinish()
   }
 
-  public onEditPenaltyForm(data: {
-    position: number
-    form: FormGroup<PenaltyForm>
-  }) {}
+  public onEditPenaltyForm(result: PenaltyFormSubmit) {
+    result.onFinish()
+  }
 
   public onDeletePenaltyForm(position: number) {
     this.penaltyListForm.removeAt(position)

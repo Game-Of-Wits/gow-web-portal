@@ -28,7 +28,7 @@
 <gow-penalty-form-dialog
   buttonText="Añadir"
   headerTitle="Añadir penalización"
-  [position]="penaltyFormSelected().position"
+  [id]="penaltyFormSelected().position"
   [show]="showAddPenaltyFormDialog()"
   (close)="onClosePenaltyFormDialog()"
   (success)="onAddPenaltyForm($event)"
@@ -37,8 +37,8 @@
 <gow-penalty-form-dialog
   buttonText="Editar"
   headerTitle="Editar penalización"
+  [id]="penaltyFormSelected().position"
   [penaltyForm]="penaltyFormSelected().form"
-  [position]="penaltyFormSelected().position"
   [show]="showEditPenaltyFormDialog()"
   (close)="onClosePenaltyFormDialog()"
   (success)="onEditPenaltyForm($event)"
