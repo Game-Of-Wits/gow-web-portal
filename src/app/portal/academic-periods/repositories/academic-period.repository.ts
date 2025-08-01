@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core'
 import {
   addDoc,
   collection,
-  collectionData,
   DocumentReference,
   DocumentSnapshot,
   doc,
@@ -17,7 +16,7 @@ import {
   updateDoc,
   where
 } from '@angular/fire/firestore'
-import type { Observable } from 'rxjs'
+import { from, map, type Observable } from 'rxjs'
 import type {
   AcademicPeriodDbModel,
   AcademicPeriodDbWithoutId
@@ -119,9 +118,13 @@ export class AcademicPeriodRespository {
     const activeAcademicPeroidsQuery =
       this.getSchoolActiveAcademicPeriodQuery(schoolId)
 
-    return collectionData<AcademicPeriodDbModel>(activeAcademicPeroidsQuery, {
-      idField: 'id'
-    })
+    return from(getDocs(activeAcademicPeroidsQuery)).pipe(
+      map(snapshots =>
+        snapshots.docs.map(
+          doc => ({ ...doc.data(), id: doc.id }) as AcademicPeriodDbModel
+        )
+      )
+    )
   }
 
   public async existsSchoolActiveAcademicPeriod(

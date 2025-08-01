@@ -12,6 +12,7 @@ import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { StudentProfileService } from '~/student-profiles/services/student-profile/student-profile.service'
+import { CreateStudentFormDialogComponent } from '~/students/components/create-student-form-dialog/create-student-form-dialog.component'
 
 const studentProfilesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
@@ -22,6 +23,7 @@ const studentProfilesErrorMessages: ErrorMessages = {
   templateUrl: './classroom-admin-panel-students.component.html',
   imports: [
     ClassroomAdminPanelLoadingComponent,
+    CreateStudentFormDialogComponent,
     Toast,
     TableModule,
     ButtonModule,
@@ -37,13 +39,23 @@ export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
   private readonly studentProfileService = inject(StudentProfileService)
 
   private readonly toastService = inject(MessageService)
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  public readonly context = inject(ClassroomAdminPanelContextService)
 
   public studentProfiles = signal<StudentProfileModel[]>([])
   public isStudentsLoading = signal<boolean>(false)
 
+  public showCreateStudentAccount = signal<boolean>(false)
+
   ngOnInit(): void {
     this.loadStudents()
+  }
+
+  public onOpenCreateStudentDialog() {
+    this.showCreateStudentAccount.set(true)
+  }
+
+  public onCloseCreateStudentDialog() {
+    this.showCreateStudentAccount.set(false)
   }
 
   private loadStudents() {

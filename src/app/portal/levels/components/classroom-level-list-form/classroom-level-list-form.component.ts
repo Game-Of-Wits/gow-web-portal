@@ -1,9 +1,12 @@
-import { Component, Input, input, OnInit, signal } from '@angular/core'
+import { Component, Input, input, signal } from '@angular/core'
 import { FormArray, FormGroup } from '@angular/forms'
 import { LucideAngularModule, Pencil, Plus } from 'lucide-angular'
 import { LevelForm } from '~/levels/models/LevelForm.model'
 import { ClassroomLevelListFormItemComponent } from '../classroom-level-list-form-item/classroom-level-list-form-item.component'
-import { LevelFormDialogComponent } from '../level-form-dialog/level-form-dialog.component'
+import {
+  LevelFormDialogComponent,
+  LevelFormSubmit
+} from '../level-form-dialog/level-form-dialog.component'
 
 @Component({
   selector: 'gow-classroom-level-list-form',
@@ -53,11 +56,9 @@ export class ClassroomLevelListFormComponent {
     })
   }
 
-  public onAddLevelForm(data: {
-    position: number
-    form: FormGroup<LevelForm>
-  }) {
-    this.levelListForm.push(data.form)
+  public onAddLevelForm(submit: LevelFormSubmit) {
+    this.levelListForm.push(submit.result.form)
+    submit.onFinish()
   }
 
   public onDeleteLevelForm(position: number) {

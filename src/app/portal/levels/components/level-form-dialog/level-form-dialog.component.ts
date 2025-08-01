@@ -6,7 +6,8 @@ import {
   OnChanges,
   OnInit,
   output,
-  SimpleChanges
+  SimpleChanges,
+  signal
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { LucideAngularModule, X } from 'lucide-angular'
@@ -17,6 +18,14 @@ import { LevelForm } from '~/levels/models/LevelForm.model'
 import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { LevelPrimaryColorPickerComponent } from '../level-primary-color-picker/level-primary-color-picker.component'
+
+export type LevelFormSubmit = {
+  result: {
+    position: number
+    form: FormGroup<LevelForm>
+  }
+  onFinish: () => void
+}
 
 @Component({
   selector: 'gow-level-form-dialog',
@@ -42,13 +51,11 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
   public buttonText = input.required<string>({ alias: 'buttonText' })
-  public isLoading = input<boolean>(false, { alias: 'isLoading' })
+
+  public formLoading = signal(false)
 
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<{
-    position: number
-    form: FormGroup<LevelForm>
-  }>({
+  public onSubmit = output<LevelFormSubmit>({
     alias: 'success'
   })
 
@@ -90,19 +97,26 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
 
     if (!levelForm || levelForm.invalid) return
 
-    this.onSuccess.emit({
-      position: this.levelFormPosition(),
-      form: levelForm
+    this.formLoading.set(true)
+
+    this.onSubmit.emit({
+      result: {
+        position: this.levelFormPosition(),
+        form: levelForm
+      },
+      onFinish: () => {
+        this.onCloseDialog()
+      }
     })
-    this.onCloseDialog()
   }
 
   public onCloseDialog() {
-    this.onClose.emit()
     this.levelForm = levelForm({
       max: null,
       min: this.minRequiredPoints
     })
+    this.onClose.emit()
+    this.formLoading.set(false)
   }
 
   get nameControl(): AbstractControl<string> | null {

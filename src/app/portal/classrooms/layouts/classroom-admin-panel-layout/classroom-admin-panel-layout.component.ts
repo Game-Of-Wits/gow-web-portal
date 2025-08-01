@@ -27,6 +27,29 @@ import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { EducationalExperience } from '~/shared/models/EducationalExperience'
+import { gowThemeConfig } from '~/shared/theme'
+
+const activeTabColors: Record<
+  EducationalExperience | 'GENERAL',
+  {
+    textColor: string
+    borderColor: string
+  }
+> = {
+  [EducationalExperience.MASTERY_ROAD]: {
+    borderColor: gowThemeConfig.semantic.info[500],
+    textColor: gowThemeConfig.semantic.info[500]
+  },
+  [EducationalExperience.SHADOW_WARFARE]: {
+    borderColor: gowThemeConfig.semantic.danger[500],
+    textColor: gowThemeConfig.semantic.danger[500]
+  },
+  GENERAL: {
+    borderColor: gowThemeConfig.semantic.primary[500],
+    textColor: gowThemeConfig.semantic.primary[500]
+  }
+}
 
 @Component({
   selector: 'gow-classroom-admin-panel-layout',
@@ -43,14 +66,15 @@ import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
   providers: [MessageService]
 })
 export class ClassroomAdminPanelLayoutComponent implements OnInit {
-  public readonly router = inject(Router)
-  public readonly activatedRoute = inject(ActivatedRoute)
-  public readonly classroomService = inject(ClassroomsService)
-  public readonly toastService = inject(MessageService)
-  public readonly context = inject(ClassroomAdminPanelContextService)
-
   public readonly classroomIcon = Presentation
   public readonly optionsIcon = Ellipsis
+
+  public readonly classroomService = inject(ClassroomsService)
+
+  private readonly router = inject(Router)
+  private readonly activatedRoute = inject(ActivatedRoute)
+  private readonly toastService = inject(MessageService)
+  public readonly context = inject(ClassroomAdminPanelContextService)
 
   public isClassroomLoading = signal<boolean>(false)
 
@@ -58,41 +82,52 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
     route: string
     label: string
     icon: LucideIconData
+    activeColor: {
+      textColor: string
+      borderColor: string
+    }
   }> = [
     {
       route: 'overview',
       label: 'Clase',
-      icon: Shapes
+      icon: Shapes,
+      activeColor: activeTabColors['GENERAL']
     },
     {
       route: 'students',
       label: 'Estudiantes',
-      icon: GraduationCap
-    },
-    {
-      route: 'teams',
-      label: 'Equipos y personajes',
-      icon: Users
-    },
-    {
-      route: 'homeworks',
-      label: 'Tareas',
-      icon: Files
-    },
-    {
-      route: 'levels',
-      label: 'Niveles',
-      icon: ArrowUpRight
+      icon: GraduationCap,
+      activeColor: activeTabColors['GENERAL']
     },
     {
       route: 'abilities',
       label: 'Habilidades',
-      icon: Sparkles
+      icon: Sparkles,
+      activeColor: activeTabColors['GENERAL']
+    },
+    {
+      route: 'teams',
+      label: 'Equipos y personajes',
+      icon: Users,
+      activeColor: activeTabColors[EducationalExperience.SHADOW_WARFARE]
+    },
+    {
+      route: 'homeworks',
+      label: 'Tareas',
+      icon: Files,
+      activeColor: activeTabColors[EducationalExperience.SHADOW_WARFARE]
+    },
+    {
+      route: 'levels',
+      label: 'Niveles',
+      icon: ArrowUpRight,
+      activeColor: activeTabColors[EducationalExperience.MASTERY_ROAD]
     },
     {
       route: 'penalties',
       label: 'Penalizaciones',
-      icon: TriangleAlert
+      icon: TriangleAlert,
+      activeColor: activeTabColors[EducationalExperience.MASTERY_ROAD]
     }
   ]
 

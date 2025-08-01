@@ -85,7 +85,7 @@ export class ClassSessionService {
       throw new ErrorResponse('class-session-not-active')
 
     try {
-      this.classSessionRepository.updateById(activeClassSessionId, {
+      await this.classSessionRepository.updateById(activeClassSessionId, {
         endedAt: Timestamp.now()
       })
     } catch (err) {

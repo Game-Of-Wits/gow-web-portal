@@ -3,7 +3,10 @@ import { FormArray, FormGroup } from '@angular/forms'
 import { LucideAngularModule, Pencil, Plus } from 'lucide-angular'
 import type { CharacterForm } from '~/characters/models/CharacterForm.model'
 import { SelectOption } from '~/shared/types/SelectOption'
-import { CharacterFormDialogComponent } from '../character-form-dialog/character-form-dialog.component'
+import {
+  CharacterFormDialogComponent,
+  CharacterFormSubmit
+} from '../character-form-dialog/character-form-dialog.component'
 import { FormCharacterListItemComponent } from '../form-character-list-item/form-character-list-item.component'
 
 @Component({
@@ -59,26 +62,13 @@ export class InitialCharacterListFormComponent {
     })
   }
 
-  public onAddCharacterForm(data: {
-    position: number
-    form: FormGroup<CharacterForm>
-  }) {
-    this.characterListForm.push(data.form)
+  public onAddCharacterForm(submit: CharacterFormSubmit) {
+    this.characterListForm.push(submit.result.form)
+    submit.onFinish()
   }
 
-  public onEditCharacterForm(data: {
-    position: number
-    form: FormGroup<CharacterForm>
-  }) {
-    const name = data.form.get('name')?.value
-    const teamName = data.form.get('teamName')?.value
-
-    if (!name || !teamName || data.form.invalid) return
-
-    this.characterListForm.at(data.position).setValue({
-      name,
-      teamName
-    })
+  public onEditCharacterForm(result: CharacterFormSubmit) {
+    result.onFinish()
   }
 
   public onDeleteCharacterForm(position: number) {

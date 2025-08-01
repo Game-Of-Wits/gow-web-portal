@@ -1,6 +1,6 @@
 @if (!isStudentsLoading()) {
   <section class="px-[26px] pt-[14px] pb-[6px]">
-    <button pButton class="mb-2.5 rounded-xl">
+    <button pButton class="mb-2.5 rounded-xl" (click)="onOpenCreateStudentDialog()">
       <i-lucide pButtonIcon [img]="addIcon" />
       <span pButtonLabel>Añadir estudiante</span>
     </button>
@@ -41,6 +41,14 @@
       </ng-template>
     </p-table>
   </section>
+
+  @if (context.classroom(); as classroom) {
+    <gow-create-student-form-dialog
+      (close)="onCloseCreateStudentDialog()"
+      [show]="showCreateStudentAccount()"
+      [classroomId]="classroom.id"
+    />
+  }
 } @else {
   <gow-classroom-admin-panel-loading />
 }

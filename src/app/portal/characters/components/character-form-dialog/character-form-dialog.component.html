@@ -1,7 +1,11 @@
 @if (characterForm; as characterFormGroup) {
   <ng-template #closeButtonIcon>
-    <button class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer" (click)="onCloseDialog()">
-      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+    <button
+      class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer group"
+      (click)="onCloseDialog()"
+      [disabled]="formLoading()"
+    >
+      <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700 group-disabled:text-gray-500" />
     </button>
   </ng-template>
 
@@ -85,15 +89,18 @@
         </div>
       </div>
 
-      <button
+      <p-button
         type="button"
         (click)="onSubmitCharacterForm()"
         [disabled]="characterFormGroup.invalid"
-        class="flex gap-1.5 py-2 px-3 rounded-lg bg-danger-500 disabled:bg-danger-100 text-white self-start disabled:cursor-not-allowed cursor-pointer"
+        [loading]="formLoading()"
+        severity="danger"
+        size="large"
+        styleClass="w-full rounded-lg"
       >
-        <i-lucide [img]="buttonIcon()" />
-        {{ buttonText() }}
-      </button>
+        <i-lucide pButtonIcon [img]="buttonIcon()" />
+        <span pButtonLabel>{{ buttonText() }}</span>
+      </p-button>
     </div>
   </p-dialog>
 }

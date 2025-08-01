@@ -1,0 +1,65 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ 'max-width': '600px', width: '100%' }"
+>
+  <ng-template #header>
+    <div class="flex justify-between items-center w-full">
+      <span class="font-bold text-xl">Crear cuenta de estudiante</span>
+
+      <button
+        class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer"
+        type="button"
+        (click)="onCloseDialog()"
+      >
+        <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Nombre"
+          placeholder="Ingrese el nombre del estudiante"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Apellido"
+          placeholder="Ingrese el apellido del estudiante"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Número telefónico"
+          placeholder="Ingrese el número telef́ónico del estudiante"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Correo electrónico"
+          placeholder="Ingrese el correo electrónico para la cuenta del estudiante"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Contraseña"
+          placeholder="Ingrese la contraseña para la cuenta del estudiante"
+        />
+      </div>
+    </div>
+
+    <p-button
+      type="submit"
+      severity="primary"
+      size="large"
+      styleClass="w-full rounded-xl"
+      label="Guardar"
+    />
+  </div>
+</p-dialog>

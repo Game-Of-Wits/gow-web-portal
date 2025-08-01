@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
-import { FormGroup } from '@angular/forms'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
@@ -9,10 +8,12 @@ import { AbilityModel } from '~/abilities/models/Ability.model'
 import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/classroom-admin-panel-loading.component'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { AddAbilityToLevelDialogComponent } from '~/levels/components/add-ability-to-level-dialog/add-ability-to-level-dialog.component'
-import { LevelFormDialogComponent } from '~/levels/components/level-form-dialog/level-form-dialog.component'
+import {
+  LevelFormDialogComponent,
+  LevelFormSubmit
+} from '~/levels/components/level-form-dialog/level-form-dialog.component'
 import { LevelItemDropdownComponent } from '~/levels/components/level-item-dropdown/level-item-dropdown.component'
 import { LevelModel } from '~/levels/models/Level.model'
-import { LevelForm } from '~/levels/models/LevelForm.model'
 import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
@@ -83,6 +84,8 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
 
     maxPoints = this.levels().at(position)?.requiredPoints ?? null
 
+    if (maxPoints !== null) maxPoints -= 1
+
     this.showCreateLevel.set(true)
     this.createLevelData.set({
       position,
@@ -95,12 +98,12 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
     this.showCreateLevel.set(false)
   }
 
-  public onCreateLevel(data: { position: number; form: FormGroup<LevelForm> }) {
+  public onCreateLevel(submit: LevelFormSubmit) {
     const classroomId = this.context.classroom()?.id ?? null
 
-    if (data.form.invalid || classroomId === null) return
+    if (submit.result.form.invalid || classroomId === null) return
 
-    const levelData = data.form.getRawValue()
+    const levelData = submit.result.form.getRawValue()
 
     this.isCreateLevelLoading.set(true)
 
@@ -110,10 +113,11 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
         this.levels.update(levels => {
           const updatedLevels = [...levels]
 
-          updatedLevels.splice(data.position, 0, level)
+          updatedLevels.splice(submit.result.position, 0, level)
 
           return updatedLevels
         })
+        submit.onFinish()
       })
       .catch(err => {
         const error = err as ErrorResponse

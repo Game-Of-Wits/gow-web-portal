@@ -4,10 +4,12 @@ import {
   Input,
   input,
   OnInit,
-  output
+  output,
+  signal
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { LucideAngularModule, LucideIconData, X } from 'lucide-angular'
+import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { characterForm } from '~/characters/forms/characterForm'
 import { CharacterForm } from '~/characters/models/CharacterForm.model'
@@ -15,10 +17,19 @@ import { SelectFieldComponent } from '~/shared/components/ui/select-field/select
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { SelectOption } from '~/shared/types/SelectOption'
 
+export type CharacterFormSubmit = {
+  result: {
+    position: number
+    form: FormGroup<CharacterForm>
+  }
+  onFinish: () => void
+}
+
 @Component({
   selector: 'gow-character-form-dialog',
   templateUrl: './character-form-dialog.component.html',
   imports: [
+    ButtonModule,
     DialogModule,
     ReactiveFormsModule,
     TextFieldComponent,
@@ -38,11 +49,10 @@ export class CharacterFormDialogComponent implements OnInit {
   public buttonText = input.required<string>({ alias: 'buttonText' })
   public buttonIcon = input.required<LucideIconData>({ alias: 'buttonIcon' })
 
+  public formLoading = signal<boolean>(false)
+
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<{
-    position: number
-    form: FormGroup<CharacterForm>
-  }>({
+  public onSuccess = output<CharacterFormSubmit>({
     alias: 'success'
   })
 
@@ -68,15 +78,22 @@ export class CharacterFormDialogComponent implements OnInit {
 
     if (!characterForm || characterForm.invalid) return
 
+    this.formLoading.set(true)
+
     this.onSuccess.emit({
-      position: this.characterFormPosition(),
-      form: characterForm
+      result: {
+        position: this.characterFormPosition(),
+        form: characterForm
+      },
+      onFinish: () => {
+        this.onCloseDialog()
+      }
     })
-    this.onCloseDialog()
   }
 
   public onCloseDialog() {
     this.onClose.emit()
+    this.formLoading.set(false)
     this.characterForm = characterForm()
   }
 

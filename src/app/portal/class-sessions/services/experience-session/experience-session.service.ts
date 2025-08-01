@@ -79,7 +79,7 @@ export class ExperienceSessionService {
       throw new ErrorResponse('experience-session-not-active')
 
     try {
-      this.experienceSessionRepository.updateById(experienceSessionId, {
+      await this.experienceSessionRepository.updateById(experienceSessionId, {
         endedAt: Timestamp.fromDate(new Date())
       })
     } catch (err) {

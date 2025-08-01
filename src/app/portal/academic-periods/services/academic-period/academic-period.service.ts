@@ -71,7 +71,7 @@ export class AcademicPeriodService {
       throw new ErrorResponse('academic-period-not-exist')
 
     try {
-      this.academicPeriodRepository.updateById(activeAcademicPeriodId, {
+      await this.academicPeriodRepository.updateById(activeAcademicPeriodId, {
         endedAt: Timestamp.fromDate(new Date())
       })
     } catch (err) {

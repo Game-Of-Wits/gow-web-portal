@@ -17,7 +17,7 @@ import {
   updateDoc,
   where
 } from '@angular/fire/firestore'
-import { Observable } from 'rxjs'
+import { from, map, Observable } from 'rxjs'
 import { AcademicPeriodRespository } from '~/academic-periods/repositories/academic-period.repository'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import {
@@ -61,9 +61,13 @@ export class ClassSessionRepository {
       classroomId,
       academicPeriodId
     })
-    return collectionData<ClassSessionDbModel>(activeClassSessionQuery, {
-      idField: 'id'
-    })
+    return from(getDocs(activeClassSessionQuery)).pipe(
+      map(snapshots =>
+        snapshots.docs.map(
+          doc => ({ ...doc.data(), id: doc.id }) as ClassSessionDbModel
+        )
+      )
+    )
   }
 
   public async existsActiveClassSession({
