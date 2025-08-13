@@ -33,18 +33,18 @@
 
     <div class="flex flex-wrap gap-4">
       @for (information of discoveryInformationOptions; track position; let position = $index) {
-        @if (getDiscoveryInformationControl(information.value); as informationControl) {
+        @if (getDiscoveryInformationControl(information.value); as discoveryInformationControl) {
           <label class="flex items-center flex-col gap-2 px-1">
-            <div class="p-6 rounded-xl flex items-center justify-center cursor-pointer {{ informationControl.value && 'shadow-lg outline outline-gray-100' }}">
+            <div class="p-6 rounded-xl flex items-center justify-center cursor-pointer {{ discoveryInformationControl.value && 'shadow-lg outline outline-gray-100' }}">
               <i-lucide [img]="information.icon" class="size-[25px] {{ information.filled && 'fill-gray-800' }}" />
             </div>
 
-            <span class="text-base {{ informationControl.value && 'font-bold' }}">{{ information.name }}</span>
+            <span class="text-base {{ discoveryInformationControl.value && 'font-bold' }}">{{ information.name }}</span>
 
             <input
               type="checkbox"
               class="hidden"
-              [formControl]="informationControl"
+              [formControl]="discoveryInformationControl"
             />
           </label>
         }

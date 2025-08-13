@@ -120,9 +120,9 @@ export class PortalCreateClassroomPageComponent implements OnInit {
     if (schoolId === null || teacherId === null) return
 
     this.classroomService.createClassroom({
-      ...this.classroomForm.getRawValue(),
       schoolId: schoolId,
-      teacherId: teacherId
+      teacherId: teacherId,
+      ...this.classroomForm.getRawValue()
     })
   }
 

@@ -19,7 +19,7 @@ export const experienceAbilityForm = (
       validators: [
         Validators.required,
         Validators.minLength(1),
-        Validators.maxLength(100)
+        Validators.maxLength(60)
       ]
     }),
     description: new FormControl('', {
@@ -27,7 +27,7 @@ export const experienceAbilityForm = (
       validators: [
         Validators.required,
         Validators.minLength(1),
-        Validators.maxLength(150)
+        Validators.maxLength(300)
       ]
     }),
     isInitial: new FormControl(false, {

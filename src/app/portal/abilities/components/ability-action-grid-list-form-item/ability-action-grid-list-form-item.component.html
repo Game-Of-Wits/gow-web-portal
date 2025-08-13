@@ -1,0 +1,33 @@
+<div
+  class="w-full rounded-xl border-[3px] border-primary-300 bg-primary-50 text-primary-500 h-[60px] group flex items-center justify-center"
+>
+  <p class="text-base group-hover:hidden font-bold">
+    {{ abilityActionTypeFormats[abilityActionForm.value.type!] }}
+  </p>
+
+  <div class="gap-2 items-center hidden group-hover:flex">
+    @if (abilityActionForm.value.type !== classroomAbilityActionType) {
+      <p-button
+        type="button"
+        [text]="true"
+        (click)="onEditForm()"
+        size="small"
+        rounded
+        styleClass="aspect-square"
+      >
+        <i-lucide pButtonIcon [img]="editIcon" class="fill-white size-[18px]" />
+      </p-button>
+    }
+
+    <p-button
+      type="button"
+      [text]="true"
+      (click)="onDeleteForm()"
+      size="small"
+      rounded
+      styleClass="aspect-square"
+    >
+      <i-lucide pButtonIcon [img]="deleteIcon" class="fill-white size-[18px]" />
+    </p-button>
+  </div>
+</div>

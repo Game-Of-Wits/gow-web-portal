@@ -43,5 +43,14 @@ export class ClassroomsService {
       .pipe(map(classsroom => ClassroomMapper.toListModels(classsroom)))
   }
 
+  public async classroomExistsById(classroomId: string): Promise<boolean> {
+    try {
+      return await this.classroomRepository.existsById(classroomId)
+    } catch (err) {
+      const error = err as FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
   public async createClassroom(data: CreateClassroomModel): Promise<void> {}
 }

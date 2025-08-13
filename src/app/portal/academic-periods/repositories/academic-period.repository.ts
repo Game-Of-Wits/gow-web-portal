@@ -87,11 +87,11 @@ export class AcademicPeriodRespository {
     }
   }
 
-  public updateById(
+  public async updateById(
     academicPeriodId: string,
     data: Partial<AcademicPeriodDbModel>
-  ) {
-    return updateDoc(this.getAcademicPeriodRefById(academicPeriodId), data)
+  ): Promise<void> {
+    await updateDoc(this.getAcademicPeriodRefById(academicPeriodId), data)
   }
 
   public async existsByEqualNameAndEqualStartAtYear(

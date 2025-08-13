@@ -1,5 +1,6 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
+import { AbilityActionModel } from './Ability.model'
 import { AbilityActionType } from './AbilityActionType.model'
 import { AbilityClassShift } from './AbilityClassShift.model'
 import { AbilityLevelScope } from './AbilityLevelScope.model'
@@ -11,6 +12,20 @@ import { AbilityUnitTime } from './AbilityUnitTime.model'
 import { AbilityUsage } from './AbilityUsage.model'
 import { AbilityUsageInterval } from './AbilityUsageInterval.model'
 import { DiscoveryInformation } from './DiscoveryInformation.model'
+
+export interface AbilityFormDefaultValues {
+  name: string
+  description: string
+  type: AbilityType
+  usage: {
+    type: AbilityUsage
+    shift: AbilityClassShift
+    interval?: AbilityUsageInterval
+  }
+  actions: AbilityActionModel[]
+  experience: EducationalExperience
+  isInitial: boolean
+}
 
 export interface AbilityForm {
   name: FormControl<string>

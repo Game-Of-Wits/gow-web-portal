@@ -1,0 +1,149 @@
+@if (!isAbilityLoading()) {
+  @if (ability(); as ability) {
+    <div class="p-4">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <gow-page-header
+          subtitle="Habilidades"
+          [principalTitle]="ability.name"
+          [defaultBackPath]="defaultBackPath"
+        >
+          <div class="flex items-center gap-2">
+            <p-button
+              severity="primary"
+              styleClass="rounded-xl"
+              (click)="onOpenEditAbilityFormDialog(ability)"
+              [disabled]="isAbilityDeletingLoading()"
+            >
+              <i-lucide pButtonIcon [img]="editIcon" />
+              <span pButtonLabel>Editar</span>
+            </p-button>
+            <p-button
+              severity="danger"
+              styleClass="rounded-xl"
+              (click)="onDeleteAbility($event, ability.id)"
+              [disabled]="isAbilityDeletingLoading()"
+            >
+              <i-lucide pButtonIcon [img]="deleteIcon" />
+              <span pButtonLabel>Eliminar</span>
+            </p-button>
+          </div>
+        </gow-page-header>
+
+        <div class="mt-4 grid grid-cols-[1fr_360px] gap-5 w-full">
+          <div class="flex flex-col gap-3">
+            <div>
+              <h3 class="text-xl font-bold text-gray-600">Experiencia educacional</h3>
+              <p class="text-lg">
+                {{ educationalExperienceFormats[ability.experience] }}
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xl font-bold text-gray-600">Descripción</h3>
+              <p class="whitespace-pre-line text-lg">
+                {{ ability.description }}
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-xl font-bold text-gray-600 mb-1">Acciones</h3>
+
+              @if (ability.actions[0].type !== abilityActionType.CLASSROOM) {
+                <div class="grid grid-cols-2 gap-3">
+                  @for (action of ability.actions; track position; let position = $index) {
+                    @if (action.type === abilityActionType.THEFT) {
+                      <gow-theft-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.HEALTH) {
+                      <gow-health-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.REVEAL) {
+                      <gow-reveal-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.REVIVE) {
+                      <gow-revive-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.ASCENSION) {
+                      <gow-ascension-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.DEFEREAL_HOMEWORK) {
+                      <gow-defereal-homework-action-card [action]="action" />
+                    }
+                  }
+                </div>
+              } @else {
+                <p-card styleClass="w-full bg-primary-500">
+                  <p class="text-center block font-bold text-xl text-white">Se desarrolla en la clase</p>
+                </p-card>
+              }
+            </div>
+          </div>
+
+          <p-card styleClass="w-full">
+            <ng-template #title>
+              <span class="font-bold">Características</span>
+            </ng-template>
+
+            <ul class="flex flex-col gap-3">
+              <li class="flex gap-2.5 items-center">
+                <i-lucide [img]="ability.isInitial ? isInitialAbilityIcon : isNotInitialAbilityIcon" class="size-11" />
+
+                <div>
+                  <span class="font-bold block">¿Es una habilidad inicial?</span>
+                  <p-tag [severity]="ability.isInitial ? 'success' : 'danger'" [value]="ability.isInitial ? 'Si' : 'No'"></p-tag>
+                </div>
+              </li>
+              <li class="flex gap-2.5 items-center">
+                <i-lucide [img]="abilityTypeIcon" class="size-11" />
+
+                <div>
+                  <span class="font-bold block">Tipo de habilidad</span>
+                  <p>{{ abilityTypeFormats[ability.type] }}</p>
+                </div>
+              </li>
+              <li class="flex gap-2.5 items-center">
+                <i-lucide [img]="abilityUsageTypeIcon" class="size-11" />
+
+                <div>
+                  <span class="font-bold block">Uso de habilidad</span>
+                  <p>{{ abilityUsageTypeFormats[ability.usage.type] }}</p>
+                </div>
+              </li>
+              <li class="flex gap-2.5 items-center">
+                <i-lucide [img]="abilityClassShiftIcon" class="size-11" />
+
+                <div>
+                  <span class="font-bold block">Turno de uso</span>
+                  <p>{{ abilityUsageShiftFormats[ability.usage.shift] }}</p>
+                </div>
+              </li>
+
+              @if (ability.usage.interval; as interval) {
+                <li class="flex gap-2.5 items-center">
+                  <i-lucide [img]="abilityUsageIntervalIcon" class="size-11" />
+
+                  <div>
+                    <span class="font-bold block">Intervalo de uso</span>
+                    <p>{{ abilityUsageIntervalFormats[interval] }}</p>
+                  </div>
+                </li>
+              }
+            </ul>
+          </p-card>
+        </div>
+      </div>
+    </div>
+
+    <gow-ability-form-dialog
+      headerTitle="Editar habilidad"
+      buttonText="Editar"
+      [buttonIcon]="editIcon"
+      [show]="showEditAbilityFormDialog()"
+      [id]="editAbilitySelected().id"
+      [abilityForm]="editAbilitySelected().form"
+      (close)="onCloseFormDialog()"
+      (submit)="onEditAbility($event)"
+    />
+
+    <p-confirmdialog [draggable]="false" [closable]="false" />
+  }
+} @else {
+  <gow-classroom-admin-panel-loading />
+}
+
+<p-toast position="top-right" />

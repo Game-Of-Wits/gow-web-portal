@@ -1,0 +1,51 @@
+<div class="grid grid-cols-3 gap-2.5">
+  @if (abilityActionListForm.controls.length > 0) {
+      @for (
+        abilityAction of abilityActionListForm.controls;
+        track position;
+        let position = $index
+      ) {
+        <gow-ability-action-grid-list-form-item
+          [abilityActionForm]="abilityAction"
+          [position]="position"
+          (delete)="onDeleteAbilityActionForm($event)"
+          (edit)="onOpenEditAbilityActionFormDialog($event)"
+        />
+      }
+  }
+
+  <p-button
+    styleClass="w-full rounded-xl h-[60px]"
+    (click)="onOpenAddAbilityActionFormDialog()"
+  >
+    <span pButtonLabel>
+      @if (!isClassroomActionActive()) {
+        Añadir acción
+      } @else {
+        Permitir más acciones
+      }
+    </span>
+
+    <i-lucide pButtonIcon [img]="addIcon" />
+  </p-button>
+</div>
+
+<gow-ability-action-form-dialog
+  headerTitle="Añadir acción"
+  buttonText="Añadir"
+  [abilityActionListForm]="abilityActionListForm"
+  [show]="showAddAbilityActionFormDialog()"
+  (close)="onCloseAbilityActionForm()"
+  (success)="onAddAbilityActionForm($event)"
+/>
+
+<gow-ability-action-form-dialog
+  headerTitle="Editar acción"
+  buttonText="Editar"
+  [abilityActionListForm]="abilityActionListForm"
+  [abilityActionForm]="abilityActionFormSelected().form"
+  [position]="abilityActionFormSelected().position"
+  [show]="showEditAbilityActionFormDialog()"
+  (close)="onCloseAbilityActionForm()"
+  (success)="onEditAbilityActionForm($event)"
+/>

@@ -1,0 +1,92 @@
+@if (context.classroom(); as classroom) {
+  <section class="px-[26px] pt-[14px] pb-[6px]">
+    <p-button
+      styleClass="mb-2.5 rounded-xl"
+      (click)="onOpenCreateAbilityForm()"
+      [disabled]="isAbilityDeletingLoading()"
+    >
+      <i-lucide pButtonIcon [img]="addIcon" class="fill-white" />
+      <span pButtonLabel>Añadir habilidad</span>
+    </p-button>
+
+    <p-table
+      [value]="abilities()"
+      [loading]="isAbilitiesLoading()"
+      [scrollable]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Uso de habilidad</th>
+          <th>Experiencia educacional</th>
+          <th>Tipo de acciones</th>
+          <th>¿Es inicial?</th>
+          <th>Opciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-ability>
+        <tr
+          class="hover:bg-gray-50 transition-colors cursor-pointer"
+          [routerLink]="ability.id"
+        >
+          <td>{{ ability.name }}</td>
+          <td>{{ getAbilityTypeFormat(ability.type) }}</td>
+          <td>{{ getAbilityUsageTypeFormat(ability.usage.type) }}</td>
+          <td>{{ getEducationalExperienceFormat(ability.experience) }}</td>
+          <td>{{ getAllAbilityActionsText(ability.actions) }}</td>
+          <td>{{ ability.isInitial ? 'Si' : 'No' }}</td>
+          <td class="flex items-center gap-1.5">
+            <button
+              pButton
+              severity="info"
+              size="large"
+              [rounded]="true"
+              [disabled]="isAbilityDeletingLoading()"
+              (click)="onOpenEditAbilityForm($event, ability)"
+            >
+              <i-lucide pButtonIcon [img]="editIcon" />
+            </button>
+
+            <button
+              pButton
+              severity="danger"
+              size="large"
+              [rounded]="true"
+              [disabled]="isAbilityDeletingLoading()"
+              (click)="onDeleteAbility($event, ability.id)"
+            >
+              <i-lucide pButtonIcon [img]="deleteIcon" />
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+
+  <gow-ability-form-dialog
+    headerTitle="Crear habilidad"
+    buttonText="Crear"
+    [buttonIcon]="addIcon"
+    [show]="showCreateAbilityFormDialog()"
+    (close)="onCloseFormDialog()"
+    (submit)="onCreateAbility($event)"
+  />
+
+  <gow-ability-form-dialog
+    headerTitle="Editar habilidad"
+    buttonText="Editar"
+    [buttonIcon]="editIcon"
+    [show]="showEditAbilityFormDialog()"
+    [id]="editAbilitySelected().id"
+    [abilityForm]="editAbilitySelected().form"
+    (close)="onCloseFormDialog()"
+    (submit)="onEditAbility($event)"
+  />
+
+  <p-confirmdialog [draggable]="false" [closable]="false" />
+  <p-toast position="top-right" />
+} @else {
+  <gow-classroom-admin-panel-loading />
+}

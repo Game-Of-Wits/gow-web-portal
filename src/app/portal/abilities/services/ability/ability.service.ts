@@ -1,7 +1,11 @@
 import { Injectable, inject } from '@angular/core'
+import { FirebaseError } from '@angular/fire/app'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { AbilityMapper } from '~/abilities/mappers/ability.mapper'
 import { AbilityModel } from '~/abilities/models/Ability.model'
+import { AbilityUsage } from '~/abilities/models/AbilityUsage.model'
+import { CreateAbility } from '~/abilities/models/CreateAbility.model'
+import { UpdateAbility } from '~/abilities/models/UpdateAbility.model'
 import { AbilityRepository } from '~/abilities/repositories/ability.repository'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
@@ -22,17 +26,105 @@ export class AbilityService {
     classroomId: string,
     experience: EducationalExperience
   ): Promise<AbilityModel[]> {
-    const classroom =
-      await this.classroomService.getClassroomByIdAsync(classroomId)
+    try {
+      const classroom =
+        await this.classroomService.getClassroomByIdAsync(classroomId)
 
-    if (classroom === null) throw new ErrorResponse('classroom-not-exist')
+      if (classroom === null) throw new ErrorResponse('classroom-not-exist')
 
-    const abilities =
-      await this.abilityRepository.getAllByClassroomIdAndExperienceAsync(
-        classroom.id,
-        experience
+      const abilities =
+        await this.abilityRepository.getAllByClassroomIdAndExperienceAsync(
+          classroom.id,
+          experience
+        )
+
+      return AbilityMapper.toListModel(abilities)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async getAllAbilitiesByClassroomAsync(
+    classroomId: string
+  ): Promise<AbilityModel[]> {
+    try {
+      const classroom =
+        await this.classroomService.getClassroomByIdAsync(classroomId)
+
+      if (classroom === null) throw new ErrorResponse('classroom-not-exist')
+
+      const abilities = await this.abilityRepository.getAllByClassroomIdAsync(
+        classroom.id
       )
 
-    return AbilityMapper.toListModel(abilities)
+      return AbilityMapper.toListModel(abilities)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async createAbility(data: CreateAbility): Promise<AbilityModel> {
+    try {
+      const classroom = await this.classroomService.getClassroomByIdAsync(
+        data.classroomId
+      )
+
+      if (classroom === null) throw new ErrorResponse('classroom-not-exist')
+
+      const abilityData = structuredClone(data)
+
+      if (abilityData.usage.type === AbilityUsage.ONE_TIME)
+        delete abilityData.usage.interval
+
+      const newAbility = await this.abilityRepository.create(abilityData)
+
+      return AbilityMapper.toModel(newAbility)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async updateAbilityById(
+    abilityId: string,
+    data: Partial<UpdateAbility>
+  ): Promise<void> {
+    try {
+      const abilityExists = await this.abilityRepository.existsById(abilityId)
+
+      if (!abilityExists) throw new ErrorResponse('ability-not-exist')
+
+      if (data.classroomId !== undefined) {
+        const classroomExists = await this.classroomService.classroomExistsById(
+          data.classroomId
+        )
+        if (!classroomExists) throw new ErrorResponse('classroom-not-exist')
+      }
+
+      const updateAbilityData = structuredClone(data)
+
+      if (data.usage?.type === AbilityUsage.ONE_TIME)
+        delete updateAbilityData.usage?.interval
+
+      await this.abilityRepository.updateById(abilityId, updateAbilityData)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async deleteAbilityById(abilityId: string) {
+    try {
+      const abilityExists = await this.abilityRepository.existsById(abilityId)
+
+      if (!abilityExists) throw new ErrorResponse('ability-not-exist')
+
+      await this.abilityRepository.deleteById(abilityId)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
   }
 }

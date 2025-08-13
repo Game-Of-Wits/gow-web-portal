@@ -49,16 +49,6 @@ import { TheftActionFormComponent } from './components/theft-action-form/theft-a
 
 export type AbilityActionColorSchema = 'primary' | 'info' | 'danger'
 
-const abilityActionFormMap: Record<AbilityActionType, AbilityActionForm> = {
-  [AbilityActionType.DEFEREAL_HOMEWORK]: deferealHomeworkActionForm(),
-  [AbilityActionType.HEALTH]: healthActionForm(),
-  [AbilityActionType.ASCENSION]: ascensionActionForm(),
-  [AbilityActionType.CLASSROOM]: classroomActionForm(),
-  [AbilityActionType.REVIVE]: reviveActionForm(),
-  [AbilityActionType.REVEAL]: revealActionForm(),
-  [AbilityActionType.THEFT]: theftActionForm()
-}
-
 const dialogColorScheme: Record<string, { buttonColorClass: string }> = {
   primary: {
     buttonColorClass:
@@ -70,6 +60,16 @@ const dialogColorScheme: Record<string, { buttonColorClass: string }> = {
   danger: {
     buttonColorClass: 'hover:bg-danger-600 bg-danger-500 disabled:bg-danger-100'
   }
+}
+
+const abilityActionFormMap: Record<AbilityActionType, Function> = {
+  [AbilityActionType.DEFEREAL_HOMEWORK]: deferealHomeworkActionForm,
+  [AbilityActionType.HEALTH]: healthActionForm,
+  [AbilityActionType.ASCENSION]: ascensionActionForm,
+  [AbilityActionType.CLASSROOM]: classroomActionForm,
+  [AbilityActionType.REVIVE]: reviveActionForm,
+  [AbilityActionType.REVEAL]: revealActionForm,
+  [AbilityActionType.THEFT]: theftActionForm
 }
 
 @Component({
@@ -94,6 +94,7 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
   public readonly infoIcon = Info
   public readonly dialogColorScheme = dialogColorScheme
   public readonly classroomAbilityActionType = AbilityActionType.CLASSROOM
+
   public isAscensionActionForm = isAscensionActionForm
   public isTheftActionForm = isTheftActionForm
   public isHealthActionForm = isHealthActionForm
@@ -105,18 +106,14 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
   @Input() abilityActionForm!: AbilityActionForm | null
   @Input() abilityActionListForm!: FormArray<AbilityActionForm>
 
-  public abilityActionPosition = input<number>(0, { alias: 'position' })
-  public colorScheme = input<AbilityActionColorSchema>('primary', {
-    alias: 'colorScheme'
-  })
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
   public buttonText = input.required<string>({ alias: 'buttonText' })
 
-  public abilityActionTypeControl = new FormControl<AbilityActionType | null>(
-    null,
-    { validators: [Validators.required] }
-  )
+  public abilityActionPosition = input<number>(0, { alias: 'position' })
+  public colorScheme = input<AbilityActionColorSchema>('primary', {
+    alias: 'colorScheme'
+  })
 
   public onClose = output<void>({ alias: 'close' })
   public onSuccess = output<{
@@ -124,12 +121,28 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
     form: AbilityActionForm
   }>({ alias: 'success' })
 
-  ngOnInit(): void {
-    const abilityActionTypeControl = this.abilityActionTypeControl
+  public abilityActionTypeControl = new FormControl<AbilityActionType | null>(
+    null,
+    { validators: [Validators.required] }
+  )
 
-    abilityActionTypeControl.valueChanges.subscribe(value => {
-      this.abilityActionForm = value ? abilityActionFormMap[value] : null
-    })
+  ngOnInit(): void {
+    if (this.abilityActionForm !== null) {
+      const abilityActionTypeControl = this.abilityActionTypeControl
+
+      abilityActionTypeControl.valueChanges.subscribe(value => {
+        const defaultAbilityActionForm =
+          value !== null
+            ? value !== AbilityActionType.CLASSROOM
+              ? abilityActionFormMap[value](
+                  this.abilityActionForm?.getRawValue()
+                )
+              : abilityActionFormMap[value]()
+            : null
+
+        this.abilityActionForm = defaultAbilityActionForm
+      })
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

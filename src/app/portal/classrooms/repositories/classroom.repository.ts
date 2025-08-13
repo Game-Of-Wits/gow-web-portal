@@ -42,6 +42,11 @@ export class ClassroomRepository {
     }
   }
 
+  public async existsById(id: string) {
+    const snapshot = await getDoc(this.getClassroomRefById(id))
+    return snapshot.exists()
+  }
+
   public getAllClassrooms(teacherId: string): Observable<ClassroomDbModel[]> {
     const teacherRef = TeacherRepository.getTeacherRefById(
       this.firestore,

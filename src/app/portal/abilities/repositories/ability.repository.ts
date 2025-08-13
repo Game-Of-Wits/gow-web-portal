@@ -1,16 +1,23 @@
 import { Injectable, inject } from '@angular/core'
 import {
+  addDoc,
   collection,
+  DocumentReference,
+  deleteDoc,
   doc,
   Firestore,
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where
 } from '@angular/fire/firestore'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { AbilityDbModel } from '../models/AbilityDb.model'
+import { CreateAbility } from '../models/CreateAbility.model'
+import { UpdateAbility } from '../models/UpdateAbility.model'
+import { UpdateAbilityDb } from '../models/UpdateAbilityDb.model'
 
 @Injectable({ providedIn: 'root' })
 export class AbilityRepository {
@@ -56,6 +63,81 @@ export class AbilityRepository {
           ...doc.data()
         }) as AbilityDbModel
     )
+  }
+
+  public async getAllByClassroomIdAsync(
+    classroomId: string
+  ): Promise<AbilityDbModel[]> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const abilitiesQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef)
+    )
+
+    const abilitiesSnapshot = await getDocs(abilitiesQuery)
+
+    return abilitiesSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data()
+        }) as AbilityDbModel
+    )
+  }
+
+  public async existsById(id: string): Promise<boolean> {
+    const abilityRef = this.getRefById(id)
+    const abilitySnapshot = await getDoc(abilityRef)
+    return abilitySnapshot.exists()
+  }
+
+  public async create(data: CreateAbility): Promise<AbilityDbModel> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      data.classroomId
+    )
+
+    const newAbililityRef = (await addDoc(this.getCollectionRef(), {
+      name: data.name,
+      type: data.type,
+      description: data.description,
+      classroom: classroomRef,
+      isInitial: data.isInitial,
+      experience: data.experience,
+      usage: data.usage,
+      actions: data.actions
+    })) as DocumentReference<AbilityDbModel>
+
+    const newAbililitySnapshot = await getDoc(newAbililityRef)
+
+    return {
+      id: newAbililitySnapshot.id,
+      ...newAbililitySnapshot.data()
+    } as AbilityDbModel
+  }
+
+  public async updateById(id: string, data: Partial<UpdateAbility>) {
+    const abilityRef = this.getRefById(id)
+
+    const updateData: Partial<UpdateAbilityDb> = { ...data }
+
+    if (data.classroomId !== undefined) {
+      const classroomRef = ClassroomRepository.getRefById(
+        this.firestore,
+        data.classroomId
+      )
+      updateData.classroom = classroomRef
+    }
+
+    await updateDoc(abilityRef, updateData)
+  }
+
+  public async deleteById(id: string) {
+    await deleteDoc(this.getRefById(id))
   }
 
   private getCollectionRef() {

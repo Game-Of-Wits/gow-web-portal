@@ -11,7 +11,7 @@ export class AbilityMapper {
       name: ability.name,
       type: ability.type,
       usage: ability.usage,
-      actions: []
+      actions: ability.actions
     }
   }
 

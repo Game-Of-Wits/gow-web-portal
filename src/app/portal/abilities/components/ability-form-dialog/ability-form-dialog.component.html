@@ -1,0 +1,199 @@
+@if (abilityForm; as abilityFormGroup) {
+  <p-dialog
+    [header]="headerTitle()"
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    [formGroup]="abilityFormGroup"
+    [style]="{
+      'max-width': '1100px',
+      width: '100%',
+      border: '0',
+      overflow: 'hidden',
+    }"
+  >
+    <ng-template #header>
+      <div class="flex justify-between items-center w-full">
+        <div class="flex items-center gap-3">
+          <span class="font-bold text-xl">{{ headerTitle() }}</span>
+          <label class="flex items-start gap-1.5">
+            <p-toggle-switch formControlName="isInitial" />
+            <span class="text-base">Habilidad inicial</span>
+          </label>
+        </div>
+
+        <div class="flex gap-2 items-center">
+          <p-button
+            type="button"
+            [disabled]="abilityFormGroup.invalid"
+            (click)="onSubmitAbilityForm()"
+            [loading]="isSubmitLoading()"
+            styleClass="rounded-lg"
+          >
+            <i-lucide pButtonIcon [img]="buttonIcon()" />
+            <span pButtonLabel>{{ buttonText() }}</span>
+          </p-button>
+
+          <p-button
+            type="button"
+            size="small"
+            severity="secondary"
+            styleClass="aspect-square"
+            rounded
+            (click)="onCloseDialog()"
+            [disabled]="isSubmitLoading()"
+          >
+            <i-lucide pButtonIcon [img]="closeIcon" class="text-gray-700" />
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2.5">
+        <div class="flex items-center gap-2.5">
+          <span class="flex font-bold text-base">Información General</span>
+          <div class="content-[''] h-0.5 flex-1 w-full rounded-lg bg-gray-300"></div>
+        </div>
+
+        <div class="flex flex-col gap-2.5">
+          <div class="flex flex-col gap-1">
+            <gow-text-field
+              label="Nombre"
+              placeholder="Ingresa el nombre de la habilidad"
+              formControlName="name"
+            />
+
+            @if (nameControl?.invalid && nameControl?.touched) {
+              @if (hasErrorValidation(nameControl, "required")) {
+                <p class="text-sm text-red-500">Es requerido</p>
+              } @else if (hasErrorValidation(nameControl, "minlength")) {
+                <p class="text-sm text-red-500">Mínimo un caracter</p>
+              } @else if (hasErrorValidation(nameControl, "maxlength")) {
+                <p class="text-sm text-red-500">Máximo 60 caracteres</p>
+              }
+            }
+          </div>
+
+          <div class="flex gap-2.5">
+            <div class="flex w-full flex-col gap-1">
+              <gow-select-field
+                label="Tipo"
+                placeholder="Selecciona el tipo de habilidad"
+                [options]="abilityTypeOptions"
+                [enableClear]="false"
+                formControlName="type"
+                [scrollHeight]="170"
+              />
+
+              @if (typeControl?.invalid && typeControl?.touched) {
+                @if (hasErrorValidation(typeControl, "required")) {
+                  <p class="text-sm text-red-500">Es requerido</p>
+                }
+              }
+            </div>
+
+            <div class="flex w-full flex-col gap-1">
+              <gow-select-field
+                label="Experience estudiantil"
+                placeholder="Selecciona la experiencia"
+                [options]="educationalExperienceOptions"
+                [enableClear]="false"
+                formControlName="experience"
+                [scrollHeight]="170"
+              />
+
+              @if (
+                educationalExperienceControl?.invalid &&
+                educationalExperienceControl?.touched
+              ) {
+                @if (
+                  hasErrorValidation(educationalExperienceControl, "required")
+                ) {
+                  <p class="text-sm text-red-500">Es requerido</p>
+                }
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <gow-textarea-field
+              label="Descripción"
+              placeholder="Ingresa la descripción de la habilidad"
+              formControlName="description"
+              [rows]="5"
+            />
+
+            @if (descriptionControl?.invalid && descriptionControl?.touched) {
+              @if (hasErrorValidation(descriptionControl, "required")) {
+                <p class="text-sm text-red-500">Es requerido</p>
+              } @else if (hasErrorValidation(descriptionControl, "minlength")) {
+                <p class="text-sm text-red-500">Mínimo un caracter</p>
+              } @else if (hasErrorValidation(descriptionControl, "maxlength")) {
+                <p class="text-sm text-red-500">Máximo 400 caracteres</p>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2.5" formGroupName="usage">
+        <div class="flex items-center gap-2.5">
+          <span class="flex font-bold text-base">Uso de habilidad</span>
+          <div class="content-[''] h-0.5 flex-1 w-full rounded-lg bg-gray-300"></div>
+        </div>
+
+        <div class="flex gap-2.5">
+          <div class="flex flex-col gap-1 w-full">
+            <gow-select-field
+              label="Tipo"
+              placeholder="Seleccione el tipo de uso"
+              [options]="abilityUsageOptions"
+              [enableClear]="false"
+              formControlName="type"
+              [scrollHeight]="100"
+            />
+
+            @if (usageTypeControl?.invalid && usageTypeControl?.touched) {
+              @if (hasErrorValidation(usageTypeControl, "required")) {
+                <p class="text-sm text-red-500">Es requerido</p>
+              }
+            }
+          </div>
+
+          <div class="flex flex-col gap-1 w-full">
+            <gow-select-field
+              label="Horario de uso"
+              placeholder="Seleccione el horario de uso"
+              [options]="abilityClassShiftOptions"
+              [enableClear]="false"
+              formControlName="shift"
+              [scrollHeight]="100"
+            />
+
+            @if (usageShiftControl?.invalid && usageShiftControl?.touched) {
+              @if (hasErrorValidation(usageShiftControl, "required")) {
+                <p class="text-sm text-red-500">Es requerido</p>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2.5">
+        <div class="flex items-center gap-2.5">
+          <span class="flex font-bold text-base">Acciones</span>
+          <div class="content-[''] h-0.5 flex-1 w-full rounded-lg bg-gray-300"></div>
+        </div>
+
+        <gow-ability-action-grid-list-form
+          [abilityActionListForm]="abilityActionsFormArray"
+          [isClassroomAction]="isClassroomActionActive()"
+          [onSetIsClassroomAction]="onSetIsClassroomAction.bind(this)"
+        />
+      </div>
+    </div>
+  </p-dialog>
+}

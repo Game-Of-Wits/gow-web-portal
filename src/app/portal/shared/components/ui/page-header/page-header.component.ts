@@ -1,7 +1,18 @@
 import { Location } from '@angular/common'
 import { Component, inject, input } from '@angular/core'
-import { Router } from '@angular/router'
+import { NavigationExtras, Router } from '@angular/router'
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular'
+
+function isBackPathObject(
+  value: unknown
+): value is { commands: string[]; extras?: NavigationExtras } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'commands' in value &&
+    Array.isArray((value as any).commands)
+  )
+}
 
 @Component({
   selector: 'gow-page-header',
@@ -31,10 +42,23 @@ export class PageHeaderComponent {
 
   public title = input.required<string>({ alias: 'principalTitle' })
   public subtitle = input.required<string>({ alias: 'subtitle' })
-  public defaultBackPath = input.required<string>({ alias: 'defaultBackPath' })
+  public defaultBackPath = input.required<
+    string | { commands: string[]; extras?: NavigationExtras }
+  >({ alias: 'defaultBackPath' })
 
   public onGoBack() {
     if (window.history.length > 0) this.location.back()
-    else this.router.navigate([this.defaultBackPath()])
+    else {
+      const defaultBackNavigation = this.defaultBackPath()
+
+      if (typeof defaultBackNavigation === 'string') {
+        this.router.navigate([defaultBackNavigation])
+      } else if (isBackPathObject(defaultBackNavigation)) {
+        this.router.navigate(
+          defaultBackNavigation.commands,
+          defaultBackNavigation.extras
+        )
+      }
+    }
   }
 }

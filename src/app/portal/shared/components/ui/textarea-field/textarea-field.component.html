@@ -11,7 +11,8 @@
     [disabled]="textareaDisabled()"
     [autoResize]="enableAutoResize()"
     (input)="handleInput($event)"
-    class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden resize-none {{
+    wrap="hard"
+    class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden resize-none text-wrap {{
       focusColorMap[focusColor()]
     }}"
   ></textarea>

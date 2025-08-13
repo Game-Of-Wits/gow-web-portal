@@ -48,9 +48,9 @@
             @if (hasErrorValidation(nameControl, "required")) {
               <p class="text-sm text-red-500">Es requerido</p>
             } @else if (hasErrorValidation(nameControl, "minlength")) {
-              <p class="text-sm text-red-500">Mínimo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+              <p class="text-sm text-red-500">Mínimo un caracter</p>
             } @else if (hasErrorValidation(nameControl, "maxlength")) {
-              <p class="text-sm text-red-500">Máximo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+              <p class="text-sm text-red-500">Máximo 60 caracteres</p>
             }
           }
         </div>
@@ -101,9 +101,9 @@
             @if (hasErrorValidation(descriptionControl, "required")) {
               <p class="text-sm text-red-500">Es requerido</p>
             } @else if (hasErrorValidation(descriptionControl, "minlength")) {
-              <p class="text-sm text-red-500">Mínimo {{ descriptionControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+              <p class="text-sm text-red-500">Mínimo un caracter</p>
             } @else if (hasErrorValidation(descriptionControl, "maxlength")) {
-              <p class="text-sm text-red-500">Máximo {{ descriptionControl?.errors?.["maxlength"].requiredLength }} caracteres</p>
+              <p class="text-sm text-red-500">Máximo 400 caracteres</p>
             }
           }
         </div>

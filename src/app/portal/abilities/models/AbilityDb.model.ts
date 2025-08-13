@@ -1,4 +1,6 @@
+import { DocumentReference } from '@angular/fire/firestore'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
+import { AbilityActionModel } from './Ability.model'
 import { AbilityClassShift } from './AbilityClassShift.model'
 import { AbilityType } from './AbilityType.model'
 import { AbilityUsage } from './AbilityUsage.model'
@@ -9,11 +11,13 @@ export interface AbilityDbModel {
   name: string
   description: string
   type: AbilityType
+  classroom: DocumentReference
   usage: {
     type: AbilityUsage
     shift: AbilityClassShift
     interval: AbilityUsageInterval
   }
+  actions: AbilityActionModel[]
   experience: EducationalExperience
   isInitial: boolean
 }

@@ -9,7 +9,6 @@ import {
   Firestore,
   getDoc,
   getDocs,
-  orderBy,
   query,
   updateDoc,
   where
@@ -98,17 +97,15 @@ export class LevelRepository {
       querySnapshot.docs.forEach(doc => abilitySnapshots.push(doc))
     })
 
-    const abilities: AbilityDbModel[] = abilitySnapshots
+    return abilitySnapshots
       .filter(snapshot => snapshot.exists())
       .map(
         snapshot =>
           ({
             id: snapshot.id,
             ...snapshot.data()
-          }) as AbilityModel
+          }) as AbilityDbModel
       )
-
-    return abilities
   }
 
   public async create(data: CreateLevelModel): Promise<LevelDbModel> {

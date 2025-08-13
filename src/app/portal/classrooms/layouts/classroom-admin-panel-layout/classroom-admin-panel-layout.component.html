@@ -36,7 +36,6 @@
             [value]="tab.route"
             [routerLink]="tab.route"
             class="flex items-center !gap-2 py-2.5 px-0 bg-background-white"
-            [style]="activeTab() === tab.route ? { color: tab.activeColor.textColor, 'border-color': tab.activeColor.borderColor} : {}"
           >
             <i-lucide [img]="tab.icon" class="size-[20px]" />
             <span>{{ tab.label }}</span>

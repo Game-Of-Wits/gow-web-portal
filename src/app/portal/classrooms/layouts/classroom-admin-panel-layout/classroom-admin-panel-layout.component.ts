@@ -27,29 +27,6 @@ import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
-import { EducationalExperience } from '~/shared/models/EducationalExperience'
-import { gowThemeConfig } from '~/shared/theme'
-
-const activeTabColors: Record<
-  EducationalExperience | 'GENERAL',
-  {
-    textColor: string
-    borderColor: string
-  }
-> = {
-  [EducationalExperience.MASTERY_ROAD]: {
-    borderColor: gowThemeConfig.semantic.info[500],
-    textColor: gowThemeConfig.semantic.info[500]
-  },
-  [EducationalExperience.SHADOW_WARFARE]: {
-    borderColor: gowThemeConfig.semantic.danger[500],
-    textColor: gowThemeConfig.semantic.danger[500]
-  },
-  GENERAL: {
-    borderColor: gowThemeConfig.semantic.primary[500],
-    textColor: gowThemeConfig.semantic.primary[500]
-  }
-}
 
 @Component({
   selector: 'gow-classroom-admin-panel-layout',
@@ -82,52 +59,41 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
     route: string
     label: string
     icon: LucideIconData
-    activeColor: {
-      textColor: string
-      borderColor: string
-    }
   }> = [
     {
       route: 'overview',
       label: 'Clase',
-      icon: Shapes,
-      activeColor: activeTabColors['GENERAL']
+      icon: Shapes
     },
     {
       route: 'students',
       label: 'Estudiantes',
-      icon: GraduationCap,
-      activeColor: activeTabColors['GENERAL']
+      icon: GraduationCap
     },
     {
       route: 'abilities',
       label: 'Habilidades',
-      icon: Sparkles,
-      activeColor: activeTabColors['GENERAL']
+      icon: Sparkles
     },
     {
       route: 'teams',
       label: 'Equipos y personajes',
-      icon: Users,
-      activeColor: activeTabColors[EducationalExperience.SHADOW_WARFARE]
+      icon: Users
     },
     {
       route: 'homeworks',
       label: 'Tareas',
-      icon: Files,
-      activeColor: activeTabColors[EducationalExperience.SHADOW_WARFARE]
+      icon: Files
     },
     {
       route: 'levels',
       label: 'Niveles',
-      icon: ArrowUpRight,
-      activeColor: activeTabColors[EducationalExperience.MASTERY_ROAD]
+      icon: ArrowUpRight
     },
     {
       route: 'penalties',
       label: 'Penalizaciones',
-      icon: TriangleAlert,
-      activeColor: activeTabColors[EducationalExperience.MASTERY_ROAD]
+      icon: TriangleAlert
     }
   ]
 
