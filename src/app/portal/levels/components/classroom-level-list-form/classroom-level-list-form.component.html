@@ -24,9 +24,9 @@
 <gow-level-form-dialog
   buttonText="Añadir"
   headerTitle="Añadir nivel"
-  [position]="levelFormSelected().position"
+  [id]="levelFormSelected().position"
   [minRequiredPoints]="levelFormSelected().minRequiredPoints"
   [show]="showAddLevelFormDialog()"
   (close)="onCloseLevelFormDialog()"
-  (success)="onAddLevelForm($event)"
+  (submit)="onAddLevelForm($event)"
 />

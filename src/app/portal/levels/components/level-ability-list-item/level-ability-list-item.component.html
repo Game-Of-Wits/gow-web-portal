@@ -1,7 +1,9 @@
-<div class="py-2 justify-between items-center">
+<div class="py-1.5 flex justify-between items-center">
   <div class="flex items-center gap-1.5">
-    <i-lucide [img]="abilityIcon" />
-    <span>{{ ability().name }}</span>
+    <i-lucide [img]="abilityIcon" class="size-9 fill-info-500 text-info-500" />
+    <span class="text-[1.1rem] line-clamp-1 text-ellipsis">{{
+      ability().name
+    }}</span>
   </div>
 
   <button

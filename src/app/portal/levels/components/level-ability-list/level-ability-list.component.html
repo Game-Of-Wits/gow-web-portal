@@ -1,7 +1,7 @@
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-2">
   @if (!isLevelAbilitiesLoading()) {
     <div class="flex flex-col">
-      @for (ability of _abilities(); track ability.id) {
+      @for (ability of getLevelAbilities(); track position; let position = $index) {
         <gow-level-ability-list-item
           [ability]="ability"
           (remove)="onRemoveAbility($event)"

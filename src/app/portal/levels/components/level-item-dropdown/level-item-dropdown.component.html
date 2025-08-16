@@ -4,7 +4,7 @@
     style="background-color: {{ level().primaryColor }};"
   ></div>
 
-  <div class="flex flex-col gap-2.5 flex-1">
+  <div class="flex flex-col gap-0.5 flex-1">
     <div class="flex justify-between">
       <div class="flex items-center gap-2.5">
         <span>{{ level().name }}</span>
@@ -20,36 +20,42 @@
 
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-0.5">
-          <button
-            pButton
+          <p-button
             [text]="true"
+            [disabled]="disable()"
+            (click)="onEdit(level().id)"
             severity="primary"
+            styleClass="aspect-square"
+            type="button"
             rounded
-            [disabled]="true"
+            size="small"
           >
             <i-lucide pButtonIcon class="text-primary-500" [img]="editIcon" />
-          </button>
+          </p-button>
 
           @if (level().requiredPoints > 0) {
-            <button
-              pButton
+            <p-button
               [text]="true"
+              (click)="onDelete($event, level().id)"
+              [disabled]="disable()"
               severity="danger"
+              styleClass="aspect-square"
+              type="button"
+              size="small"
               rounded
-              [disabled]="true"
             >
               <i-lucide
                 pButtonIcon
                 class="text-danger-500"
                 [img]="deleteIcon"
               />
-            </button>
+            </p-button>
           }
         </div>
 
-        <button class="cursor-pointer" (click)="onToggleShowAbilities()">
+        <button class="cursor-pointer group" (click)="onToggleShowAbilities()" [disabled]="disable()">
           <i-lucide
-            class="text-info-500 size-9"
+            class="text-info-500 size-9 group-disabled:text-gray-300"
             [img]="isLevelAbilitiesShowing() ? upIcon : downIcon"
           />
         </button>
@@ -59,10 +65,20 @@
     @if (isLevelAbilitiesShowing()) {
       <gow-level-abilities-list
         [levelId]="level().id"
-        [abilities]="loadLevelAbilities()"
+        [levelAbilitiesMap]="loadLevelAbilitiesMap"
         (updateAbilities)="onSetLevelAbilities($event)"
-        (selectLevelToAddAbility)="onSetSelectLevelToAddAbility($event)"
+        (selectLevelToAddAbility)="onOpenAddAbilityToLevelDialog()"
       />
     }
   </div>
 </div>
+
+@if (showAddAbilityToLevelDialog()) {
+  <gow-add-ability-to-level-dialog
+    [levelId]="level().id"
+    [levelAbilityIds]="level().abilityIds"
+    [show]="showAddAbilityToLevelDialog()"
+    (close)="onCloseAddAbilityToLevelDialog()"
+    (submit)="onAddAbilityToLoadLevelAbilities($event)"
+  />
+}

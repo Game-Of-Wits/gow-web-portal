@@ -9,6 +9,7 @@ import { AbilityService } from '~/abilities/services/ability/ability.service'
 import { LevelMapper } from '~/levels/mappers/level.mapper'
 import { CreateLevelModel } from '~/levels/models/CreateLevel.model'
 import { LevelModel } from '~/levels/models/Level.model'
+import { UpdateLevelModel } from '~/levels/models/UpdateLevel.model'
 import { LevelRepository } from '~/levels/repositories/level.repository'
 
 @Injectable({ providedIn: 'root' })
@@ -44,8 +45,45 @@ export class LevelService {
   }
 
   public async createLevel(data: CreateLevelModel): Promise<LevelModel> {
-    const newLevel = await this.levelRepository.create(data)
-    return LevelMapper.toModel(newLevel)
+    try {
+      const newLevel = await this.levelRepository.create(data)
+      return LevelMapper.toModel(newLevel)
+    } catch (err) {
+      const error = err as FirebaseError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async updateLevelById(
+    levelId: string,
+    data: Partial<UpdateLevelModel>
+  ): Promise<void> {
+    try {
+      const levelExists = await this.levelRepository.existsById(levelId)
+
+      if (!levelExists) throw new ErrorResponse('level-not-exist')
+
+      await this.levelRepository.updateByIdAsync(levelId, data)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async deleteLevelById(levelId: string): Promise<void> {
+    try {
+      const level = await this.levelRepository.getByIdAsync(levelId)
+
+      if (level === null) throw new ErrorResponse('level-not-exist')
+
+      if (level.requiredPoints === 0)
+        throw new ErrorResponse('delete-initial-level-not-allowed')
+
+      await this.levelRepository.deleteByIdAsync(levelId)
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
   }
 
   public async removeAbilityFromLevelAsync(
@@ -62,10 +100,10 @@ export class LevelService {
       )
 
       await this.levelRepository.updateByIdAsync(abilityId, {
-        abilities: updatedLevelAbilities
+        abilityIds: updatedLevelAbilities.map(ability => ability.id)
       })
     } catch (err) {
-      const error = err as FirebaseError
+      const error = err as FirebaseError | ErrorResponse
       throw new ErrorResponse(error.code)
     }
   }
@@ -74,18 +112,27 @@ export class LevelService {
     levelId: string,
     abilityId: string
   ): Promise<AbilityModel> {
-    const level = await this.levelRepository.getByIdAsync(levelId)
+    try {
+      const level = await this.levelRepository.getByIdAsync(levelId)
 
-    if (level === null) throw new ErrorResponse('level-not-exist')
+      if (level === null) throw new ErrorResponse('level-not-exist')
 
-    const ability = await this.abilityService.getAbilityByIdAsync(abilityId)
+      const ability = await this.abilityService.getAbilityByIdAsync(abilityId)
 
-    if (ability === null) throw new ErrorResponse('ability-not-exist')
+      if (ability === null) throw new ErrorResponse('ability-not-exist')
 
-    await this.levelRepository.updateByIdAsync(level.id, {
-      abilities: level?.abilities.filter(a => a.id !== abilityId)
-    })
+      const levelAbilities = level.abilities.map(ability => ability.id)
 
-    return ability
+      const levelUpdatedAbilities = [...levelAbilities, ability.id]
+
+      await this.levelRepository.updateByIdAsync(level.id, {
+        abilityIds: levelUpdatedAbilities
+      })
+
+      return ability
+    } catch (err) {
+      const error = err as FirebaseError | ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
   }
 }

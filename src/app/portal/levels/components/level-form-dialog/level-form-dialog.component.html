@@ -39,41 +39,43 @@
               formControlName="name"
             />
 
-            @if (nameControl?.invalid && nameControl?.touched) {
+            @if (nameControl.invalid && nameControl.touched) {
               @if (hasErrorValidation(nameControl, "required")) {
                 <p class="text-red-500 text-sm">Es requerido</p>
               } @else if (hasErrorValidation(nameControl, "minlength")) {
-                <p class="text-red-500 text-sm">Mínimo {{ nameControl?.errors?.["minlength"].requiredLength }} caracteres</p>
+                <p class="text-red-500 text-sm">Mínimo {{ nameControl.errors?.["minlength"].requiredLength }} caracteres</p>
               } @else if (hasErrorValidation(nameControl, "maxlength")) {
-                <p class="text-red-500 text-sm">Máximo {{ nameControl?.errors?.["maxlength"].requiredLength }} caracteres</p>
+                <p class="text-red-500 text-sm">Máximo {{ nameControl.errors?.["maxlength"].requiredLength }} caracteres</p>
               }
             }
           </div>
 
-          <div class="flex flex-col gap-1">
-            <gow-number-field
-              label="Puntaje requerido (Mínimo: {{ minRequiredPoints }} - Máximo: {{ maxRequiredPoints == null ? 'ninguno' : maxRequiredPoints }})"
-              placeholder="Ingrese el puntaje requerido"
-              focusColor="info"
-              formControlName="requiredPoints"
-            />
+          @if (!isInitialLevel()) {
+            <div class="flex flex-col gap-1">
+              <gow-number-field
+                label="Puntaje requerido (Mínimo: {{ minRequiredPoints }} - Máximo: {{ maxRequiredPoints == null ? 'ninguno' : maxRequiredPoints }})"
+                placeholder="Ingrese el puntaje requerido"
+                focusColor="info"
+                formControlName="requiredPoints"
+              />
 
-            @if (requiredPointsControl?.invalid && requiredPointsControl?.touched) {
-              @if (hasErrorValidation(requiredPointsControl, "required")) {
-                <p class="text-red-500 text-sm">Es requerido</p>
-              } @else if (hasErrorValidation(requiredPointsControl, "outOfPointLimit")) {
-                <p class="text-red-500 text-sm">
-                  Mínimo {{ requiredPointsControl?.errors?.["outOfPointLimit"].min }} de puntaje
-                </p>
-
-                @if (requiredPointsControl?.errors?.["outOfPointLimit"].max != null) {
+              @if (requiredPointsControl.invalid && requiredPointsControl.touched) {
+                @if (hasErrorValidation(requiredPointsControl, "required")) {
+                  <p class="text-red-500 text-sm">Es requerido</p>
+                } @else if (hasErrorValidation(requiredPointsControl, "outOfPointLimit")) {
                   <p class="text-red-500 text-sm">
-                    Máximo {{ requiredPointsControl?.errors?.["outOfPointLimit"].max }} de puntaje
+                    Mínimo {{ requiredPointsControl.errors?.["outOfPointLimit"].min }} de puntaje
                   </p>
+
+                  @if (requiredPointsControl.errors?.["outOfPointLimit"].max != null) {
+                    <p class="text-red-500 text-sm">
+                      Máximo {{ requiredPointsControl.errors?.["outOfPointLimit"].max }} de puntaje
+                    </p>
+                  }
                 }
               }
-            }
-          </div>
+            </div>
+          }
         </div>
       </div>
 

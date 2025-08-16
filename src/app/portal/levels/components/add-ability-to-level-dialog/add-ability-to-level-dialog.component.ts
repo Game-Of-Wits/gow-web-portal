@@ -23,6 +23,14 @@ import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 
+export interface AddAbilityToLevelDialogSubmit {
+  result: {
+    levelId: string
+    abilityAdded: AbilityModel
+  }
+  onFinish: () => void
+}
+
 const abilitiesLoadingErrorMessages: ErrorMessages = {
   ...commonErrorMessages
 }
@@ -61,7 +69,10 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
     nonNullable: true
   })
 
-  public levelId = input.required<string | null>({ alias: 'levelId' })
+  public levelId = input.required<string>({ alias: 'levelId' })
+  public levelAbilityIds = input.required<string[]>({
+    alias: 'levelAbilityIds'
+  })
   public showDialog = input.required<boolean>({ alias: 'show' })
 
   public abilities = signal<AbilityModel[]>([])
@@ -70,8 +81,8 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
   public isAddAbilityToLevelLoading = signal<boolean>(false)
 
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<{ levelId: string; abilityAdded: AbilityModel }>({
-    alias: 'success'
+  public onSubmit = output<AddAbilityToLevelDialogSubmit>({
+    alias: 'submit'
   })
 
   ngOnInit(): void {
@@ -84,7 +95,7 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
   }
 
   public async onSelectAbilityToLevel() {
-    if (!this.selectedAbilityControl.invalid) return
+    if (this.selectedAbilityControl.invalid) return
 
     const abilityId = this.selectedAbilityControl.value
     const levelId = this.levelId()
@@ -98,8 +109,15 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
         levelId,
         abilityId
       )
-      this.onSuccess.emit({ levelId, abilityAdded: ability })
-      this.onClose.emit()
+      this.onSubmit.emit({
+        result: {
+          levelId,
+          abilityAdded: ability
+        },
+        onFinish: () => {
+          this.onCloseDialog()
+        }
+      })
     } catch (err) {
       const error = err as ErrorResponse
       this.onShowAddAbilityToLevelErrorMessage(error.code)
@@ -111,6 +129,7 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
   public onCloseDialog() {
     this.selectedAbilityControl.setValue('')
     this.onClose.emit()
+    this.isAddAbilityToLevelLoading.set(false)
   }
 
   public hasErrorValidation(validationKey: string) {
@@ -133,7 +152,11 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
         EducationalExperience.MASTERY_ROAD
       )
       .then(abilities => {
-        this.abilities.set(abilities)
+        this.abilities.set(
+          abilities.filter(
+            ability => !this.levelAbilityIds().includes(ability.id)
+          )
+        )
         this.isAbilitiesLoading.set(false)
       })
       .catch(err => {

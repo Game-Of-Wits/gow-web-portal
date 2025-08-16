@@ -1,24 +1,47 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
+import { FormGroup } from '@angular/forms'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
-import { MessageService } from 'primeng/api'
+import { ConfirmationService, MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { CardModule } from 'primeng/card'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
 import { AbilityModel } from '~/abilities/models/Ability.model'
 import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/classroom-admin-panel-loading.component'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
-import { AddAbilityToLevelDialogComponent } from '~/levels/components/add-ability-to-level-dialog/add-ability-to-level-dialog.component'
 import {
   LevelFormDialogComponent,
   LevelFormSubmit
 } from '~/levels/components/level-form-dialog/level-form-dialog.component'
 import { LevelItemDropdownComponent } from '~/levels/components/level-item-dropdown/level-item-dropdown.component'
+import { levelForm } from '~/levels/forms'
 import { LevelModel } from '~/levels/models/Level.model'
+import { LevelForm } from '~/levels/models/LevelForm.model'
 import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 
+const deleteLevelErrorMessages: ErrorMessages = {
+  'level-not-exist': {
+    message: 'Nivel no existente',
+    summary: 'El nivel no ha sido encontrado'
+  },
+  'delete-initial-level-not-allowed': {
+    message: 'Eliminar nivel inicial no ',
+    summary: 'El nivel inicial no se puede eliminar'
+  },
+  ...commonErrorMessages
+}
+
 const createLevelErrorMessages: ErrorMessages = {
+  ...commonErrorMessages
+}
+
+const updateLevelErrorMessages: ErrorMessages = {
+  'level-not-exist': {
+    message: 'Nivel no existente',
+    summary: 'El nivel no ha sido encontrado'
+  },
   ...commonErrorMessages
 }
 
@@ -33,12 +56,12 @@ const levelsLoadingErrorMessages: ErrorMessages = {
     LevelItemDropdownComponent,
     ButtonModule,
     CardModule,
-    AddAbilityToLevelDialogComponent,
     LevelFormDialogComponent,
     ClassroomAdminPanelLoadingComponent,
+    ConfirmDialogModule,
     LucideAngularModule
   ],
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   public readonly addIcon = Plus
@@ -46,24 +69,27 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   private readonly levelService = inject(LevelService)
 
   private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly confirmationService = inject(ConfirmationService)
   private readonly toastService = inject(MessageService)
 
   public levels = signal<LevelModel[]>([])
   public isLevelsLoading = signal<boolean>(true)
 
-  public levelIdSelectedToAddAbility = signal<string | null>(null)
-  public showAddAbilityToLevelDialog = signal<boolean>(false)
-
   public loadLevelAbilitiesMap = signal<Map<string, AbilityModel[]>>(new Map())
   public isCreateLevelLoading = signal<boolean>(false)
+  public deletingLevelLoading = signal<boolean>(false)
 
-  public showCreateLevel = signal<boolean>(false)
-  public createLevelData = signal<{
-    position: number
+  public showCreateLevelFormDialog = signal<boolean>(false)
+  public showEditLevelFormDialog = signal<boolean>(false)
+
+  public levelSelected = signal<{
+    id: number | string
+    form: FormGroup<LevelForm> | null
     minPoints: number
     maxPoints: number | null
   }>({
-    position: 0,
+    id: 0,
+    form: null,
     minPoints: 0,
     maxPoints: null
   })
@@ -76,44 +102,77 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
     this.loadLevels(classroomId)
   }
 
-  public onOpenCreateLevelDialog(position: number) {
+  public onCloseLevelFormDialog() {
+    this.showCreateLevelFormDialog.set(false)
+    this.showEditLevelFormDialog.set(false)
+    this.levelSelected.set({
+      id: 0,
+      form: null,
+      minPoints: 0,
+      maxPoints: null
+    })
+  }
+
+  public onOpenCreateLevelDialog(nextLevelPosition: number) {
     let minPoints = 0
     let maxPoints: number | null = null
 
-    minPoints = (this.levels().at(position - 1)?.requiredPoints ?? 0) + 1
+    minPoints = (this.levels()[nextLevelPosition - 1]?.requiredPoints ?? 0) + 1
 
-    maxPoints = this.levels().at(position)?.requiredPoints ?? null
+    maxPoints = this.levels()[nextLevelPosition]?.requiredPoints ?? null
 
     if (maxPoints !== null) maxPoints -= 1
 
-    this.showCreateLevel.set(true)
-    this.createLevelData.set({
-      position,
+    this.showCreateLevelFormDialog.set(true)
+    this.levelSelected.set({
+      id: 0,
+      form: null,
       minPoints,
       maxPoints
     })
   }
 
-  public onCloseAddLevelDialog() {
-    this.showCreateLevel.set(false)
+  public onOpenEditLevelDialog(levelId: string) {
+    const level = this.levels().find(level => level.id === levelId)
+
+    if (level === undefined) return
+
+    let maxPoints: number | null = null
+
+    const levelPosition = this.levels().findIndex(l => l.id === level.id)
+
+    maxPoints = this.levels()[levelPosition + 1]?.requiredPoints ?? null
+
+    if (maxPoints !== null) maxPoints -= 1
+
+    this.showEditLevelFormDialog.set(true)
+    this.levelSelected.set({
+      id: level.id,
+      form: levelForm({
+        requiredPoints: level.requiredPoints,
+        max: maxPoints,
+        name: level.name,
+        primaryColor: level.primaryColor
+      }),
+      minPoints: level.requiredPoints,
+      maxPoints
+    })
   }
 
   public onCreateLevel(submit: LevelFormSubmit) {
     const classroomId = this.context.classroom()?.id ?? null
 
-    if (submit.result.form.invalid || classroomId === null) return
-
-    const levelData = submit.result.form.getRawValue()
+    if (classroomId === null) return
 
     this.isCreateLevelLoading.set(true)
 
     this.levelService
-      .createLevel({ classroomId, ...levelData })
+      .createLevel({ classroomId, ...submit.result.formData })
       .then(level => {
         this.levels.update(levels => {
           const updatedLevels = [...levels]
 
-          updatedLevels.splice(submit.result.position, 0, level)
+          updatedLevels.splice(submit.result.id as number, 0, level)
 
           return updatedLevels
         })
@@ -121,21 +180,52 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
       })
       .catch(err => {
         const error = err as ErrorResponse
-        this.onShowCreateLevelErrorMessage(error.code)
+        this.showCreateLevelErrorMessage(error.code)
       })
       .finally(() => {
         this.isCreateLevelLoading.set(false)
       })
   }
 
-  public onCloseAddAbilityToLevelDialog() {
-    this.showAddAbilityToLevelDialog.set(false)
-    this.levelIdSelectedToAddAbility.set(null)
-  }
+  public onEditLevel(submit: LevelFormSubmit) {
+    const classroomId = this.context.classroom()?.id ?? null
 
-  public onOpenAddAbilityToLevelDialog(levelId: string) {
-    this.showAddAbilityToLevelDialog.set(true)
-    this.levelIdSelectedToAddAbility.set(levelId)
+    if (classroomId === null) return
+
+    const levelId = submit.result.id as string
+    const updateData = submit.result.formData
+
+    this.isCreateLevelLoading.set(true)
+
+    this.levelService
+      .updateLevelById(levelId, updateData)
+      .then(() => {
+        this.levels.update(levels => {
+          const levelIndex = levels.findIndex(
+            level => level.id === submit.result.id
+          )
+          if (levelIndex === -1) return levels
+
+          const formData = submit.result.formData
+
+          levels[levelIndex] = {
+            ...levels[levelIndex],
+            requiredPoints: formData.requiredPoints,
+            primaryColor: formData.primaryColor.trim(),
+            name: formData.name.trim()
+          }
+
+          return levels
+        })
+        submit.onFinish()
+      })
+      .catch(err => {
+        const error = err as ErrorResponse
+        this.showUpdateLevelErrorMessage(error.code)
+      })
+      .finally(() => {
+        this.isCreateLevelLoading.set(false)
+      })
   }
 
   public onUpdateLoadLevelAbilities(data: {
@@ -148,20 +238,6 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
     })
   }
 
-  public onAddAbilityToLoadLevelAbilities(data: {
-    levelId: string
-    abilityAdded: AbilityModel
-  }) {
-    this.loadLevelAbilitiesMap.update(currentMap => {
-      const newMap = new Map(currentMap)
-      if (!newMap.has(data.levelId)) return newMap
-
-      const currentAbilities = newMap.get(data.levelId)!
-      newMap.set(data.levelId, [...currentAbilities, data.abilityAdded])
-      return newMap
-    })
-  }
-
   public isValidCreateLevelBetweenLevels(
     currentRequiredPoints: number,
     nextRequiredPoints: number | null
@@ -169,6 +245,41 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
     if (nextRequiredPoints === null) return true
 
     return nextRequiredPoints - currentRequiredPoints > 1
+  }
+
+  public onDeleteLevel(data: { event: Event; levelId: string }) {
+    this.confirmationService.confirm({
+      target: data.event.target as EventTarget,
+      message: '¿Estas seguro de eliminar el nivel?',
+      header: 'Eliminar nivel',
+      rejectLabel: 'Cancelar',
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+        loading: this.deletingLevelLoading()
+      },
+      acceptButtonProps: {
+        label: 'Eliminar',
+        severity: 'danger',
+        loading: this.deletingLevelLoading()
+      },
+      accept: async () => {
+        this.deletingLevelLoading.set(true)
+
+        try {
+          await this.levelService.deleteLevelById(data.levelId)
+          this.levels.update(levels =>
+            levels.filter(level => level.id !== data.levelId)
+          )
+        } catch (err) {
+          const error = err as ErrorResponse
+          this.showDeleteLevelErrorMessage(error.code)
+        } finally {
+          this.deletingLevelLoading.set(false)
+        }
+      }
+    })
   }
 
   private loadLevels(classroomId: string) {
@@ -181,22 +292,32 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
       },
       error: err => {
         const error = err as ErrorResponse
-        this.onShowLevelsLoadingErrorMessage(error.code)
+        this.showLevelsLoadingErrorMessage(error.code)
       }
     })
   }
 
-  private onShowCreateLevelErrorMessage(code: string) {
+  private showDeleteLevelErrorMessage(code: string) {
+    const { summary, message } = deleteLevelErrorMessages[code]
+    this.showErrorMessage(summary, message)
+  }
+
+  private showUpdateLevelErrorMessage(code: string) {
+    const { summary, message } = updateLevelErrorMessages[code]
+    this.showErrorMessage(summary, message)
+  }
+
+  private showCreateLevelErrorMessage(code: string) {
     const { summary, message } = createLevelErrorMessages[code]
-    this.onShowErrorMessage(summary, message)
+    this.showErrorMessage(summary, message)
   }
 
-  private onShowLevelsLoadingErrorMessage(code: string) {
+  private showLevelsLoadingErrorMessage(code: string) {
     const { summary, message } = levelsLoadingErrorMessages[code]
-    this.onShowErrorMessage(summary, message)
+    this.showErrorMessage(summary, message)
   }
 
-  private onShowErrorMessage(summary: string, detail: string) {
+  private showErrorMessage(summary: string, detail: string) {
     this.toastService.add({ severity: 'error', summary, detail })
   }
 }

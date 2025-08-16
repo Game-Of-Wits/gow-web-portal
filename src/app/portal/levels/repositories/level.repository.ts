@@ -4,6 +4,7 @@ import {
   collection,
   DocumentReference,
   DocumentSnapshot,
+  deleteDoc,
   doc,
   documentId,
   Firestore,
@@ -15,12 +16,13 @@ import {
 } from '@angular/fire/firestore'
 import { chuckArray } from '@shared/utils/chuckArray'
 import { from, map } from 'rxjs'
-import { AbilityModel } from '~/abilities/models/Ability.model'
 import { AbilityDbModel } from '~/abilities/models/AbilityDb.model'
 import { AbilityRepository } from '~/abilities/repositories/ability.repository'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { CreateLevelModel } from '../models/CreateLevel.model'
 import { LevelDbModel } from '../models/LevelDb.model'
+import { UpdateLevelModel } from '../models/UpdateLevel.model'
+import { UpdateLevelDb } from '../models/UpdateLevelDb.model'
 
 @Injectable({ providedIn: 'root' })
 export class LevelRepository {
@@ -108,6 +110,17 @@ export class LevelRepository {
       )
   }
 
+  public async count(): Promise<number> {
+    const levelsSnapshot = await getDocs(this.getCollectionRef())
+    return levelsSnapshot.size
+  }
+
+  public async existsById(id: string): Promise<boolean> {
+    const levelRef = this.getRefById(id)
+    const levelSnapshot = await getDoc(levelRef)
+    return levelSnapshot.exists()
+  }
+
   public async create(data: CreateLevelModel): Promise<LevelDbModel> {
     const classroomRef = ClassroomRepository.getRefById(
       this.firestore,
@@ -131,8 +144,33 @@ export class LevelRepository {
     } as LevelDbModel
   }
 
-  public async updateByIdAsync(levelId: string, data: Partial<LevelDbModel>) {
-    await updateDoc(this.getRefById(levelId), data)
+  public async updateByIdAsync(
+    levelId: string,
+    data: Partial<UpdateLevelModel>
+  ) {
+    const { abilityIds, classroomId, ...levelData } = data
+
+    const updatedata: Partial<UpdateLevelDb> = {
+      ...levelData
+    }
+
+    if (classroomId)
+      updatedata.classroom = ClassroomRepository.getRefById(
+        this.firestore,
+        classroomId
+      )
+
+    if (abilityIds) {
+      updatedata.abilities = abilityIds.map(abilityId =>
+        AbilityRepository.getRefById(this.firestore, abilityId)
+      )
+    }
+
+    await updateDoc(this.getRefById(levelId), updatedata)
+  }
+
+  public async deleteByIdAsync(id: string) {
+    await deleteDoc(this.getRefById(id))
   }
 
   private getCollectionRef() {

@@ -1,6 +1,7 @@
 import { Component, Input, input, signal } from '@angular/core'
 import { FormArray, FormGroup } from '@angular/forms'
 import { LucideAngularModule, Pencil, Plus } from 'lucide-angular'
+import { levelForm } from '~/levels/forms'
 import { LevelForm } from '~/levels/models/LevelForm.model'
 import { ClassroomLevelListFormItemComponent } from '../classroom-level-list-form-item/classroom-level-list-form-item.component'
 import {
@@ -57,7 +58,7 @@ export class ClassroomLevelListFormComponent {
   }
 
   public onAddLevelForm(submit: LevelFormSubmit) {
-    this.levelListForm.push(submit.result.form)
+    this.levelListForm.push(levelForm(submit.result.formData))
     submit.onFinish()
   }
 

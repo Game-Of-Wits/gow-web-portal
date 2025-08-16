@@ -1,4 +1,12 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core'
+import {
+  Component,
+  Input,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal
+} from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
@@ -33,24 +41,26 @@ export class LevelAbilityListComponent implements OnInit {
   private readonly toastService = inject(MessageService)
 
   public levelId = input.required<string>({ alias: 'levelId' })
-  public abilities = input<AbilityModel[] | null>(null, { alias: 'abilities' })
+  @Input() levelAbilitiesMap!: Map<string, AbilityModel[]>
 
-  public _abilities = signal<AbilityModel[]>([])
   public isLevelAbilitiesLoading = signal<boolean>(true)
   public isRemovingAbilityLoading = signal<boolean>(false)
 
   public onUpdateAbilities = output<AbilityModel[]>({
     alias: 'updateAbilities'
   })
-  public onSelectLevelToAddAbility = output<string>({
+  public onSelectLevelToAddAbility = output<void>({
     alias: 'selectLevelToAddAbility'
   })
 
-  ngOnInit(): void {
-    const abilities = this.abilities()
+  public getLevelAbilities() {
+    return this.levelAbilitiesMap.get(this.levelId()) ?? []
+  }
 
-    if (abilities !== null) {
-      this._abilities.set(abilities)
+  ngOnInit(): void {
+    const abilities = this.levelAbilitiesMap.get(this.levelId())
+
+    if (abilities !== undefined) {
       this.isLevelAbilitiesLoading.set(false)
       return
     }
@@ -66,8 +76,10 @@ export class LevelAbilityListComponent implements OnInit {
         this.levelId(),
         abilityId
       )
-      this.updateLevelAbilities(
-        this._abilities().filter(ability => ability.id !== abilityId)
+
+      this.levelAbilitiesMap.set(
+        this.levelId(),
+        this.getLevelAbilities().filter(ability => ability.id !== abilityId)
       )
       this.isRemovingAbilityLoading.set(false)
     } catch (err) {
@@ -77,7 +89,7 @@ export class LevelAbilityListComponent implements OnInit {
   }
 
   public onOpenAddAbilityToLevelForm() {
-    this.onSelectLevelToAddAbility.emit(this.levelId())
+    this.onSelectLevelToAddAbility.emit()
   }
 
   private loadLevelAbilities() {
@@ -85,7 +97,7 @@ export class LevelAbilityListComponent implements OnInit {
 
     this.levelService.getAllAbilitiesFromLevel(this.levelId()).subscribe({
       next: abilities => {
-        this.updateLevelAbilities(abilities)
+        this.levelAbilitiesMap.set(this.levelId(), abilities)
         this.isLevelAbilitiesLoading.set(false)
       },
       error: err => {
@@ -93,11 +105,6 @@ export class LevelAbilityListComponent implements OnInit {
         this.onShowLevelAbilitiesLoadingErrorMessage(error.code)
       }
     })
-  }
-
-  private updateLevelAbilities(abilities: AbilityModel[]) {
-    this._abilities.set(abilities)
-    this.onUpdateAbilities.emit(abilities)
   }
 
   private onShowLevelAbilitiesLoadingErrorMessage(code: string) {
