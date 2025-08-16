@@ -6,6 +6,7 @@ import { LevelForm } from '~/levels/models/LevelForm.model'
 import { MasteryRoadLevelsFormValidator } from '~/levels/validators/MasteryRoadLevelsFormValidator'
 import { PenaltyForm } from '~/penalties/models/PenaltyForm.model'
 import { MasteryRoadPenaltiesFormValidator } from '~/penalties/validations/MasteryRoadPenaltiesFormValidator'
+import { FieldValidator } from '~/shared/validators/FieldValidator'
 import {
   CreateClassroomForm,
   CreateClassroomMasteryRoadExperienceForm,
@@ -51,12 +52,14 @@ export const classroomForm = (
             character: fb.nonNullable.group({
               healthPointBase: fb.nonNullable.control(0, [
                 Validators.required,
-                Validators.min(1)
+                Validators.min(1),
+                FieldValidator.isNaN()
               ]),
               limitAbilities: fb.nonNullable.control(0, [
                 Validators.required,
                 Validators.min(1),
-                Validators.max(10)
+                Validators.max(10),
+                FieldValidator.isNaN()
               ])
             }),
             initialCharacters: fb.nonNullable.array<FormGroup<CharacterForm>>(
@@ -78,7 +81,7 @@ export const classroomForm = (
         fb.nonNullable.group<CreateClassroomMasteryRoadExperienceForm>({
           levels: fb.nonNullable.group(
             {
-              initialLevel: levelForm({ min: 0, max: null }),
+              initialLevel: levelForm({ requiredPoints: 0, max: null }),
               list: fb.nonNullable.array<FormGroup<LevelForm>>(
                 [],
                 [Validators.required, Validators.minLength(1)]

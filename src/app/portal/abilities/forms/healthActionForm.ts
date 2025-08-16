@@ -2,6 +2,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { AbilityActionType } from '~/abilities/models/AbilityActionType.model'
 import { AddHealthActionForm } from '~/abilities/models/AbilityForm.model'
 import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
+import { FieldValidator } from '~/shared/validators/FieldValidator'
 import { HealthActionFormData } from '../models/AbilityFormData.model'
 
 export const healthActionForm = (
@@ -21,7 +22,12 @@ export const healthActionForm = (
     ),
     healthPoints: new FormControl(defaultValues?.healthPoints ?? 1, {
       nonNullable: true,
-      validators: [Validators.required, Validators.min(1), Validators.max(1000)]
+      validators: [
+        Validators.required,
+        FieldValidator.isNaN(),
+        Validators.min(1),
+        Validators.max(1000)
+      ]
     })
   })
 }

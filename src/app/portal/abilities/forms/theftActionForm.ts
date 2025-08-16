@@ -2,6 +2,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { AbilityActionType } from '~/abilities/models/AbilityActionType.model'
 import { AddTheftActionForm } from '~/abilities/models/AbilityForm.model'
 import { AbilityTheftTarget } from '~/abilities/models/AbilityTheftTarget.model'
+import { FieldValidator } from '~/shared/validators/FieldValidator'
 import { TheftActionFormData } from '../models/AbilityFormData.model'
 
 export const theftActionForm = (
@@ -18,7 +19,12 @@ export const theftActionForm = (
     }),
     numberOfAbilities: new FormControl(defaultValues?.numberOfAbilities ?? 1, {
       nonNullable: true,
-      validators: [Validators.required, Validators.min(1), Validators.max(25)]
+      validators: [
+        Validators.required,
+        Validators.min(1),
+        FieldValidator.isNaN(),
+        Validators.max(25)
+      ]
     })
   })
 }

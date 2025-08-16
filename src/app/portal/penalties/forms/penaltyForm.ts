@@ -1,4 +1,5 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { FieldValidator } from '~/shared/validators/FieldValidator'
 import { PenaltyForm } from '../models/PenaltyForm.model'
 
 export const penaltyForm = (defaultValues?: {
@@ -16,7 +17,11 @@ export const penaltyForm = (defaultValues?: {
     }),
     reducePoints: new FormControl(defaultValues?.reducePoints ?? 1, {
       nonNullable: true,
-      validators: [Validators.required, Validators.min(1)]
+      validators: [
+        Validators.required,
+        FieldValidator.isNaN(),
+        Validators.min(1)
+      ]
     })
   })
 }
