@@ -14,6 +14,7 @@
     (input)="handleInput($event)"
     class="truncate placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden {{ focusColorMap[focusColor()] }}"
     [class.pr-4]="inputType() === 'password'"
+    [attr.maxlength]="inputMaxLength()"
   />
 
   @if (inputType() === 'password') {

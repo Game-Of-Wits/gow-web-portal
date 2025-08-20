@@ -42,7 +42,7 @@ export class ClassroomRepository {
     }
   }
 
-  public async existsById(id: string) {
+  public async existById(id: string) {
     const snapshot = await getDoc(this.getClassroomRefById(id))
     return snapshot.exists()
   }

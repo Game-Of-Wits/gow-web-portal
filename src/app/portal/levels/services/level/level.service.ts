@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { FirebaseError } from '@angular/fire/app'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { catchError, map, Observable } from 'rxjs'
+import { catchError, map, Observable, throwError } from 'rxjs'
 import { AbilityMapper } from '~/abilities/mappers/ability.mapper'
 import { AbilityModel } from '~/abilities/models/Ability.model'
 import { AbilityService } from '~/abilities/services/ability/ability.service'
@@ -18,14 +18,28 @@ export class LevelService {
 
   private readonly levelRepository = inject(LevelRepository)
 
+  public async getLevelByIdAsync(levelId: string): Promise<LevelModel> {
+    try {
+      const level = await this.levelRepository.getByIdAsync(levelId)
+
+      if (level === null) throw new ErrorResponse('level-not-exist')
+
+      return LevelMapper.toModel(level)
+    } catch (err) {
+      const error = err as FirebaseError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
   public getAllLevelsByClassroom(
     classroomId: string
   ): Observable<LevelModel[]> {
     return this.levelRepository.getAllByClassroomId(classroomId).pipe(
       map(levels => LevelMapper.toListModel(levels)),
       catchError(err => {
-        const error = err as FirestoreError
-        throw new ErrorResponse(error.code)
+        if (err instanceof FirestoreError)
+          return throwError(() => new ErrorResponse(err.code))
+        return throwError(() => err)
       })
     )
   }

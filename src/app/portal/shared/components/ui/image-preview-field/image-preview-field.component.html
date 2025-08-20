@@ -1,0 +1,32 @@
+<label [class.cursor-pointer]="!inputDisabled()">
+  @if (previewImage(); as imageUrl) {
+    <div class="relative">
+      <img
+        class="aspect-video w-full rounded-xl object-contain bg-gray-200"
+        alt="Pre-visualización de la imagen"
+        [src]="imageUrl"
+      />
+
+      <div
+        class="bg-danger-400 aspect-square p-1.5 absolute bottom-2 right-4 rounded-lg"
+      >
+        <i-lucide [img]="imageIcon" class="size-6 text-white" />
+      </div>
+    </div>
+  } @else {
+    <div
+      class="flex flex-col gap-1 items-center justify-center bg-gray-100 w-full aspect-video rounded-xl"
+    >
+      <i-lucide [img]="imageIcon" class="size-10" />
+      <span class="text-lg text-center">{{ inputLabel() }}</span>
+    </div>
+  }
+
+  <input
+    type="file"
+    accept="image/png, image/jpeg"
+    [disabled]="inputDisabled()"
+    (input)="handleFileInput($event)"
+    class="hidden"
+  />
+</label>

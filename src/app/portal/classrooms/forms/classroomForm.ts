@@ -50,7 +50,7 @@ export const classroomForm = (
               { validators: [InitialTeamsValidators.noEqualTeamNames()] }
             ),
             character: fb.nonNullable.group({
-              healthPointBase: fb.nonNullable.control(0, [
+              healthPointsBase: fb.nonNullable.control(0, [
                 Validators.required,
                 Validators.min(1),
                 FieldValidator.isNaN()

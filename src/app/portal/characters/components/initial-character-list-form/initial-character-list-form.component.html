@@ -30,7 +30,7 @@
   [show]="showAddCharacterFormDialog()"
   [teams]="teamOptions()"
   (close)="onCloseCharacterForm()"
-  (success)="onAddCharacterForm($event)"
+  (submit)="onAddCharacterForm($event)"
 />
 
 <gow-character-form-dialog
@@ -42,5 +42,5 @@
   [show]="showEditCharacterFormDialog()"
   [teams]="teamOptions()"
   (close)="onCloseCharacterForm()"
-  (success)="onEditCharacterForm($event)"
+  (submit)="onEditCharacterForm($event)"
 />

@@ -5,9 +5,11 @@ import { AuthLayoutComponent } from '~/auth/layouts/auth-layout/auth-layout.comp
 import { ForgotPasswordPageComponent } from '~/auth/pages/forgot-password/forgot-password.component'
 import { SignInPageComponent } from '~/auth/pages/sign-in/sign-in.component'
 import { ClassroomAdminPanelLayoutComponent } from '~/classrooms/layouts/classroom-admin-panel-layout/classroom-admin-panel-layout.component'
-import { ClassroomAdminPanelHomeworksPageComponent } from '~/classrooms/pages/classroom-admin-panel-homeworks/classroom-admin-panel-homeworks.component'
 import { ClassroomAdminPanelOverviewPageComponent } from '~/classrooms/pages/classroom-admin-panel-overview/classroom-admin-panel-overview.component'
 import { PortalCreateClassroomPageComponent } from '~/classrooms/pages/portal-create-classroom/portal-create-classroom.component'
+import { ClassroomAdminPanelHomeworkDetailsPageComponent } from '~/homeworks/pages/classroom-admin-panel-homework-details/classroom-admin-panel-homework-details.component'
+import { ClassroomAdminPanelHomeworkGroupDetailsPageComponent } from '~/homeworks/pages/classroom-admin-panel-homework-group-details/classroom-admin-panel-homework-group-details.component'
+import { ClassroomAdminPanelHomeworksPageComponent } from '~/homeworks/pages/classroom-admin-panel-homeworks/classroom-admin-panel-homeworks.component'
 import { ClassroomAdminPanelLevelsPageComponent } from '~/levels/pages/classroom-admin-panel-levels/classroom-admin-panel-levels.component'
 import { ClassroomAdminPanelPenaltiesPageComponent } from '~/penalties/pages/classroom-admin-panel-penalties/classroom-admin-panel-penalties.component'
 import { getDefaultSchoolGuard } from '~/shared/guards/default-school.guard'
@@ -84,7 +86,21 @@ export const routes: Routes = [
               },
               {
                 path: 'homeworks',
-                component: ClassroomAdminPanelHomeworksPageComponent
+                children: [
+                  {
+                    path: '',
+                    component: ClassroomAdminPanelHomeworksPageComponent
+                  },
+                  {
+                    path: ':homeworkId',
+                    component: ClassroomAdminPanelHomeworkDetailsPageComponent
+                  },
+                  {
+                    path: 'g/:homeworkGroupId',
+                    component:
+                      ClassroomAdminPanelHomeworkGroupDetailsPageComponent
+                  }
+                ]
               },
               {
                 path: 'levels',

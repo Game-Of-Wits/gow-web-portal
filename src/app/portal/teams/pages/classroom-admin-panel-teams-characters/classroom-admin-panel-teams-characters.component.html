@@ -1,18 +1,51 @@
-<section class="px-[26px] py-4.5 flex flex-col gap-4">
+<section class="px-[26px] py-4 flex flex-col gap-4 max-w-[110rem] mx-auto">
   <div class="flex flex-col gap-3">
     <gow-section-title color="danger">Equipos</gow-section-title>
-    <div class="flex flex-wrap gap-2.5">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5">
       @if (!isTeamsLoading()) {
         @for (team of teams(); track team.id) {
           <button
-            class="bg-danger-100 rounded-xl text-danger-500 italic w-[220px] h-[120px] text-lg font-bold cursor-pointer"
+            class="bg-danger-100 rounded-xl text-danger-500 h-[140px] text-xl font-bold px-6 group flex items-center justify-center"
           >
-            {{ team.name }}
+            <span class="group-hover:hidden">{{ team.name }}</span>
+
+            <div class="hidden group-hover:flex flex-col justify-center gap-2">
+              <span>{{ team.name }}</span>
+
+              <div class="flex items-center justify-center gap-2">
+                <p-button
+                  severity="danger"
+                  rounded
+                  size="small"
+                  styleClass="aspect-square"
+                  (click)="onOpenEditTeamFormDialog(team)"
+                  [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
+                >
+                  <i-lucide pButtonIcon [img]="editIcon" class="size-4.5" />
+                </p-button>
+
+                @if (teams().length > 2) {
+                  <p-button
+                    severity="danger"
+                    rounded
+                    size="small"
+                    styleClass="aspect-square"
+                    (click)="onOpenDeleteTeamConfirmation(team.id, $event)"
+                    [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
+                  >
+                    <i-lucide pButtonIcon [img]="deleteIcon" class="size-4.5" />
+                  </p-button>
+                }
+              </div>
+            </div>
           </button>
         }
 
         <button
-          class="bg-danger-500 hover:bg-danger-600 rounded-xl text-white w-[220px] h-[120px] text-lg flex items-center justify-center cursor-pointer"
+          class="bg-danger-500 hover:bg-danger-600 rounded-xl text-white h-[140px] text-lg flex items-center justify-center cursor-pointer transition-colors"
+          (click)="onOpenCreateTeamFormDialog()"
+          [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
         >
           <i-lucide [img]="addIcon" class="size-[34px] text-white" />
         </button>
@@ -30,7 +63,21 @@
   </div>
 
   <div class="flex flex-col gap-3">
-    <gow-section-title color="danger">Personajes</gow-section-title>
+    <gow-section-title color="danger">
+      Personajes
+
+      <div actions>
+        <p-button
+          severity="danger"
+          size="small"
+          styleClass="aspect-square size-6"
+          [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
+          (click)="onOpenCreateCharacterFormDialog()"
+        >
+          <i-lucide pButtonIcon [img]="addIcon" class="size-5" />
+        </p-button>
+      </div>
+    </gow-section-title>
 
     <p-table
       [value]="characters()"
@@ -39,7 +86,6 @@
     >
       <ng-template #header>
         <tr>
-          <th>ID</th>
           <th>Nombre</th>
           <th>Equipo</th>
           <th>Acciones</th>
@@ -48,27 +94,76 @@
 
       <ng-template #body let-character>
         <tr>
-          <td>{{ character.id }}</td>
           <td>{{ character.name }}</td>
           <td>{{ getTeamName(character.teamId) }}</td>
           <td class="flex items-center gap-1.5">
-            <button
-              pButton
+            <p-button
+              severity="info"
+              rounded
+              [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
+              (click)="onOpenEditCharacterFormDialog(character)"
+              styleClass="aspect-square"
+              size="small"
+            >
+              <i-lucide pButtonIcon [img]="editIcon" />
+            </p-button>
+
+            <p-button
               severity="danger"
-              [rounded]="true"
-              [disabled]="true"
+              rounded
+              [disabled]="deletingTeamLoading() || deletingCharacterLoading()"
+              size="small"
+              styleClass="aspect-square"
             >
               <i-lucide pButtonIcon [img]="deleteIcon" />
-            </button>
-
-            <button pButton severity="info" [rounded]="true" [disabled]="true">
-              <i-lucide pButtonIcon [img]="editIcon" />
-            </button>
+            </p-button>
           </td>
         </tr>
       </ng-template>
     </p-table>
   </div>
 </section>
+
+<gow-team-form-dialog
+  headerTitle="Crear equipo"
+  buttonText="Guardar"
+  [show]="showCreateTeamFormDialog()"
+  (submit)="onCreateTeam($event)"
+  (close)="onCloseTeamFormDialog()"
+/>
+
+<gow-team-form-dialog
+  headerTitle="Editar equipo"
+  buttonText="Editar"
+  [id]="editTeamSelected().id"
+  [teamForm]="editTeamSelected().form"
+  [show]="showEditTeamFormDialog()"
+  (submit)="onEditTeam($event)"
+  (close)="onCloseTeamFormDialog()"
+/>
+
+<gow-full-character-form-dialog
+  headerTitle="Crear personaje"
+  buttonText="Guardar"
+  [teams]="teams()"
+  [buttonIcon]="saveIcon"
+  [show]="showCreateCharacterFormDialog()"
+  (close)="onCloseCharacterFormDialog()"
+  (submit)="onCreateCharacter($event)"
+/>
+
+<gow-full-character-form-dialog
+  headerTitle="Editar personaje"
+  buttonText="Editar"
+  [buttonIcon]="editIcon"
+  [id]="editCharacterSelected().id"
+  [fullCharacterForm]="editCharacterSelected().form"
+  [teams]="teams()"
+  [show]="showEditCharacterFormDialog()"
+  (close)="onCloseCharacterFormDialog()"
+  (submit)="onEditCharacter($event)"
+/>
+
+<p-confirm-dialog [draggable]="false" [closable]="false"  />
 
 <p-toast position="top-right" />

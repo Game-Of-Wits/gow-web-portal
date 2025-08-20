@@ -4,12 +4,14 @@
   (ngSubmit)="signIn()"
 >
   <div class="flex flex-col gap-3">
-    <gow-text-field
-      label="Correo electrónico"
-      type="email"
-      placeholder="Ingresa tu correo electrónico"
-      formControlName="email"
-    />
+    <div class="flex flex-col gap-1">
+      <gow-text-field
+        label="Correo electrónico"
+        type="email"
+        placeholder="Ingresa tu correo electrónico"
+        formControlName="email"
+      />
+    </div>
 
     <div class="flex flex-col gap-2">
       <gow-text-field

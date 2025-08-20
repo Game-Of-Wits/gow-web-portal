@@ -1,0 +1,100 @@
+<div [formGroup]="contentFormGroup" class="flex flex-col gap-3">
+  <div class="flex flex-col gap-1">
+    <gow-select-field
+      label="Respuesta correcta"
+      placeholder="Selecciona una respuesta correcta"
+      formControlName="correctOption"
+      [enableClear]="true"
+      [options]="answerOptions()"
+      emptyMessage="No se encotro ninguna respuesta"
+    />
+
+    @if (correctOptionControl.invalid && correctOptionControl.touched) {
+      @if (hasErrorValidation(correctOptionControl, "required")) {
+        <p class="text-red-500 text-sm">Es requerido</p>
+      } @else if (hasErrorValidation(correctOptionControl, "minlength")) {
+        <p class="text-red-500 text-sm">
+          Mínimo
+          {{ correctOptionControl.errors?.["minlength"].requiredLength }}
+          caracteres
+        </p>
+      } @else if (hasErrorValidation(correctOptionControl, "maxlength")) {
+        <p class="text-red-500 text-sm">
+          Máximo
+          {{ correctOptionControl.errors?.["maxlength"].requiredLength }}
+          caracteres
+        </p>
+      }
+    }
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    <div class="flex gap-2 items-center">
+      <span>Respuestas (Mínimo 2 respuestas y sin duplicados)</span>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      @for (option of answersFormArray.controls; track $index) {
+        <gow-answer-option-list-item
+          [answerOptionForm]="option"
+          [position]="$index"
+          (remove)="onRemoveAnswerOptionForm($event)"
+          (edit)="onEditAnswerOptionForm($event)"
+        />
+      }
+
+      @if (createAnswerOptionForm(); as answerOptionFormGroup) {
+        <div
+          class="flex items-center gap-4 py-1.5 pl-3 rounded-lg"
+          [formGroup]="answerOptionFormGroup"
+        >
+          <input
+            class="w-full flex-1 outline-none border-b text-[1.1rem] border-gray-300 placeholder:text-gray-400 focus:border-gray-500 transition-colors"
+            placeholder="Ingrese la respuesta"
+            [autofocus]="true"
+            formControlName="answer"
+          />
+
+          <div class="flex items-center gap-1">
+            <button
+              pButton
+              rounded
+              (click)="onAddAnswerOptionForm()"
+              class="cursor-pointer bg-success-50 hover:bg-success-100 border-none disabled:bg-gray-100 group disabled:cursor-not-allowed"
+              [disabled]="answerOptionFormGroup.get('answer')?.invalid"
+            >
+              <i-lucide
+                pButtonIcon
+                [img]="acceptIcon"
+                class="size-5 text-success-500 group-disabled:text-gray-500"
+              />
+            </button>
+            <button
+              pButton
+              rounded
+              (click)="onCloseCreateAnswerOptionForm()"
+              class="cursor-pointer bg-danger-50 hover:bg-danger-100 border-none"
+            >
+              <i-lucide
+                pButtonIcon
+                [img]="notAcceptIcon"
+                class="size-5 text-danger-500"
+              />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <p-button
+      severity="danger"
+      (click)="onOpenCreateAnswerOptionForm()"
+      styleClass="w-full rounded-xl"
+      outlined
+      label="Añadir respuesta"
+      [disabled]="createAnswerOptionForm() != null"
+    />
+  </div>
+</div>
+
+<p-toast position="top-right" />

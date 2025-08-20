@@ -171,21 +171,21 @@
                 label="Puntos de vida base"
                 focusColor="danger"
                 placeholder="Puntos de vida base"
-                formControlName="healthPointBase"
+                formControlName="healthPointsBase"
               />
 
               @if (
-                healthPointBaseControl?.touched &&
-                healthPointBaseControl?.invalid
+                healthPointsBaseControl?.touched &&
+                healthPointsBaseControl?.invalid
               ) {
-                @if (hasErrorValidation(healthPointBaseControl, "required")) {
+                @if (hasErrorValidation(healthPointsBaseControl, "required")) {
                   <p class="text-red-500 text-sm">Es requerido</p>
                 } @else if (
-                  hasErrorValidation(healthPointBaseControl, "min")
+                  hasErrorValidation(healthPointsBaseControl, "min")
                 ) {
                   <p class="text-red-500 text-sm">
                     Mínimo
-                    {{ healthPointBaseControl?.errors?.["min"].min }} de
+                    {{ healthPointsBaseControl?.errors?.["min"].min }} de
                     puntos de vida base
                   </p>
                 }

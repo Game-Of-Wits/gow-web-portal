@@ -20,7 +20,7 @@ export interface CreateClassroomShadowWarfareExperienceModel {
     secondTeamName: string
   }
   character: {
-    healthPointBase: number
+    healthPointsBase: number
     limitAbilities: number
   }
   initialCharacters: CharacterFormData[]

@@ -11,7 +11,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner'
         strokeWidth="5"
         [style]="{ width: '42px', height: '42px' }"
       ></p-progress-spinner>
-      <p class="text-lg text-gray-600">Cargando...</p>
+      <p class="text-lg text-gray-500">Cargando...</p>
     </div>
   </section>
   `,

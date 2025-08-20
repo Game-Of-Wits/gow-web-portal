@@ -160,9 +160,9 @@ export class PortalCreateClassroomPageComponent implements OnInit {
     )
   }
 
-  get healthPointBaseControl(): AbstractControl<number> | null {
+  get healthPointsBaseControl(): AbstractControl<number> | null {
     return this.classroomForm.get(
-      'experiences.SHADOW_WARFARE.character.healthPointBase'
+      'experiences.SHADOW_WARFARE.character.healthPointsBase'
     )
   }
 

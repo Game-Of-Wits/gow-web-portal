@@ -39,7 +39,7 @@ export class AcademicPeriodRespository {
     }) as Observable<AcademicPeriodDbModel>
   }
 
-  public async getById(
+  public async getByIdAsync(
     academicPeriodId: string
   ): Promise<AcademicPeriodDbModel | null> {
     const snapshot = await getDoc(
@@ -52,6 +52,26 @@ export class AcademicPeriodRespository {
       id: snapshot.id,
       ...(snapshot.data() as AcademicPeriodDbWithoutId)
     }
+  }
+
+  public async getAllBySchoolId(
+    schoolId: string
+  ): Promise<AcademicPeriodDbModel[]> {
+    const schoolRef = SchoolRepository.getSchoolRefById(
+      this.firestore,
+      schoolId
+    )
+
+    const academicPeriodsQuery = query(
+      this.getAcademicPeriodsRef(),
+      where('school', '==', schoolRef)
+    )
+
+    const academicPeriodsSnapshot = await getDocs(academicPeriodsQuery)
+
+    return academicPeriodsSnapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as AcademicPeriodDbModel
+    )
   }
 
   public async existsById(academicPeriodId: string): Promise<boolean> {

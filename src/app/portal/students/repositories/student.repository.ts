@@ -5,9 +5,12 @@ import {
   doc,
   Firestore,
   getDoc,
+  getDocs,
+  limit,
   query,
   where
 } from '@angular/fire/firestore'
+import { StudentProfileRepository } from '~/student-profiles/repositories/student-profile.repository'
 import { StudentDbModel } from '../models/StudentDb.model'
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +29,29 @@ export class StudentRepository {
     return {
       id: studentSnapshot.id,
       ...studentSnapshot.data()
+    } as StudentDbModel
+  }
+
+  public async getByProfileIdAsync(
+    studentProfileId: string
+  ): Promise<StudentDbModel | null> {
+    const studentProfileRef = StudentProfileRepository.getRefById(
+      this.firestore,
+      studentProfileId
+    )
+    const studentQuery = query(
+      this.getCollectionRef(),
+      where('profile', '==', studentProfileRef),
+      limit(1)
+    )
+
+    const studentSnapshot = await getDocs(studentQuery)
+
+    if (studentSnapshot.size === 0) return null
+
+    return {
+      id: studentSnapshot.docs[0].id,
+      ...studentSnapshot.docs[0].data()
     } as StudentDbModel
   }
 

@@ -4,10 +4,10 @@
   </h3>
 
   @if (!activeAcademicPeriodLoading()) {
-    @if (activeAcademicPeriod() !== null) {
+    @if (activeAcademicPeriod(); as activeAcademicPeriod) {
       <div class="flex justify-between items-center">
         <p class="text-3xl leading-none">
-          {{ activeAcademicPeriod()!.name }}· Semana
+          {{ activeAcademicPeriod.name }}· Semana
           {{ weekAndDayDiff()!.week }}· Día {{ weekAndDayDiff()!.day }}
         </p>
 
@@ -33,7 +33,6 @@
       </div>
 
       <p-confirmdialog [draggable]="false" [closable]="false" />
-      <p-toast position="bottom-center" />
     } @else {
       <button
         class="cursor-pointer flex items-center gap-2"
@@ -73,3 +72,5 @@
     </div>
   }
 </section>
+
+<p-toast position="bottom-center" />

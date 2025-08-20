@@ -4,6 +4,7 @@ import {
   DocumentData,
   doc,
   Firestore,
+  getDoc,
   getDocs,
   QuerySnapshot,
   query,
@@ -21,6 +22,20 @@ export class StudentPeriodStateRepository {
 
   private static readonly collectionName = 'student_period_states'
   private readonly collectionName = StudentPeriodStateRepository.collectionName
+
+  public async getByIdAsync(
+    id: string
+  ): Promise<StudentPeriodStatesDbModel | null> {
+    const ref = this.getRefById(id)
+
+    const snapshot = await getDoc(ref)
+    if (!snapshot.exists()) return null
+
+    return {
+      id: snapshot.id,
+      ...snapshot.data()
+    } as StudentPeriodStatesDbModel
+  }
 
   public getAllByClassroomIdAndExperienceSession({
     classroomId,
@@ -69,6 +84,23 @@ export class StudentPeriodStateRepository {
           })
         )
       })
+    )
+  }
+
+  public async getAllByStudentId(
+    studentId: string
+  ): Promise<StudentPeriodStatesDbModel[]> {
+    const studentRef = StudentRepository.getRefById(this.firestore, studentId)
+
+    const studentPeriodStatesQuery = query(
+      this.getCollectionRef(),
+      where('student', '==', studentRef)
+    )
+
+    const studentPeriodStatesSnapshot = await getDocs(studentPeriodStatesQuery)
+
+    return studentPeriodStatesSnapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as StudentPeriodStatesDbModel
     )
   }
 

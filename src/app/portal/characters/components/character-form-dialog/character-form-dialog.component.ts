@@ -41,19 +41,19 @@ export class CharacterFormDialogComponent implements OnInit {
   public readonly closeIcon = X
 
   @Input() characterForm: FormGroup<CharacterForm> | null = null
-
   public characterFormPosition = input<number>(0, { alias: 'position' })
+
   public teamOptions = input<SelectOption[]>([], { alias: 'teams' })
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
   public buttonText = input.required<string>({ alias: 'buttonText' })
   public buttonIcon = input.required<LucideIconData>({ alias: 'buttonIcon' })
 
-  public formLoading = signal<boolean>(false)
+  public isSubmitLoading = signal<boolean>(false)
 
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<CharacterFormSubmit>({
-    alias: 'success'
+  public onSubmit = output<CharacterFormSubmit>({
+    alias: 'submit'
   })
 
   ngOnInit(): void {
@@ -78,9 +78,9 @@ export class CharacterFormDialogComponent implements OnInit {
 
     if (!characterForm || characterForm.invalid) return
 
-    this.formLoading.set(true)
+    this.isSubmitLoading.set(true)
 
-    this.onSuccess.emit({
+    this.onSubmit.emit({
       result: {
         position: this.characterFormPosition(),
         form: characterForm
@@ -93,7 +93,7 @@ export class CharacterFormDialogComponent implements OnInit {
 
   public onCloseDialog() {
     this.onClose.emit()
-    this.formLoading.set(false)
+    this.isSubmitLoading.set(false)
     this.characterForm = characterForm()
   }
 

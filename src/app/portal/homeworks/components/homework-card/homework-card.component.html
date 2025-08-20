@@ -1,0 +1,6 @@
+<p-card styleClass="overflow-hidden">
+  <ng-template #header>
+    <img [alt]="homework().name" class="w-full" [ngSrc]="homework().imageUrl" />
+  </ng-template>
+  <ng-template #title>{{ homework().name }}</ng-template>
+</p-card>

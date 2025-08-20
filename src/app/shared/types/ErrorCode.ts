@@ -12,8 +12,24 @@ export enum ErrorCode {
   AlreadyExists = 'already-exists',
   DataLoss = 'data-loss',
   Unknown = 'unknown',
+
   AuthInvalidEmail = 'auth/invalid-email',
   AuthUserDisabled = 'auth/user-disabled',
   AuthTooManyRequests = 'auth/too-many-requests',
-  AuthPermissionDenied = 'auth/permission-denied'
+  AuthPermissionDenied = 'auth/permission-denied',
+
+  StorageObjectNotFound = 'storage/object-not-found',
+  StorageBucketNotFound = 'storage/bucket-not-found',
+  StorageProjectNotFound = 'storage/project-not-found',
+  StorageQuotaExceeded = 'storage/quota-exceeded',
+  StorageUnauthenticated = 'storage/unauthenticated',
+  StorageUnauthorized = 'storage/unauthorized',
+  StorageRetryLimitExceeded = 'storage/retry-limit-exceeded',
+  StorageInvalidChecksum = 'storage/invalid-checksum',
+  StorageCanceled = 'storage/canceled',
+  StorageInvalidEventName = 'storage/invalid-event-name',
+  StorageInvalidUrl = 'storage/invalid-url',
+  StorageInvalidArgument = 'storage/invalid-argument',
+  StorageNoDefaultBucket = 'storage/no-default-bucket',
+  StorageInvalidFormat = 'storage/invalid-format'
 }

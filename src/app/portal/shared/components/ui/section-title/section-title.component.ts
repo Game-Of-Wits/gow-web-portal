@@ -5,7 +5,7 @@ import { Component, input } from '@angular/core'
   imports: [],
   template: `
     <div class="flex flex-col gap-[6px]">
-      <div class="flex gap-2 items-center">
+      <div class="flex gap-3 items-center">
         <h2 class="text-2xl leading-none font-bold {{ colors[color()].title }}">
           <ng-content></ng-content>
         </h2>

@@ -3,9 +3,7 @@ import type { AcademicPeriodModel } from '../models/AcademicPeriod.model'
 import { AcademicPeriodDbModel } from '../models/AcademicPeriodDb.model'
 
 export class AcademicPeriodMapper {
-  public static toModel(
-    academicPeriod: AcademicPeriodDbModel
-  ): AcademicPeriodModel {
+  static toModel(academicPeriod: AcademicPeriodDbModel): AcademicPeriodModel {
     const endedAt = academicPeriod.endedAt as Timestamp | null
     const classSessionIds = academicPeriod.classSessions.map(
       classSessionId => classSessionId.id
@@ -19,5 +17,11 @@ export class AcademicPeriodMapper {
       startedAt: academicPeriod.startedAt.toDate(),
       schoolId: academicPeriod.school.id
     }
+  }
+
+  static toListModel(
+    academicPeriods: AcademicPeriodDbModel[]
+  ): AcademicPeriodModel[] {
+    return academicPeriods.map(AcademicPeriodMapper.toModel)
   }
 }

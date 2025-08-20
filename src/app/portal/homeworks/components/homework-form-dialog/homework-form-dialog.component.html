@@ -1,0 +1,99 @@
+@if (homeworkForm; as homeworkFormGroup) {
+  <p-dialog
+    [header]="headerTitle()"
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    [style]="{
+      'max-width': '580px',
+      width: '100%',
+      border: '0',
+      overflow: 'hidden',
+    }"
+  >
+    <ng-template #header>
+      <div class="flex justify-between items-center w-full">
+        <span class="font-bold text-xl">{{ headerTitle() }}</span>
+
+        <p-button
+          type="button"
+          size="small"
+          severity="secondary"
+          styleClass="aspect-square"
+          rounded
+          (click)="onCloseDialog()"
+          [disabled]="isSubmitLoading()"
+        >
+          <i-lucide pButtonIcon [img]="closeIcon" class="text-gray-700" />
+        </p-button>
+      </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-3" [formGroup]="homeworkFormGroup">
+      <gow-image-preview-field
+        formControlName="image"
+        label="Selecciona imagen del problema"
+      />
+
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Nombre"
+          placeholder="Ingrese el nombre"
+          formControlName="name"
+          focusColor="danger"
+        />
+
+        @if (nameControl.invalid && nameControl.touched) {
+          @if (hasErrorValidation(nameControl, "required")) {
+            <p class="text-red-500 text-sm">Es requerido</p>
+          } @else if (hasErrorValidation(nameControl, "minlength")) {
+            <p class="text-red-500 text-sm">
+              Mínimo
+              {{ nameControl.errors?.["minlength"].requiredLength }} caracteres
+            </p>
+          } @else if (hasErrorValidation(nameControl, "maxlength")) {
+            <p class="text-red-500 text-sm">
+              Máximo
+              {{ nameControl.errors?.["maxlength"].requiredLength }} caracteres
+            </p>
+          }
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <gow-select-field
+          label="Categoria"
+          placeholder="Selecciona el tipo de habilidad"
+          [options]="homeworkCategoryOptions"
+          [enableClear]="false"
+          formControlName="category"
+          [scrollHeight]="200"
+        />
+
+        @if (categoryControl.invalid && categoryControl.touched) {
+          @if (hasErrorValidation(categoryControl, "required")) {
+            <p class="text-sm text-red-500">Es requerido</p>
+          }
+        }
+      </div>
+
+      @if (categoryControl.value == homeworkCategory.SINGLE_CHOISE) {
+        <gow-single-choise-content-form
+          [contentFormGroup]="contentFormGroup"
+          [homeworkId]="homeworkId()"
+        />
+      }
+
+      <p-button
+        severity="danger"
+        size="large"
+        styleClass="py-3 rounded-xl w-full mt-2.5"
+        [disabled]="homeworkFormGroup.invalid"
+        [label]="buttonText()"
+        (click)="onSubmitForm()"
+      />
+    </div>
+  </p-dialog>
+}

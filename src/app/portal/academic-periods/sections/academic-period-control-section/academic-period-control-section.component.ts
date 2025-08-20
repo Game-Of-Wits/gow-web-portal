@@ -104,15 +104,14 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
           this.weekAndDayDiff.set(
             getWeekAndDayDifference(activeAcademicPeriod.startedAt)
           )
-        },
-        complete: () => {
           this.activeAcademicPeriodLoading.set(false)
         },
         error: err => {
           const error = err as ErrorResponse
-
-          if (error.code === 'active-academic-period-not-exist') return
-
+          if (error.code === 'active-academic-period-not-exist') {
+            this.activeAcademicPeriodLoading.set(false)
+            return
+          }
           this.onShowErrorMessage(error.code)
         }
       })

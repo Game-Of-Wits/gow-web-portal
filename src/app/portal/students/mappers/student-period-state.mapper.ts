@@ -41,7 +41,7 @@ export class StudentPeriodStateMapper {
   public toListModel(
     students: StudentPeriodStatesDbModel[]
   ): StudentPeriodStatesModel[] {
-    return students.map(this.toModel)
+    return students.map(student => this.toModel(student))
   }
 
   public async onlyShadowWarfareExperience(

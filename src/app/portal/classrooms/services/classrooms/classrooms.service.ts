@@ -45,7 +45,7 @@ export class ClassroomsService {
 
   public async classroomExistsById(classroomId: string): Promise<boolean> {
     try {
-      return await this.classroomRepository.existsById(classroomId)
+      return await this.classroomRepository.existById(classroomId)
     } catch (err) {
       const error = err as FirestoreError
       throw new ErrorResponse(error.code)

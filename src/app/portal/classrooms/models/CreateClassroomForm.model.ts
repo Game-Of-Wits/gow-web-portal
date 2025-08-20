@@ -19,7 +19,7 @@ export interface CreateClassroomShadowWarfareExperienceForm {
     secondTeamName: FormControl<string>
   }>
   character: FormGroup<{
-    healthPointBase: FormControl<number>
+    healthPointsBase: FormControl<number>
     limitAbilities: FormControl<number>
   }>
   initialCharacters: FormArray<FormGroup<CharacterForm>>

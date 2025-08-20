@@ -34,6 +34,9 @@ export class TextFieldComponent implements ControlValueAccessor {
   public inputType = input<'text' | 'password' | 'email'>('text', {
     alias: 'type'
   })
+  public inputMaxLength = input<number | null>(null, {
+    alias: 'maxLength'
+  })
   public inputLabel = input<string>('', {
     alias: 'label'
   })

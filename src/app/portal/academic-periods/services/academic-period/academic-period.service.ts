@@ -7,10 +7,12 @@ import { AcademicPeriodMapper } from '~/academic-periods/mappers/academic-period
 import type { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeriod.model'
 import type { CreateAcademicPeriod } from '~/academic-periods/models/CreateAcademicPeriod.model'
 import { AcademicPeriodRespository } from '~/academic-periods/repositories/academic-period.repository'
+import { SchoolRepository } from '~/schools/repositories/school.repository'
 
 @Injectable({ providedIn: 'root' })
 export class AcademicPeriodService {
   private readonly academicPeriodRepository = inject(AcademicPeriodRespository)
+  private readonly schoolRepository = inject(SchoolRepository)
 
   public getSchoolActiveAcademicPeriod(
     schoolId: string
@@ -22,10 +24,31 @@ export class AcademicPeriodService {
         map(academicPeriods => {
           if (academicPeriods[0] === null || academicPeriods[0] === undefined)
             throw new ErrorResponse('active-academic-period-not-exist')
-
           return AcademicPeriodMapper.toModel(academicPeriods[0])
         })
       )
+  }
+
+  public async getAllAcademicPeriodsBySchool(
+    schoolId: string
+  ): Promise<AcademicPeriodModel[]> {
+    try {
+      const schoolExist = await this.schoolRepository.existById(schoolId)
+      if (!schoolExist) throw new ErrorResponse('school-not-exist')
+
+      const academicPeriods =
+        await this.academicPeriodRepository.getAllBySchoolId(schoolId)
+
+      const academicPeriodsMapped =
+        AcademicPeriodMapper.toListModel(academicPeriods)
+
+      return academicPeriodsMapped.sort(
+        (a, b) => b.startedAt.getTime() - a.startedAt.getTime()
+      )
+    } catch (err) {
+      const error = err as FirestoreError
+      throw new ErrorResponse(error.code)
+    }
   }
 
   public async verifySchoolHasActiveAcademicPeriod(
@@ -46,7 +69,7 @@ export class AcademicPeriodService {
   ): Promise<boolean> {
     try {
       const academicPeriod =
-        await this.academicPeriodRepository.getById(academicPeriodId)
+        await this.academicPeriodRepository.getByIdAsync(academicPeriodId)
       return academicPeriod?.endedAt === null
     } catch (err) {
       const error = err as FirestoreError

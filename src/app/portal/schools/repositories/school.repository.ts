@@ -35,6 +35,12 @@ export class SchoolRepository {
     )
   }
 
+  public async existById(id: string): Promise<boolean> {
+    const schoolRef = this.getRefById(id)
+    const schoolSnapshot = await getDoc(schoolRef)
+    return schoolSnapshot.exists()
+  }
+
   public static getSchoolRefById(db: Firestore, id: string) {
     return doc(db, `${SchoolRepository.collectionName}/${id}`)
   }

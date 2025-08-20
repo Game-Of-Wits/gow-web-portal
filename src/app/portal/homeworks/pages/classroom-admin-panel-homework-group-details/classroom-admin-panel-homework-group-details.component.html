@@ -1,0 +1,27 @@
+@if (!isHomeworkGroupLoading()) {
+  @if (homeworkGroup(); as homeworkGroup) {
+    <section class="px-[26px] py-4 flex flex-col gap-4 max-w-[110rem] mx-auto">
+      <gow-page-header
+        subtitle="Grupo de tareas"
+        [principalTitle]="homeworkGroup.name"
+        defaultBackPath="defaultBackPath"
+      >
+        <div class="flex items-center gap-4">
+          <span class="text-xl font-bold">
+            <span aria-label="X">❌</span> No entregado
+          </span>
+          <p-button severity="danger" styleClass="rounded-xl">
+            <i-lucide pButtonIcon [img]="sendIcon" />
+            <span pButtonLabel>Entregar</span>
+          </p-button>
+        </div>
+      </gow-page-header>
+
+      <gow-homework-card-list [homeworkGroupId]="homeworkGroup.id" />
+    </section>
+  }
+} @else {
+  <gow-classroom-admin-panel-loading />
+}
+
+<p-toast position="top-right" />

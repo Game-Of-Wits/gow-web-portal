@@ -92,7 +92,7 @@ export class AbilityService {
     data: Partial<UpdateAbility>
   ): Promise<void> {
     try {
-      const abilityExists = await this.abilityRepository.existsById(abilityId)
+      const abilityExists = await this.abilityRepository.existById(abilityId)
 
       if (!abilityExists) throw new ErrorResponse('ability-not-exist')
 
@@ -117,7 +117,7 @@ export class AbilityService {
 
   public async deleteAbilityById(abilityId: string) {
     try {
-      const abilityExists = await this.abilityRepository.existsById(abilityId)
+      const abilityExists = await this.abilityRepository.existById(abilityId)
 
       if (!abilityExists) throw new ErrorResponse('ability-not-exist')
 

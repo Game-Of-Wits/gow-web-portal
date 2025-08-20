@@ -1,0 +1,176 @@
+@if (fullCharacterForm; as fullCharacterFormGroup) {
+  <p-dialog
+    [header]="headerTitle()"
+    [modal]="true"
+    [visible]="showDialog()"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="false"
+    [formGroup]="fullCharacterFormGroup"
+    [style]="{ 'max-width': '680px', width: '100%' }"
+  >
+    <ng-template #header>
+      <div class="flex justify-between items-center w-full">
+        <span class="font-bold text-xl">{{ headerTitle() }}</span>
+
+        <div class="flex gap-2 items-center">
+          <p-button
+            type="button"
+            severity="danger"
+            [disabled]="fullCharacterFormGroup.invalid"
+            (click)="onSubmitCharacterForm()"
+            [loading]="isSubmitLoading()"
+            styleClass="rounded-lg"
+          >
+            <i-lucide pButtonIcon [img]="buttonIcon()" />
+            <span pButtonLabel>{{ buttonText() }}</span>
+          </p-button>
+
+          <p-button
+            type="button"
+            size="small"
+            severity="secondary"
+            styleClass="aspect-square"
+            rounded
+            (click)="onCloseDialog()"
+            [disabled]="isSubmitLoading()"
+          >
+            <i-lucide pButtonIcon [img]="closeIcon" class="text-gray-700" />
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
+          <gow-text-field
+            label="Nombre"
+            focusColor="danger"
+            placeholder="Ingresar nombre del equipo"
+            formControlName="name"
+          />
+
+          @if (characterNameControl.touched && characterNameControl.invalid) {
+            @if (hasErrorValidation(characterNameControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(characterNameControl, "minlength")) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{ characterNameControl.errors?.["minlength"].requiredLength }}
+                caracteres
+              </p>
+            } @else if (hasErrorValidation(characterNameControl, "maxlength")) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{ characterNameControl.errors?.["maxlength"].requiredLength }}
+                caracteres
+              </p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <gow-select-field
+            label="Equipo"
+            focusColor="danger"
+            placeholder="Selecciona un equipo"
+            formControlName="team"
+            [options]="teamOptions()"
+            [scrollHeight]="200"
+          />
+
+          @if (teamControl.touched && teamControl.invalid) {
+            @if (hasErrorValidation(teamControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(teamControl, "minlength")) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{ teamControl.errors?.["minlength"]?.requiredLength }}
+                caracteres
+              </p>
+            } @else if (hasErrorValidation(teamControl, "maxlength")) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{ teamControl.errors?.["maxlength"]?.requiredLength }}
+                caracteres
+              </p>
+            }
+          }
+        </div>
+
+        <div class="flex flex-col gap-2.5">
+          <span>Orden de obtención de habilidades ({{ abilitiesControl.value.length }} - {{ classroomLimitAbilities() }})</span>
+
+          @if (!isAbilitiesLoading()) {
+            <div
+              class="flex flex-col gap-1"
+              cdkDropList
+              [cdkDropListData]="abilitiesControl.value"
+              (cdkDropListDropped)="onDropAbility($event)"
+            >
+              @for (abilityId of abilitiesControl.value; track $index) {
+                @if (abilitiesMap().get(abilityId); as ability) {
+                  <div class="flex items-center justify-between rounded-lg bg-danger-50" cdkDrag>
+                    <div class="flex items-center gap-1">
+                      <div class="pl-1 pr-2 py-2 cursor-grab active:cursor-grabbing" cdkDragHandle>
+                        <i-lucide [img]="grabIcon" class="size-8 text-danger-500" />
+                      </div>
+
+                      <div class="flex items-center gap-2">
+                        <i-lucide
+                          [img]="abilityIcon"
+                          class="text-danger-500 fill-danger-500 size-7"
+                        />
+
+                        <span
+                          class="text-lg line-clamp-1 overflow-ellipsis text-danger-600"
+                          [title]="ability.name"
+                        >
+                          {{ ability.name }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-lg text-danger-500">{{ abilityTypeFormats[ability.type] }}</span>
+
+                      <p-button text severity="danger" (click)="onRemoveAbility($index)">
+                        <i-lucide pButtonIcon [img]="removeIcon" />
+                      </p-button>
+                    </div>
+                  </div>
+                }
+              } @empty {
+                <div
+                  class="w-full h-[200px] flex justify-center items-center rounded-2xl border-2 border-gray-300 border-dashed"
+                >
+                  <span class="text-gray-500">No tiene habilidades seleccionadas</span>
+                </div>
+              }
+            </div>
+          }
+
+          <p-button
+            severity="danger"
+            styleClass="w-full py-2.5"
+            outlined
+            label="Seleccionar habilidades"
+            (click)="onOpenSelectAbilities()"
+          />
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  @if (classroomLimitAbilities(); as limitAbilities) {
+    <gow-character-select-abilities-dialog
+      [defaultAbilities]="selectedAbilities()"
+      [abilities]="abilities()"
+      [show]="showSelectAbilities()"
+      [limit]="limitAbilities"
+      (close)="onCloseSelectAbilities()"
+      (complete)="onUpdateAbilitiesSelected($event)"
+    />
+  }
+}

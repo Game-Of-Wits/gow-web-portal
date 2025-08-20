@@ -5,6 +5,7 @@ import {
   DocumentReference,
   deleteDoc,
   doc,
+  documentId,
   Firestore,
   getDoc,
   getDocs,
@@ -12,6 +13,7 @@ import {
   updateDoc,
   where
 } from '@angular/fire/firestore'
+import { chuckArray } from '@shared/utils/chuckArray'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { AbilityDbModel } from '../models/AbilityDb.model'
@@ -89,10 +91,51 @@ export class AbilityRepository {
     )
   }
 
-  public async existsById(id: string): Promise<boolean> {
+  public async existById(id: string): Promise<boolean> {
     const abilityRef = this.getRefById(id)
     const abilitySnapshot = await getDoc(abilityRef)
     return abilitySnapshot.exists()
+  }
+
+  public async existAllByIds(ids: string[]): Promise<boolean> {
+    const collection = this.getCollectionRef()
+
+    const chunks = chuckArray(ids, 10)
+    let foundCount = 0
+
+    for (const part of chunks) {
+      const q = query(collection, where(documentId(), 'in', part))
+      const snapshot = await getDocs(q)
+      foundCount += snapshot.size
+    }
+
+    return foundCount === ids.length
+  }
+
+  public async existAllByIdsAndClassroom(
+    ids: string[],
+    classroomId: string
+  ): Promise<boolean> {
+    const collection = this.getCollectionRef()
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const chunks = chuckArray(ids, 10)
+    let foundCount = 0
+
+    for (const part of chunks) {
+      const q = query(
+        collection,
+        where(documentId(), 'in', part),
+        where('classroom', '==', classroomRef)
+      )
+      const snapshot = await getDocs(q)
+      foundCount += snapshot.size
+    }
+
+    return foundCount === ids.length
   }
 
   public async create(data: CreateAbility): Promise<AbilityDbModel> {

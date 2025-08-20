@@ -57,6 +57,12 @@ export class StudentProfileRepository {
     )
   }
 
+  public async existById(id: string): Promise<boolean> {
+    const studentProfileRef = this.getRefById(id)
+    const studentProfileSnapshot = await getDoc(studentProfileRef)
+    return studentProfileSnapshot.exists()
+  }
+
   private getCollectionRef() {
     return collection(this.firestore, this.collectionName)
   }

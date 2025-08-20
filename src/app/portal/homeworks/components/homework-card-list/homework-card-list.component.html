@@ -1,0 +1,37 @@
+@if (!isHomeworksLoading()) {
+  <div
+    class="grid gap-2 grid-cols-1 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2"
+  >
+    @for (homework of homeworks(); track homework.id) {
+      <gow-homework-card [homework]="homework" />
+    }
+
+    <button
+      class="bg-danger-400 text-white flex items-center justify-center gap-2 flex-col rounded-2xl cursor-pointer hover:bg-danger-500 h-[250px] transition-colors"
+      (click)="onOpenCreateHomework()"
+    >
+      <i-lucide [img]="addIcon" class="size-8" />
+      <span class="text-center text-lg text-white">Crear nueva tarea</span>
+    </button>
+  </div>
+
+  <gow-homework-form-dialog
+    headerTitle="Crear tarea"
+    buttonText="Crear"
+    [show]="showCreateHomework()"
+    [homeworkGroupId]="homeworkGroupId()"
+    (close)="onCloseDialog()"
+    (submit)="onCreateHomework($event)"
+  />
+} @else {
+  <div class="flex flex-col items-center justify-center gap-2 h-52">
+    <p-progress-spinner
+      ariaLabel="loading"
+      strokeWidth="4"
+      [style]="{ width: '54px', height: '54px' }"
+    ></p-progress-spinner>
+    <span class="text-lg text-gray-500">Cargando tareas...</span>
+  </div>
+}
+
+<p-toast position="top-right" />
