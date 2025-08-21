@@ -1,6 +1,6 @@
-import { Component, Input, inject, signal } from '@angular/core'
-import type { FirebaseError } from '@angular/fire/app'
+import { Component, inject, output, signal } from '@angular/core'
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
@@ -27,7 +27,7 @@ export class PasswordResetFormComponent {
   private authService = inject(AuthService)
   private toastService = inject(MessageService)
 
-  @Input() setPasswordResetSuccessful?: () => void
+  public onSuccess = output<void>({ alias: 'success' })
 
   public passwordResetLoading = signal<boolean>(false)
 
@@ -43,33 +43,27 @@ export class PasswordResetFormComponent {
 
     const email: string = this.userEmail.value
 
-    this.authService.sendPasswordReset(email).subscribe({
-      complete: () => {
+    this.authService
+      .sendPasswordReset(email)
+      .then(() => {
         this.passwordResetLoading.set(false)
-        this.setPasswordResetSuccessful?.()
-      },
-      error: (err: FirebaseError) => {
-        this.passwordResetLoading.set(false)
-
-        if (err.code in passwordResetErrorMessages) {
-          this.showPasswordResetErrorMessage(
-            passwordResetErrorMessages[err.code].summary,
-            passwordResetErrorMessages[err.code].message
-          )
-          return
-        }
-
-        this.showPasswordResetErrorMessage(
-          'Error inesperado',
-          'Ha ocurrido un fallo al recuperar su contraseña, vuelva a intentarlo de nuevo.'
-        )
+        this.onSuccess.emit()
+      })
+      .catch(err => {
+        const error = err as ErrorResponse
+        this.showSendPasswordResetErrorMessage(error.code)
 
         this.userEmail.reset()
-      }
-    })
+        this.passwordResetLoading.set(false)
+      })
   }
 
-  public showPasswordResetErrorMessage(summary: string, message: string) {
+  private showSendPasswordResetErrorMessage(code: string) {
+    const { summary, message } = passwordResetErrorMessages[code]
+    this.showErrorMessage(summary, message)
+  }
+
+  private showErrorMessage(summary: string, message: string) {
     this.toastService.add({ severity: 'error', summary, detail: message })
   }
 }

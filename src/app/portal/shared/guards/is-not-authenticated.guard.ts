@@ -6,7 +6,7 @@ export const isNotAuthenticatedGuard: CanActivateFn = async () => {
   const authStore = inject(AuthStore)
   const router = inject(Router)
 
-  if (!authStore.isAuth() && authStore.authUser() === null) return true
+  if (!authStore.isAuth() || authStore.authUser() === null) return true
 
   router.navigate(['/p/general'])
   return false

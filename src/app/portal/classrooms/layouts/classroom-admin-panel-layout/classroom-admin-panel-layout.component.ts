@@ -117,17 +117,17 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
       return
     }
 
-    this.classroomService.getClassroomById(classroomId).subscribe({
-      next: classroom => {
+    this.classroomService
+      .getClassroomByIdAsync(classroomId)
+      .then(classroom => {
         this.context.classroom.set(classroom)
         this.isClassroomLoading.set(false)
-      },
-      error: err => {
+      })
+      .catch(err => {
         const error = err as ErrorResponse
         const { summary, message } = commonErrorMessages[error.code]
         this.onShowErrorMessage(summary, message)
-      }
-    })
+      })
   }
 
   private syncActiveTab() {

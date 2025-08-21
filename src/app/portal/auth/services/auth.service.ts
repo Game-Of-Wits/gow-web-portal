@@ -1,25 +1,45 @@
 import { Injectable, inject } from '@angular/core'
 import {
   Auth,
+  AuthError,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  UserCredential
 } from '@angular/fire/auth'
-import { from } from 'rxjs'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private fireAuth = inject(Auth)
 
-  public signIn(email: string, password: string) {
-    return from(signInWithEmailAndPassword(this.fireAuth, email, password))
+  public async signIn(
+    email: string,
+    password: string
+  ): Promise<UserCredential> {
+    try {
+      return await signInWithEmailAndPassword(this.fireAuth, email, password)
+    } catch (err) {
+      const error = err as AuthError
+      throw new ErrorResponse(error.code)
+    }
   }
 
-  public sendPasswordReset(email: string) {
-    return from(sendPasswordResetEmail(this.fireAuth, email))
+  public async sendPasswordReset(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.fireAuth, email)
+    } catch (err) {
+      const error = err as AuthError
+      throw new ErrorResponse(error.code)
+    }
   }
 
-  public signOut() {
-    return from(signOut(this.fireAuth))
+  public async signOut(): Promise<void> {
+    try {
+      await signOut(this.fireAuth)
+    } catch (err) {
+      const error = err as AuthError
+      throw new ErrorResponse(error.code)
+    }
   }
 }

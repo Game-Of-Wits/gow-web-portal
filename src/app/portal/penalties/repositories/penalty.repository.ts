@@ -16,7 +16,6 @@ import {
 import { from, map, Observable } from 'rxjs'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { CreatePenalty } from '../models/CreatePenalty.model'
-import { PenaltyModel } from '../models/Penalty.model'
 import { PenaltyDbModel } from '../models/PenaltyDb.model'
 import { UpdatePenalty } from '../models/UpdatePenalty.model'
 import { UpdatePenaltyDb } from '../models/UpdatePenaltyDb.model'

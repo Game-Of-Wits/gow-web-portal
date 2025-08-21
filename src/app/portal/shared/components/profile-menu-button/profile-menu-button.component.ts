@@ -31,15 +31,16 @@ export class ProfileMenuButtonComponent {
       label: 'Cerrar sesión',
       command: async () => {
         this.showSignOutLoading()
-        this.authService.signOut().subscribe({
-          complete: () => {
+
+        this.authService
+          .signOut()
+          .then(() => {
             this.authStore.logOut()
             this.router.navigate(['/'])
-          },
-          error: () => {
+          })
+          .catch(() => {
             this.showSignOutError()
-          }
-        })
+          })
       }
     }
   ]

@@ -10,7 +10,7 @@ import { PasswordResetFormComponent } from './components/password-reset-form/pas
 export class ForgotPasswordPageComponent {
   public sendPasswordResetSuccessfully = signal<boolean>(false)
 
-  public setPasswordResetSuccessful = () => {
+  public setPasswordResetSuccessful() {
     this.sendPasswordResetSuccessfully.set(true)
   }
 }

@@ -1,17 +1,16 @@
 import { Injectable, inject } from '@angular/core'
 import {
   collection,
-  collectionData,
   doc,
-  docData,
   Firestore,
   getDoc,
+  getDocs,
   Query,
   query,
   where
 } from '@angular/fire/firestore'
-import { Observable } from 'rxjs'
-import { TeacherRepository } from '~/teacher-profile/repositories/teacher.repository'
+import { from, map, Observable } from 'rxjs'
+import { TeacherProfileRepository } from '~/teacher-profile/repositories/teacher.repository'
 import type {
   ClassroomDbModel,
   ClassroomDbWithoutId
@@ -26,9 +25,13 @@ export class ClassroomRepository {
 
   public getClassroomById(classroomId: string): Observable<ClassroomDbModel> {
     const classroomRef = this.getClassroomRefById(classroomId)
-    return docData(classroomRef, {
-      idField: 'id'
-    }) as Observable<ClassroomDbModel>
+
+    return from(getDoc(classroomRef)).pipe(
+      map(
+        snapshot =>
+          ({ ...snapshot.data(), id: snapshot.id }) as ClassroomDbModel
+      )
+    )
   }
 
   public async getById(classroomId: string): Promise<ClassroomDbModel | null> {
@@ -48,7 +51,7 @@ export class ClassroomRepository {
   }
 
   public getAllClassrooms(teacherId: string): Observable<ClassroomDbModel[]> {
-    const teacherRef = TeacherRepository.getTeacherRefById(
+    const teacherRef = TeacherProfileRepository.getRefById(
       this.firestore,
       teacherId
     )
@@ -58,7 +61,13 @@ export class ClassroomRepository {
       where('teacher', '==', teacherRef)
     ) as Query<ClassroomDbModel>
 
-    return collectionData<ClassroomDbModel>(classroomsQuery, { idField: 'id' })
+    return from(getDocs(classroomsQuery)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(
+          doc => ({ ...doc.data(), id: doc.id }) as ClassroomDbModel
+        )
+      })
+    )
   }
 
   public getRefById(id: string) {

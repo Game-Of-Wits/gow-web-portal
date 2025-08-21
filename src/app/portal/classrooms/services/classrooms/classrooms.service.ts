@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
+import { Functions, httpsCallable } from '@angular/fire/functions'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable } from 'rxjs'
 import { ClassroomMapper } from '~/classrooms/mappers/classroom.mapper'
 import type { ClassroomModel } from '~/classrooms/models/Classroom.model'
-import { CreateClassroomModel } from '~/classrooms/models/CreateClassroom.model'
+import { CreateClassroom } from '~/classrooms/models/CreateClassroom.model'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { AuthStore } from '~/shared/store/auth.store'
 
@@ -13,6 +14,7 @@ import { AuthStore } from '~/shared/store/auth.store'
 export class ClassroomsService {
   private readonly classroomRepository = inject(ClassroomRepository)
   private readonly authStore = inject(AuthStore)
+  private readonly cloudFunctions = inject(Functions)
 
   public getClassroomById(classroomId: string): Observable<ClassroomModel> {
     return this.classroomRepository
@@ -52,5 +54,18 @@ export class ClassroomsService {
     }
   }
 
-  public async createClassroom(data: CreateClassroomModel): Promise<void> {}
+  public async createClassroom(data: CreateClassroom): Promise<string> {
+    try {
+      const createClassroomFn = httpsCallable(
+        this.cloudFunctions,
+        'createClassroom'
+      )
+      const result = await createClassroomFn(data)
+      const { classroomId } = result.data as { classroomId: string }
+      return classroomId
+    } catch (err) {
+      const error = err as { code: string; message: string }
+      throw { code: error.code, message: error.message }
+    }
+  }
 }

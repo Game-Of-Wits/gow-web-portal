@@ -1,6 +1,6 @@
 <form
   class="flex flex-col gap-4"
-  [formGroup]="signInCredentials"
+  [formGroup]="signInForm"
   (ngSubmit)="signIn()"
 >
   <div class="flex flex-col gap-3">
@@ -98,7 +98,7 @@
     pRipple
     size="large"
     [loading]="signInLoading()"
-    [disabled]="signInCredentials.invalid"
+    [disabled]="signInForm.invalid"
     type="submit"
   >
     Ingresar

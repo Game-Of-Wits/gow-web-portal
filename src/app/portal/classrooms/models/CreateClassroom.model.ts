@@ -3,7 +3,7 @@ import { CharacterFormData } from '~/characters/models/CharacterFormData.model'
 import { LevelFormData } from '~/levels/models/LevelFormData.model'
 import { PenaltyFormData } from '~/penalties/models/PenaltyFormData.model'
 
-export interface CreateClassroomModel {
+export interface CreateClassroom {
   name: string
   schoolId: string
   teacherId: string

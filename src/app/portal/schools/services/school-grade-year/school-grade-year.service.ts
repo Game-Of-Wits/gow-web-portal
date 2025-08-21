@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { map, Observable } from 'rxjs'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { SchoolGradeYearMapper } from '~/schools/mappers/school-grade-year.mapper'
 import { SchoolGradeYearModel } from '~/schools/models/SchoolGradeYear.model'
 import { SchoolGradeYearRepository } from '~/schools/repositories/school-grade-year.repository'
@@ -8,11 +8,16 @@ import { SchoolGradeYearRepository } from '~/schools/repositories/school-grade-y
 export class SchoolGradeYearService {
   private readonly schoolGradeYearRepository = inject(SchoolGradeYearRepository)
 
-  public getGradeYearBySchool(
+  public async getGradeYearBySchoolId(
     schoolId: string
-  ): Observable<SchoolGradeYearModel[]> {
-    return this.schoolGradeYearRepository
-      .getGradeYearsBySchoolId(schoolId)
-      .pipe(map(SchoolGradeYearMapper.toListModel))
+  ): Promise<SchoolGradeYearModel[]> {
+    try {
+      const gradeYears =
+        await this.schoolGradeYearRepository.getGradeYearsBySchoolId(schoolId)
+      return SchoolGradeYearMapper.toListModel(gradeYears)
+    } catch (err) {
+      const error = err as ErrorResponse
+      throw new ErrorResponse(error.code)
+    }
   }
 }

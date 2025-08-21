@@ -1,31 +1,23 @@
-import { Component, inject, signal } from '@angular/core'
-import type { FirebaseError } from '@angular/fire/app'
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms'
+import { Component, inject, OnInit, signal } from '@angular/core'
+import { getAuth, onAuthStateChanged } from '@angular/fire/auth'
+import { ReactiveFormsModule } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Ripple } from 'primeng/ripple'
 import { Toast } from 'primeng/toast'
-import { tap } from 'rxjs'
+import { signInForm } from '~/auth/forms/signInForm'
 import { AuthService } from '~/auth/services/auth.service'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
-import { PasswordValidators } from '~/shared/components/ui/text-field/validators/PasswordValidators'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { AuthUserMapper } from '~/shared/mappers/auth-user.mapper'
 import { UserMapper } from '~/shared/mappers/user.mapper'
-import { UserService } from '~/shared/services/user.service'
 import { AuthStore } from '~/shared/store/auth.store'
+import { TeacherProfileService } from '~/teacher-profile/services/teacher-profile/teacher-profile.service'
 
-interface SignInForm {
-  email: FormControl<string>
-  password: FormControl<string>
-}
+const signOutErrorMessages = commonErrorMessages
 
 const signInErrorMessages = commonErrorMessages
 
@@ -43,9 +35,10 @@ const signInErrorMessages = commonErrorMessages
   ],
   providers: [MessageService]
 })
-export class SignInFormComponent {
+export class SignInFormComponent implements OnInit {
   private readonly authService = inject(AuthService)
-  private readonly userService = inject(UserService)
+  private readonly teacherProfileService = inject(TeacherProfileService)
+
   private readonly toastService = inject(MessageService)
   private readonly authStore = inject(AuthStore)
   private readonly router = inject(Router)
@@ -54,87 +47,80 @@ export class SignInFormComponent {
   readonly isNoValidIcon = Circle
 
   public signInLoading = signal<boolean>(false)
-  public signInCredentials = new FormGroup<SignInForm>({
-    email: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email]
-    }),
-    password: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [
-        Validators.required,
-        Validators.minLength(12),
-        PasswordValidators.hasLowercase(),
-        PasswordValidators.hasCapitalLetter(),
-        PasswordValidators.hasSpecialSymbols(),
-        PasswordValidators.hasNumber()
-      ]
-    })
-  })
+  public signInForm = signInForm()
 
-  public signIn() {
-    if (this.signInCredentials.invalid) return
+  ngOnInit(): void {
+    this.initAuthListener()
+  }
+
+  public async signIn() {
+    if (this.signInForm.invalid) return
 
     this.signInLoading.set(true)
 
-    const email = this.signInCredentials.get('email')!.value.trim()
-    const password = this.signInCredentials.get('password')!.value.trim()
+    const signInCredentials = this.signInForm.getRawValue()
 
-    this.authService
-      .signIn(email, password)
-      .pipe(
-        tap(async cred => {
-          const profile = await this.userService.getTeacherProfile(
-            cred.user.uid
-          )
-
-          if (!profile) {
-            this.authService.signOut().subscribe()
-            throw new Error('auth/permission-denied')
-          }
-
-          const user = UserMapper.toModel(cred.user)
-          const authUser = AuthUserMapper.toModel(user, profile)
-
-          this.authStore.signIn(authUser)
-        })
+    try {
+      await this.authService.signIn(
+        signInCredentials.email,
+        signInCredentials.password
       )
-      .subscribe({
-        complete: async () => {
-          this.router.navigate(['/p/general'])
-        },
-        error: (err: FirebaseError) => {
-          this.signInLoading.set(false)
-          this.signInCredentials.reset({ email: '', password: '' })
+    } catch (err) {
+      const error = err as ErrorResponse
+      this.showSignInErrorMessage(error.code)
+      this.signInLoading.set(false)
+    }
+  }
 
-          if (err.code in signInErrorMessages) {
-            this.showSignInErrorToast(
-              signInErrorMessages[err.code].summary,
-              signInErrorMessages[err.code].message
-            )
+  private initAuthListener() {
+    const auth = getAuth()
 
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        this.teacherProfileService
+          .getTeacherProfileById(user.uid)
+          .then(teacherProfile => {
+            const userMapped = UserMapper.toModel(user)
+            const authUser = AuthUserMapper.toModel(userMapped, teacherProfile)
+
+            this.authStore.signIn(authUser)
+            this.router.navigate(['/p/general'])
+          })
+          .catch(err => {
+            const error = err as ErrorResponse
+
+            if (error.code === 'teacher-profile-not-exist') {
+              return this.authService
+                .signOut()
+                .then(() => {
+                  this.signInLoading.set(false)
+                })
+                .catch(err => {
+                  const error = err as ErrorResponse
+                  this.showSignOutErrorMessage(error.code)
+                })
+            }
+
+            this.showSignInErrorMessage(error.code)
             return
-          }
-
-          this.showSignInErrorToast(
-            'Error inesperado',
-            'Ha ocurrido un fallo al iniciar sesión, vuelva a intentarlo de nuevo'
-          )
-        }
-      })
+          })
+      } else {
+        this.signInLoading.set(false)
+      }
+    })
   }
 
-  /*
-  public invalidPasswordValidation(validationKey: string) {
-    return (
-      this.signInCredentials.pristine ||
-      this.signInCredentials.get('password')?.value === '' ||
-      this.signInCredentials.get('password')?.hasError(validationKey)
-    )
+  private showSignOutErrorMessage(code: string) {
+    const { summary, message } = signOutErrorMessages[code]
+    this.showErrorMessage(summary, message)
   }
-  */
 
-  public showSignInErrorToast(summary: string, message: string) {
+  private showSignInErrorMessage(code: string) {
+    const { summary, message } = signInErrorMessages[code]
+    this.showErrorMessage(summary, message)
+  }
+
+  private showErrorMessage(summary: string, message: string) {
     this.toastService.add({
       severity: 'error',
       summary: summary,

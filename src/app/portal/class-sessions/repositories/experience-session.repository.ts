@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core'
 import {
   addDoc,
   collection,
-  collectionData,
   DocumentReference,
   DocumentSnapshot,
   doc,
@@ -19,7 +18,7 @@ import {
 } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { Observable } from 'rxjs'
+import { from, map, Observable } from 'rxjs'
 import { CreateExperienceSession } from '../models/CreateExperienceSession.model'
 import {
   ExperienceSessionDbModel,
@@ -59,9 +58,12 @@ export class ExperienceSessionRepository {
     const activeExperienceSessionsQuery =
       this.getActiveExperienceSessionQuery(classSessionId)
 
-    return collectionData<ExperienceSessionDbModel>(
-      activeExperienceSessionsQuery,
-      { idField: 'id' }
+    return from(getDocs(activeExperienceSessionsQuery)).pipe(
+      map(snapshot => {
+        return snapshot.docs.map(
+          doc => ({ ...doc.data(), id: doc.id }) as ExperienceSessionDbModel
+        )
+      })
     )
   }
 

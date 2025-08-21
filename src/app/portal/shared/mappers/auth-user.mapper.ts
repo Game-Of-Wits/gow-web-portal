@@ -1,5 +1,5 @@
 import { AuthUserModel } from '~/shared/models/AuthUser'
-import { TeacherProfileModel } from '../models/TeacherProfile'
+import { TeacherProfileModel } from '~/teacher-profile/models/TeacherProfile.model'
 import { UserModel } from '../models/User'
 
 export class AuthUserMapper {

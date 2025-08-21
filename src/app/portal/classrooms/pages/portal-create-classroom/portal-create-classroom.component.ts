@@ -6,8 +6,11 @@ import {
   FormGroup,
   ReactiveFormsModule
 } from '@angular/forms'
+import { Router } from '@angular/router'
 import { LucideAngularModule, Plus } from 'lucide-angular'
+import { MessageService } from 'primeng/api'
 import { ColorPickerModule } from 'primeng/colorpicker'
+import { Toast } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 import { InitialExperienceAbilityListFormComponent } from '~/abilities/components/initial-experience-ability-list-form/initial-experience-ability-list-form.component'
 import { AbilityForm } from '~/abilities/models/AbilityForm.model'
@@ -45,15 +48,20 @@ import { SelectOption } from '~/shared/types/SelectOption'
     PenaltyListFormComponent,
     ReactiveFormsModule,
     TooltipModule,
+    Toast,
     ColorPickerModule,
     LucideAngularModule
-  ]
+  ],
+  providers: [MessageService]
 })
 export class PortalCreateClassroomPageComponent implements OnInit {
   private readonly classroomService = inject(ClassroomsService)
+
   private readonly defaultSchoolStore = inject(DefaultSchoolStore)
   private readonly authStore = inject(AuthStore)
   private readonly fb = inject(FormBuilder)
+  private readonly toastService = inject(MessageService)
+  private readonly router = inject(Router)
 
   public readonly shadowWarfareExperience = EducationalExperience.SHADOW_WARFARE
   public readonly masteryRoadExperience = EducationalExperience.MASTERY_ROAD
@@ -66,6 +74,8 @@ export class PortalCreateClassroomPageComponent implements OnInit {
 
   public schoolGradeYearOptions = signal<SelectOption[]>([])
   public teamNameOptions = signal<SelectOption[]>([])
+
+  public isCreatingLoading = signal<boolean>(false)
 
   ngOnInit(): void {
     this.onLoadSchoolGradeYears()
@@ -119,11 +129,30 @@ export class PortalCreateClassroomPageComponent implements OnInit {
 
     if (schoolId === null || teacherId === null) return
 
-    this.classroomService.createClassroom({
-      schoolId: schoolId,
-      teacherId: teacherId,
-      ...this.classroomForm.getRawValue()
-    })
+    this.isCreatingLoading.set(true)
+
+    this.classroomService
+      .createClassroom({
+        schoolId: schoolId,
+        teacherId: teacherId,
+        ...this.classroomForm.getRawValue()
+      })
+      .then(classroomId => {
+        this.isCreatingLoading.set(false)
+        this.router.navigate(['p', 's', schoolId, 'c', classroomId])
+      })
+      .catch(err => {
+        const error = err as { code: string; message: string }
+        this.showCreateClassroomErrorMessage(error.code, error.message)
+      })
+  }
+
+  private showCreateClassroomErrorMessage(code: string, message: string) {
+    this.showErrorMessage(code, message)
+  }
+
+  private showErrorMessage(summary: string, detail: string) {
+    this.toastService.add({ severity: 'error', summary, detail })
   }
 
   private onLoadSchoolGradeYears() {

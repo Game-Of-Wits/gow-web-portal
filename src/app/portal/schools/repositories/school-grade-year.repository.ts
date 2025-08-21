@@ -1,13 +1,11 @@
 import { Injectable, inject } from '@angular/core'
 import {
   collection,
-  collectionData,
   Firestore,
-  Query,
+  getDocs,
   query,
   where
 } from '@angular/fire/firestore'
-import { Observable } from 'rxjs'
 import { SchoolGradeYearDbModel } from '../models/SchoolGradeYearDb.model'
 import { SchoolRepository } from './school.repository'
 
@@ -18,25 +16,27 @@ export class SchoolGradeYearRepository {
   private static readonly collectionName = 'school_grade_years'
   private readonly collectionName = SchoolGradeYearRepository.collectionName
 
-  public getGradeYearsBySchoolId(
+  public async getGradeYearsBySchoolId(
     schoolId: string
-  ): Observable<SchoolGradeYearDbModel[]> {
+  ): Promise<SchoolGradeYearDbModel[]> {
     const schoolRef = SchoolRepository.getSchoolRefById(
       this.firestore,
       schoolId
     )
 
     const gradeYearsQuery = query(
-      this.getGradeYearsRef(),
+      this.getCollectionRef(),
       where('school', '==', schoolRef)
-    ) as Query<SchoolGradeYearDbModel>
+    )
 
-    return collectionData<SchoolGradeYearDbModel>(gradeYearsQuery, {
-      idField: 'id'
-    })
+    const gradeYearsSnapshot = await getDocs(gradeYearsQuery)
+
+    return gradeYearsSnapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as SchoolGradeYearDbModel
+    )
   }
 
-  private getGradeYearsRef() {
+  private getCollectionRef() {
     return collection(this.firestore, this.collectionName)
   }
 }

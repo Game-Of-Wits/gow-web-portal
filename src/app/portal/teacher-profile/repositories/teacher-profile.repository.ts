@@ -9,15 +9,15 @@ export class TeacherProfileRepository {
   private static readonly collectionName = 'teacher_profiles'
   private readonly collectionName = TeacherProfileRepository.collectionName
 
-  public async getById(userId: string): Promise<TeacherProfileDbModel | null> {
+  public async getTeacherProfileById(
+    userId: string
+  ): Promise<TeacherProfileDbModel | null> {
     const profileRef = TeacherProfileRepository.getRefById(
       this.firestore,
       userId
     )
     const profileSnapshot = await getDoc(profileRef)
-
     if (!profileSnapshot.exists()) return null
-
     return {
       id: profileSnapshot.id,
       ...profileSnapshot.data()
@@ -34,7 +34,7 @@ export class TeacherProfileRepository {
     return doc(db, `${TeacherProfileRepository.collectionName}/${id}`)
   }
 
-  private getRefById(id: string) {
+  public getRefById(id: string) {
     return doc(
       this.firestore,
       `${TeacherProfileRepository.collectionName}/${id}`
