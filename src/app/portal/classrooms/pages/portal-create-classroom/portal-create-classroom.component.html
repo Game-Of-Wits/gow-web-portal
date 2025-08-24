@@ -9,14 +9,16 @@
       principalTitle="Iniciar nueva aula"
       defaultBackPath="/p/general"
     >
-      <button
+      <p-button
         type="submit"
+        severity="primary"
         [disabled]="classroomForm.invalid"
-        class="px-3 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 disabled:bg-primary-100 text-white cursor-pointer flex items-center gap-1.5 disabled:cursor-not-allowed"
+        (loading)="isCreatingLoading()"
+        styleClass="rounded-xl"
       >
-        <i-lucide [img]="addClassroomIcon" class="size-5" />
-        Crear
-      </button>
+        <i-lucide pButtonIcon [img]="addClassroomIcon" />
+        <span pButtonLabel>Crear</span>
+      </p-button>
     </gow-page-header>
 
     <div class="flex flex-col gap-1.5">

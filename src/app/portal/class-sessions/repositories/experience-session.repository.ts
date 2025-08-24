@@ -5,7 +5,6 @@ import {
   DocumentReference,
   DocumentSnapshot,
   doc,
-  docData,
   Firestore,
   getDoc,
   getDocs,
@@ -32,12 +31,6 @@ export class ExperienceSessionRepository {
 
   private static readonly collectionName = 'experience_sessions'
   private readonly collectionName = ExperienceSessionRepository.collectionName
-
-  public getByIdObserve(id: string): Observable<ExperienceSessionDbModel> {
-    return docData(this.getRefById(id), {
-      idField: 'id'
-    }) as Observable<ExperienceSessionDbModel>
-  }
 
   public async getById(
     experienceSessionId: string

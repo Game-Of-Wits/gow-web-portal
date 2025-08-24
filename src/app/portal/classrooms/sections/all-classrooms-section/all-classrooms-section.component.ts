@@ -1,6 +1,7 @@
+import { NgOptimizedImage } from '@angular/common'
 import { Component, inject, OnInit, signal } from '@angular/core'
 import type { ErrorResponse } from '@shared/types/ErrorResponse'
-import { LucideAngularModule, Plus } from 'lucide-angular'
+import { LucideAngularModule } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'

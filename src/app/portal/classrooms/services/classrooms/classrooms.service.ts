@@ -60,10 +60,13 @@ export class ClassroomsService {
         this.cloudFunctions,
         'createClassroom'
       )
+
       const result = await createClassroomFn(data)
+
       const { classroomId } = result.data as { classroomId: string }
       return classroomId
     } catch (err) {
+      console.log(err)
       const error = err as { code: string; message: string }
       throw { code: error.code, message: error.message }
     }

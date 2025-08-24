@@ -83,7 +83,7 @@ export class ShadowWarfareExperiencePanelComponent
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
-  public isStudentsLoading = signal<boolean>(false)
+  public isStudentsLoading = signal<boolean>(true)
   public students = signal<ShadowWarfareStudentPeriodState[]>([])
 
   public isExperienceSessionEndingLoading = signal<boolean>(false)
@@ -165,10 +165,9 @@ export class ShadowWarfareExperiencePanelComponent
   }
 
   private loadAllTeams(classroomId: string) {
-    this.isTeamsLoading.set(true)
-
     this.teamService.getAllTeamsByClassroom(classroomId).subscribe({
       next: teams => {
+        console.log(teams)
         this.teams.set(teams)
         this.isTeamsLoading.set(false)
       },
@@ -180,10 +179,9 @@ export class ShadowWarfareExperiencePanelComponent
   }
 
   private loadAllCharacters(classroomId: string) {
-    this.isCharactersLoading.set(true)
-
     this.characterService.getAllCharactersByClassroom(classroomId).subscribe({
       next: characters => {
+        console.log(characters)
         this.characters.set(characters)
         this.isCharactersLoading.set(false)
       },
@@ -195,8 +193,6 @@ export class ShadowWarfareExperiencePanelComponent
   }
 
   private loadAbilityUses(experienceSession: ExperienceSessionModel) {
-    this.isAbilityUsesLoading.set(true)
-
     this.abilityUseService
       .getAllAbilityUsesByExperienceAndExperienceSessionId({
         experience: experienceSession.experience,
@@ -205,6 +201,7 @@ export class ShadowWarfareExperiencePanelComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: abilityUses => {
+          console.log(abilityUses)
           this.abilityUses.set(abilityUses)
           this.isAbilityUsesLoading.set(false)
         },
@@ -222,12 +219,11 @@ export class ShadowWarfareExperiencePanelComponent
     classroomId: string
     academicPeriodId: string
   }) {
-    this.isStudentsLoading.set(true)
-
     this.studentPeriodStateService
       .getAllShadowWarfareStudentPeriodStates({ classroomId, academicPeriodId })
       .subscribe({
         next: students => {
+          console.log(students)
           this.students.set(students)
           this.isStudentsLoading.set(false)
         },

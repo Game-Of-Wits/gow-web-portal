@@ -5,7 +5,6 @@ import {
   DocumentReference,
   DocumentSnapshot,
   doc,
-  docData,
   Firestore,
   getDoc,
   getDocs,
@@ -30,14 +29,6 @@ export class AcademicPeriodRespository {
 
   private static readonly collectionName = 'academic_periods'
   private readonly collectionName = AcademicPeriodRespository.collectionName
-
-  public getByIdObserve(
-    academicPeriodId: string
-  ): Observable<AcademicPeriodDbModel | undefined> {
-    return docData(this.getAcademicPeriodRefById(academicPeriodId), {
-      idField: 'id'
-    }) as Observable<AcademicPeriodDbModel>
-  }
 
   public async getByIdAsync(
     academicPeriodId: string

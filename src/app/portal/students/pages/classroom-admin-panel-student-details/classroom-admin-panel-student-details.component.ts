@@ -111,11 +111,13 @@ export class ClassroomAdminPanelStudentDetailsPageComponent implements OnInit {
     extras: { relativeTo: this.activatedRoute }
   }
 
+  public selectedAcademicPeriodId = signal<string | null>(
+    this.selectAcademicPeriodControl.value
+  )
+
   public studentPeriodStateSelected = computed(() => {
     return this.studentPeriodStates().find(
-      period =>
-        period.academicPeriodId ===
-        this.selectAcademicPeriodControl.getRawValue()
+      period => period.academicPeriodId === this.selectedAcademicPeriodId()
     )
   })
 
@@ -127,6 +129,10 @@ export class ClassroomAdminPanelStudentDetailsPageComponent implements OnInit {
 
     this.selectAcademicPeriodControl.disable()
     this.loadStudentInformation(studentProfileId)
+
+    this.selectAcademicPeriodControl.valueChanges.subscribe(value => {
+      this.selectedAcademicPeriodId.set(value)
+    })
   }
 
   public getMasteryRoadState(

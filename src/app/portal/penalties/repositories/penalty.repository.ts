@@ -1,5 +1,4 @@
 import { Injectable, inject } from '@angular/core'
-import { Firestore } from '@angular/fire/firestore'
 import {
   addDoc,
   collection,
@@ -7,12 +6,13 @@ import {
   DocumentSnapshot,
   deleteDoc,
   doc,
+  Firestore,
   getDoc,
   getDocs,
   query,
   updateDoc,
   where
-} from '@firebase/firestore'
+} from '@angular/fire/firestore'
 import { from, map, Observable } from 'rxjs'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { CreatePenalty } from '../models/CreatePenalty.model'

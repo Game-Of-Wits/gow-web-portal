@@ -18,7 +18,12 @@
     <div class="flex-1 w-full">
       <h2 class="text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
 
-      <p-table [value]="students()" [loading]="isStudentsLoading() || isCharactersLoading() || isTeamsLoading()" [scrollable]="true" scrollHeight="400px" [style]="{ height: '500px' }">
+      <p-table
+        [value]="students()"
+        [scrollable]="true"
+        scrollHeight="400px"
+        [style]="{ height: '500px' }"
+      >
         <ng-template #header>
           <tr>
             <th>Nombre completo</th>

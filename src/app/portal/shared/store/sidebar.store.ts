@@ -1,11 +1,11 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 
 type SidebarState = {
-  isOpen: boolean
+  isClose: boolean
 }
 
 const initialState: SidebarState = {
-  isOpen: window.localStorage.getItem('open-sidebar') === 'true'
+  isClose: window.localStorage.getItem('close-sidebar') === null
 }
 
 export const SidebarStateStore = signalStore(
@@ -13,7 +13,7 @@ export const SidebarStateStore = signalStore(
   withState(initialState),
   withMethods(store => ({
     toggle(): void {
-      patchState(store, ({ isOpen }) => ({ isOpen: !isOpen }))
+      patchState(store, ({ isClose: isClose }) => ({ isClose: !isClose }))
     }
   }))
 )

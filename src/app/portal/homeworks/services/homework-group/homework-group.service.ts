@@ -38,7 +38,7 @@ export class HomeworkGroupService {
     }
   }
 
-  public async create(data: CreateHomeworkGroup) {
+  public async create(data: CreateHomeworkGroup): Promise<HomeworkGroupModel> {
     try {
       const classroomExists = await this.classroomRepository.existById(
         data.classroomId
@@ -46,7 +46,9 @@ export class HomeworkGroupService {
 
       if (!classroomExists) throw new ErrorResponse('classroom-not-exist')
 
-      return await this.homeworkGroupRepository.create(data)
+      const newHomeworkGroup = await this.homeworkGroupRepository.create(data)
+
+      return HomeworkGroupMapper.toModel(newHomeworkGroup)
     } catch (err) {
       const error = err as ErrorResponse | FirebaseError
       throw new ErrorResponse(error.code)

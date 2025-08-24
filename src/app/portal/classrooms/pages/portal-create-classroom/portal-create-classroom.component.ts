@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router'
 import { LucideAngularModule, Plus } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
+import { ButtonModule } from 'primeng/button'
 import { ColorPickerModule } from 'primeng/colorpicker'
 import { Toast } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
@@ -38,6 +39,7 @@ import { SelectOption } from '~/shared/types/SelectOption'
   selector: 'gow-portal-create-classroom',
   templateUrl: './portal-create-classroom.component.html',
   imports: [
+    ButtonModule,
     PageHeaderComponent,
     TextFieldComponent,
     SelectFieldComponent,
@@ -163,7 +165,7 @@ export class PortalCreateClassroomPageComponent implements OnInit {
         gradeYears.map(gradeYear => ({
           name: `${educationLevelFormats[gradeYear.educationLevel]} - ${
             gradeYearFormats[gradeYear.gradeYear]
-          } ${gradeYear.section}`,
+          } ${gradeYear.section ?? ''}`,
           code: gradeYear.id
         }))
       )

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { LucideAngularModule, Plus, Trash2 } from 'lucide-angular'
+import { LucideAngularModule, Pencil, Plus, Trash2 } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { TableModule } from 'primeng/table'
@@ -35,6 +35,7 @@ const studentProfilesErrorMessages: ErrorMessages = {
 export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
   public readonly addIcon = Plus
   public readonly deleteIcon = Trash2
+  public readonly editIcon = Pencil
 
   private readonly studentProfileService = inject(StudentProfileService)
 
@@ -56,6 +57,11 @@ export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
 
   public onCloseCreateStudentDialog() {
     this.showCreateStudentAccount.set(false)
+  }
+
+  public onCreateStudent(studentProfile: StudentProfileModel) {
+    this.showCreateStudentAccount.set(false)
+    this.studentProfiles.update(profiles => [...profiles, studentProfile])
   }
 
   private loadStudents() {

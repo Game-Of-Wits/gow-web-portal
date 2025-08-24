@@ -41,7 +41,7 @@ export const createStudentForm = (): FormGroup<CreateStudentForm> => {
       ]
     }),
     character: new FormControl<string | null>(null, {
-      validators: [Validators.required]
+      validators: []
     })
   })
 }

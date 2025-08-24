@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core'
 import { FirebaseError } from '@angular/fire/app'
+import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { map, Observable } from 'rxjs'
+import { catchError, map, Observable, throwError } from 'rxjs'
 import { PenaltyMapper } from '~/penalties/mappers/penalty.mapper'
 import { CreatePenalty } from '~/penalties/models/CreatePenalty.model'
 import { PenaltyModel } from '~/penalties/models/Penalty.model'
@@ -19,6 +20,11 @@ export class PenaltyService {
       map(penalties => {
         const penaltiesMapped = PenaltyMapper.toListModel(penalties)
         return penaltiesMapped.sort((a, b) => a.name.localeCompare(b.name))
+      }),
+      catchError(err => {
+        if (err instanceof FirestoreError)
+          return throwError(() => new ErrorResponse(err.code))
+        return throwError(() => err)
       })
     )
   }

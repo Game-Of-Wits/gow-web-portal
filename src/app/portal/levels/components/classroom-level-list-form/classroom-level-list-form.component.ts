@@ -27,7 +27,6 @@ export class ClassroomLevelListFormComponent {
   public disabled = input(false, { alias: 'disabled' })
 
   public showAddLevelFormDialog = signal<boolean>(false)
-  public showEditLevelFormDialog = signal<boolean>(false)
   public levelFormSelected = signal<{
     position: number
     form: FormGroup<LevelForm> | null
@@ -41,7 +40,7 @@ export class ClassroomLevelListFormComponent {
   public onOpenAddLevelFormDialog() {
     this.levelFormSelected.set({
       position: this.levelListForm.length,
-      form: null,
+      form: levelForm({ requiredPoints: this.getLastLevelRequiredPoints() }),
       minRequiredPoints: this.getLastLevelRequiredPoints()
     })
     this.showAddLevelFormDialog.set(true)
@@ -49,7 +48,6 @@ export class ClassroomLevelListFormComponent {
 
   public onCloseLevelFormDialog() {
     this.showAddLevelFormDialog.set(false)
-    this.showEditLevelFormDialog.set(false)
     this.levelFormSelected.set({
       position: 0,
       form: null,

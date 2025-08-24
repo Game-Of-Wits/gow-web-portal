@@ -1,7 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { House, LucideAngularModule, Plus, School } from 'lucide-angular'
+import {
+  House,
+  LucideAngularModule,
+  Plus,
+  School,
+  SquareDashed
+} from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { MessageModule } from 'primeng/message'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
@@ -37,15 +43,16 @@ import { PortalSidebarPaperComponent } from './ui/portal-sidebar-paper.component
   providers: [MessageService]
 })
 export class PortalSidebarComponent implements OnInit {
+  public readonly generalIcon = House
+  public readonly classroomsIcon = School
+  public readonly addClassroomIcon = Plus
+  public readonly emptyIcon = SquareDashed
+
   public readonly classroomService = inject(ClassroomsService)
   public readonly sidebarStore = inject(SidebarStateStore)
   public readonly localStorage = inject(LocalStorageService)
   public readonly defaultSchoolStore = inject(DefaultSchoolStore)
   public readonly toastService = inject(MessageService)
-
-  public readonly generalIcon = House
-  public readonly classroomsIcon = School
-  public readonly addClassroomIcon = Plus
 
   public classrooms = signal<ClassroomModel[]>([])
 

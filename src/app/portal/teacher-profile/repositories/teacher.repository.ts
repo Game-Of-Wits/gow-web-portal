@@ -10,10 +10,7 @@ export class TeacherProfileRepository {
   private readonly collectionName = TeacherProfileRepository.collectionName
 
   public async getById(userId: string): Promise<TeacherProfileDbModel | null> {
-    const profileRef = TeacherProfileRepository.getRefById(
-      this.firestore,
-      userId
-    )
+    const profileRef = this.getRefById(userId)
     const profileSnapshot = await getDoc(profileRef)
 
     if (!profileSnapshot.exists()) return null

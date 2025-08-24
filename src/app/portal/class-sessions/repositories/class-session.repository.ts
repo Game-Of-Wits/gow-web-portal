@@ -5,7 +5,6 @@ import {
   DocumentReference,
   DocumentSnapshot,
   doc,
-  docData,
   Firestore,
   getDoc,
   getDocs,
@@ -31,12 +30,6 @@ export class ClassSessionRepository {
 
   private static readonly collectionName = 'class_sessions'
   private readonly collectionName = ClassSessionRepository.collectionName
-
-  public getByIdObserve(id: string): Observable<ClassSessionDbModel> {
-    return docData(this.getRefById(id), {
-      idField: 'id'
-    }) as Observable<ClassSessionDbModel>
-  }
 
   public async getById(sessionId: string): Promise<ClassSessionDbModel | null> {
     const snapshot = await getDoc(this.getRefById(sessionId))

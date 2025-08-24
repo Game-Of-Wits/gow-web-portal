@@ -30,8 +30,8 @@ export class PortalNavbarComponent {
   public onToggleSidebar() {
     this.sidebarStore.toggle()
 
-    if (this.sidebarStore.isOpen())
-      this.localStorageService.setValue('open-sidebar', 'true')
-    else this.localStorageService.removeValue('open-sidebar')
+    if (this.sidebarStore.isClose())
+      this.localStorageService.removeValue('close-sidebar')
+    else this.localStorageService.setValue('close-sidebar', 'true')
   }
 }

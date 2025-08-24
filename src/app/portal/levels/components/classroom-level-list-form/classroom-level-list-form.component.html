@@ -25,6 +25,7 @@
   buttonText="Añadir"
   headerTitle="Añadir nivel"
   [id]="levelFormSelected().position"
+  [levelForm]="levelFormSelected().form"
   [minRequiredPoints]="levelFormSelected().minRequiredPoints"
   [show]="showAddLevelFormDialog()"
   (close)="onCloseLevelFormDialog()"

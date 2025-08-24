@@ -22,6 +22,7 @@ import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { LevelModel } from '~/levels/models/Level.model'
+import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
@@ -62,6 +63,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
   private readonly abilityUseService = inject(AbilityUseService)
+  private readonly levelService = inject(LevelService)
 
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
@@ -169,21 +171,22 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   private loadLevels() {
-    this.isLevelsLoading.set(true)
+    const classroomId = this.context.classroom()?.id ?? null
 
-    setTimeout(() => {
-      this.levels.set([
-        {
-          id: '1TbKYXAqJMel5TQVFlSt',
-          classroomId: 'hin6KfWOYnKbDRkuPd1B',
-          name: 'Aldeano',
-          abilityIds: [],
-          primaryColor: '#143AF6',
-          requiredPoints: 0
-        }
-      ])
-      this.isLevelsLoading.set(false)
-    }, 200)
+    if (classroomId === null) return
+
+    this.isStudentsLoading.set(true)
+
+    this.levelService.getAllLevelsByClassroom(classroomId).subscribe({
+      next: levels => {
+        this.levels.set(levels)
+        this.isLevelsLoading.set(false)
+      },
+      error: err => {
+        const error = err as ErrorResponse
+        this.onShowStudentsLoadingErrorMessage(error.code)
+      }
+    })
   }
 
   private onShowStudentsLoadingErrorMessage(code: string) {

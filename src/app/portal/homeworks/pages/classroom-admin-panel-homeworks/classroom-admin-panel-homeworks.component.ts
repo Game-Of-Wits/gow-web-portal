@@ -12,7 +12,6 @@ import {
   HomeworkGroupFormDialogComponent,
   HomeworkGroupFormSubmit
 } from '~/homeworks/components/homework-group-form-dialog/homework-group-form-dialog.component'
-import { homeworkGroupForm } from '~/homeworks/forms/homeworkGroupForm'
 import { HomeworkGroupModel } from '~/homeworks/models/HomeworkGroup.model'
 import { HomeworkGroupService } from '~/homeworks/services/homework-group/homework-group.service'
 import { SectionTitleComponent } from '~/shared/components/ui/section-title/section-title.component'
@@ -93,7 +92,10 @@ export class ClassroomAdminPanelHomeworksPageComponent implements OnInit {
     this.homeworkGroupService
       .create({ classroomId, name: submit.result.formData.name })
       .then(homeworkGroup => {
-        this.router.navigate([`g/${homeworkGroup.id}`])
+        this.router.navigate(['../', `g/${homeworkGroup.id}`])
+        this.homeworkGroups.update(homeworkGroups => {
+          return [...homeworkGroups, homeworkGroup]
+        })
         submit.onFinish()
       })
       .catch(err => {

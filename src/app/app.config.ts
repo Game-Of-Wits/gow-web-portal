@@ -29,10 +29,19 @@ import { environment } from '../environments/environment'
 import { routes } from './app.routes'
 
 if (!environment.production) {
+  ;(self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true
   setLogLevel('debug')
 }
 
-const app = initializeApp(environment.firebase)
+const app = initializeApp({
+  apiKey: environment.firebase.apiKey,
+  authDomain: environment.firebase.authDomain,
+  projectId: environment.firebase.projectId,
+  storageBucket: environment.firebase.storageBucket,
+  messagingSenderId: environment.firebase.messagingSenderId,
+  appId: environment.firebase.appId,
+  measurementId: environment.firebase.measurementId
+})
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -59,26 +68,16 @@ export const appConfig: ApplicationConfig = {
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
     UserTrackingService,
-    provideFirestore(() => {
-      const app = initializeApp(environment.firebase)
-      return initializeFirestore(app, {
-        experimentalAutoDetectLongPolling: true
-      })
-    }),
+    provideFirestore(() => initializeFirestore(app, {})),
     provideDatabase(() => getDatabase()),
-    provideFunctions(() => getFunctions()),
+    provideFunctions(() => getFunctions(app, 'us-central1')),
     provideMessaging(() => getMessaging()),
     provideStorage(() => getStorage()),
-    provideAppCheck(() => {
-      const appCheck = initializeAppCheck(undefined, {
-        provider: new ReCaptchaV3Provider(environment.reCAPTCHAKey),
+    provideAppCheck(() =>
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(environment.reCaptchaKey),
         isTokenAutoRefreshEnabled: true
       })
-
-      if (!environment.production)
-        (window as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true
-
-      return appCheck
-    })
+    )
   ]
 }

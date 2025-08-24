@@ -62,9 +62,7 @@ export class StudentPeriodStateRepository {
       switchMap((studentsSnapshot: QuerySnapshot<DocumentData>) => {
         const studentRefs = studentsSnapshot.docs.map(doc => doc.ref)
 
-        if (studentRefs.length === 0) {
-          return from([])
-        }
+        if (studentRefs.length === 0) return from([])
 
         const studentPeriodStatesQuery = query(
           this.getCollectionRef(),

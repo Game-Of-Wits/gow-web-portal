@@ -84,6 +84,7 @@
             placeholder="Selecciona su personaje"
             formControlName="character"
             [options]="characterOptions()"
+            [enableClear]="false"
           />
         </div>
       }
@@ -177,6 +178,8 @@
       size="large"
       styleClass="w-full rounded-xl py-2.5"
       label="Guardar"
+      (loading)="isCreatingStudentLoading()"
+      (click)="onCreateStudent()"
       [disabled]="createStudentForm.invalid"
     />
   </div>

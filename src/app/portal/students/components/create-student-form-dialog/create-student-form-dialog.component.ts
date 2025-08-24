@@ -1,23 +1,17 @@
 import { Component, inject, input, OnInit, output, signal } from '@angular/core'
 import { AbstractControl, ReactiveFormsModule } from '@angular/forms'
-import {
-  Circle,
-  CircleCheckBig,
-  LucideAngularModule,
-  Square,
-  X
-} from 'lucide-angular'
+import { Circle, CircleCheckBig, LucideAngularModule, X } from 'lucide-angular'
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { AcademicPeriodService } from '~/academic-periods/services/academic-period/academic-period.service'
-import { CharacterModel } from '~/characters/models/Character.model'
 import { CharacterService } from '~/characters/services/character/character.service'
 import { SelectFieldComponent } from '~/shared/components/ui/select-field/select-field.component'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { DefaultSchoolStore } from '~/shared/store/default-school.store'
 import { SelectOption } from '~/shared/types/SelectOption'
+import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { createStudentForm } from '~/students/forms/createStudentForm'
-import { StudentModel } from '~/students/models/Student.model'
+import { StudentService } from '~/students/services/student/student.service'
 
 @Component({
   selector: 'gow-create-student-form-dialog',
@@ -38,6 +32,7 @@ export class CreateStudentFormDialogComponent implements OnInit {
 
   private readonly academicPeriodService = inject(AcademicPeriodService)
   private readonly characterService = inject(CharacterService)
+  private readonly studentService = inject(StudentService)
 
   private readonly defaultSchoolStore = inject(DefaultSchoolStore)
 
@@ -51,7 +46,9 @@ export class CreateStudentFormDialogComponent implements OnInit {
   public createStudentForm = createStudentForm()
 
   public onClose = output<void>({ alias: 'close' })
-  public onSuccess = output<{ student: StudentModel }>({ alias: 'success' })
+  public onSuccess = output<StudentProfileModel>({
+    alias: 'success'
+  })
 
   ngOnInit(): void {
     this.verifyAcademicPeriodIsActive()
@@ -59,7 +56,18 @@ export class CreateStudentFormDialogComponent implements OnInit {
 
   public onCreateStudent() {
     const createStudentData = this.createStudentForm.getRawValue()
-    console.log(createStudentData)
+
+    this.isCreatingStudentLoading.set(true)
+
+    this.studentService
+      .createStudent(this.classroomId(), createStudentData)
+      .then(student => {
+        this.onSuccess.emit(student)
+        this.isCreatingStudentLoading.set(false)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 
   public onCloseDialog() {

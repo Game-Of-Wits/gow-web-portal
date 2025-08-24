@@ -6,10 +6,12 @@
   @if (!activeAcademicPeriodLoading()) {
     @if (activeAcademicPeriod(); as activeAcademicPeriod) {
       <div class="flex justify-between items-center">
-        <p class="text-3xl leading-none">
-          {{ activeAcademicPeriod.name }}· Semana
-          {{ weekAndDayDiff()!.week }}· Día {{ weekAndDayDiff()!.day }}
-        </p>
+        @if (weekAndDayDiff(); as weekAndDayDiff) {
+          <p class="text-3xl leading-none">
+            {{ activeAcademicPeriod.name }}· Semana
+            {{ weekAndDayDiff.week }}· Día {{ weekAndDayDiff.day }}
+          </p>
+        }
 
         <button
           class="group cursor-pointer flex items-center gap-1.5"

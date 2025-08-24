@@ -4,7 +4,7 @@
   <div class="flex gap-5">
     <button class="cursor-pointer" (click)="onToggleSidebar()">
       <i-lucide
-        [img]="sidebarStore.isOpen() ? closePortalSidebar : openPortalSidebar"
+        [img]="sidebarStore.isClose() ? closePortalSidebar : openPortalSidebar"
         class="text-white hover:bg-transparent size-[32px]"
       ></i-lucide>
     </button>

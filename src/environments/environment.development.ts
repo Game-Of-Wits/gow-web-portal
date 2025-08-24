@@ -1,24 +1,14 @@
 export const environment = {
   production: false,
-  reCAPTCHAKey: '071236E4-01FE-47D1-B689-0BF14230D1F8',
+  reCaptchaKey: 'RECAPTCHA_KEY_TEST',
   firebase: {
-    /*
-    apiKey: 'AIzaSyBkH0Ai_FVea2kZaEDlSRImABKSko0sgQQ',
-    authDomain: 'gameofwits-test.firebaseapp.com',
-    databaseURL: 'https://gameofwits-test-default-rtdb.firebaseio.com',
-    projectId: 'gameofwits-test',
-    storageBucket: 'gameofwits-test.firebasestorage.app',
-    messagingSenderId: '794861208414',
-    appId: '1:794861208414:web:a58a3493cf262aaa7485cf',
-    measurementId: 'G-EKDP40E5M7'
-  */
-    apiKey: 'AIzaSyBkYps1O6lcuRwHfHxKRhNM6GukOYWAGX0',
-    authDomain: 'gow-game-of-wits.firebaseapp.com',
-    databaseURL: 'https://gow-game-of-wits-default-rtdb.firebaseio.com',
-    projectId: 'gow-game-of-wits',
-    storageBucket: 'gow-game-of-wits.firebasestorage.app',
-    messagingSenderId: '693554987815',
-    appId: '1:693554987815:web:9b494fdc6d039f031fdf02',
-    measurementId: 'G-D85GDK88DJ'
+    apiKey: 'AIzaSyCHug83aNuYtPtd52qDrdTAExqyCRCqk_A',
+    authDomain: 'gameofwits-gow.firebaseapp.com',
+    databaseURL: 'https://gameofwits-gow-default-rtdb.firebaseio.com',
+    projectId: 'gameofwits-gow',
+    storageBucket: 'gameofwits-gow.firebasestorage.app',
+    messagingSenderId: '897776608067',
+    appId: '1:897776608067:web:53ee09603535be492d05f6',
+    measurementId: 'G-7SK6M8JQ6X'
   }
 }
