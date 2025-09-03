@@ -1,9 +1,7 @@
 export interface AbilityUseModel {
-  student: {
-    firstName: string
-    lastName: string
-  }
+  studentFullName: string
+  abilityId: string
   abilityName: string
-  characterId: string | null
+  characterName: string | null
   createdAt: Date
 }

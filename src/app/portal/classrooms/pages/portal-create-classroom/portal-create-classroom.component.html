@@ -2,7 +2,6 @@
   <form
     class="max-w-[700px] w-full flex flex-col gap-3.5"
     [formGroup]="classroomForm"
-    (ngSubmit)="onCreateClassroom()"
   >
     <gow-page-header
       subtitle="Aulas"
@@ -10,11 +9,11 @@
       defaultBackPath="/p/general"
     >
       <p-button
-        type="submit"
         severity="primary"
         [disabled]="classroomForm.invalid"
-        (loading)="isCreatingLoading()"
+        [loading]="isCreatingLoading()"
         styleClass="rounded-xl"
+        (click)="onCreateClassroom()"
       >
         <i-lucide pButtonIcon [img]="addClassroomIcon" />
         <span pButtonLabel>Crear</span>

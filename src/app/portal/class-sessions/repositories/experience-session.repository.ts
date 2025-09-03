@@ -2,8 +2,6 @@ import { Injectable, inject } from '@angular/core'
 import {
   addDoc,
   collection,
-  DocumentReference,
-  DocumentSnapshot,
   doc,
   Firestore,
   getDoc,
@@ -11,7 +9,7 @@ import {
   limit,
   Query,
   query,
-  Timestamp,
+  serverTimestamp,
   updateDoc,
   where
 } from '@angular/fire/firestore'
@@ -19,10 +17,9 @@ import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { from, map, Observable } from 'rxjs'
 import { CreateExperienceSession } from '../models/CreateExperienceSession.model'
-import {
-  ExperienceSessionDbModel,
-  ExperienceSessionDbWithoutId
-} from '../models/ExperienceSessionDb.model'
+import { CreateExperienceSessionDb } from '../models/CreateExperienceSessionDb.model'
+import { ExperienceSessionDbModel } from '../models/ExperienceSessionDb.model'
+import { UpdateExperienceSessionDb } from '../models/UpdateExperienceSession.model'
 import { ClassSessionRepository } from './class-session.repository'
 
 @Injectable({ providedIn: 'root' })
@@ -41,8 +38,8 @@ export class ExperienceSessionRepository {
 
     return {
       id: snapshot.id,
-      ...(snapshot.data() as ExperienceSessionDbWithoutId)
-    }
+      ...snapshot.data()
+    } as ExperienceSessionDbModel
   }
 
   public getActiveExperienceSessions(
@@ -85,25 +82,35 @@ export class ExperienceSessionRepository {
       data.classSessionId
     )
 
-    const newExperienceSessionRef = (await addDoc(this.getCollectionRef(), {
+    const saveData: CreateExperienceSessionDb = {
       classSession: classSessionRef,
       experience: data.experience,
       endedAt: null,
-      startedAt: Timestamp.now()
-    })) as DocumentReference<ExperienceSessionDbModel>
+      startedAt: serverTimestamp()
+    }
 
-    const newExperienceSessionSnapshot: DocumentSnapshot<ExperienceSessionDbModel> =
-      await getDoc(newExperienceSessionRef)
+    if (data.rules) {
+      saveData.rules = {
+        shift: data.rules.shift
+      }
+    }
+
+    const newExperienceSessionRef = await addDoc(
+      this.getCollectionRef(),
+      saveData
+    )
+
+    const newExperienceSessionSnapshot = await getDoc(newExperienceSessionRef)
 
     return {
       id: newExperienceSessionSnapshot.id,
-      ...(newExperienceSessionSnapshot.data() as ExperienceSessionDbWithoutId)
-    }
+      ...newExperienceSessionSnapshot.data()
+    } as ExperienceSessionDbModel
   }
 
   public updateById(
     experienceSessionId: string,
-    data: Partial<ExperienceSessionDbModel>
+    data: Partial<UpdateExperienceSessionDb>
   ) {
     return updateDoc(this.getRefById(experienceSessionId), data)
   }

@@ -114,4 +114,8 @@ export class AnswerOptionRepository {
   public static getRefById(db: Firestore, id: string) {
     return doc(db, `${AnswerOptionRepository.collectionName}/${id}`)
   }
+
+  public static generateRef(db: Firestore) {
+    return doc(AnswerOptionRepository.getCollectionRef(db))
+  }
 }

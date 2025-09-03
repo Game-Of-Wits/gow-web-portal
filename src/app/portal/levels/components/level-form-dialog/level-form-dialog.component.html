@@ -50,7 +50,7 @@
             }
           </div>
 
-          @if (!isInitialLevel()) {
+          @if (!isInitialLevel() && !hasActiveAcademicPeriod()) {
             <div class="flex flex-col gap-1">
               <gow-number-field
                 label="Puntaje requerido (Mínimo: {{ minRequiredPoints }} - Máximo: {{ maxRequiredPoints == null ? 'ninguno' : maxRequiredPoints }})"

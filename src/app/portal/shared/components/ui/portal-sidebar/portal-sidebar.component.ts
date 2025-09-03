@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import {
@@ -9,11 +9,14 @@ import {
   SquareDashed
 } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
+import { ButtonModule } from 'primeng/button'
 import { MessageModule } from 'primeng/message'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { ClassroomSidebarLinkComponent } from '~/classrooms/components/ui/classroom-sidebar-link/classroom-sidebar-link.component'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { ClassroomModel } from '~/classrooms/models/Classroom.model'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
+import { GeneralPanelContextService } from '~/shared/contexts/general-panel-context/general-panel-context.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { LocalStorageService } from '~/shared/services/local-storage.service'
 import { DefaultSchoolStore } from '~/shared/store/default-school.store'
@@ -31,6 +34,7 @@ import { PortalSidebarPaperComponent } from './ui/portal-sidebar-paper.component
     }
   `,
   imports: [
+    ButtonModule,
     RouterLink,
     RouterLinkActive,
     PortalSidebarLinkComponent,
@@ -54,9 +58,19 @@ export class PortalSidebarComponent implements OnInit {
   public readonly defaultSchoolStore = inject(DefaultSchoolStore)
   public readonly toastService = inject(MessageService)
 
+  private readonly generalContext = inject(GeneralPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
+
   public classrooms = signal<ClassroomModel[]>([])
 
   public isClassroomsLoading = signal<boolean>(false)
+
+  public hasActiveAcademicPeriod = computed(() => {
+    return (
+      this.generalContext.activeAcademicPeriod() !== null ||
+      this.classroomContext.activeAcademicPeriod() !== null
+    )
+  })
 
   ngOnInit(): void {
     this.loadClassrooms()

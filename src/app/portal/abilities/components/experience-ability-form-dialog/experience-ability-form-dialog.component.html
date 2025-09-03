@@ -72,22 +72,24 @@
           }
         </div>
 
-        <div class="flex flex-col gap-1" formGroupName="usage">
-          <gow-select-field
-            label="Horario de uso"
-            placeholder="Seleccione el horario de uso"
-            [options]="abilityClassShiftOptions"
-            [enableClear]="false"
-            formControlName="shift"
-            [scrollHeight]="150"
-          />
+        @if (usageTypeControl?.value == usageType.INTERVAL_TIME) {
+          <div class="flex flex-col gap-1" formGroupName="usage">
+            <gow-select-field
+              label="Horario de uso"
+              placeholder="Seleccione el horario de uso"
+              [options]="abilityClassShiftOptions"
+              [enableClear]="false"
+              formControlName="shift"
+              [scrollHeight]="150"
+            />
 
-          @if (usageShiftControl?.invalid && usageShiftControl?.touched) {
-            @if (hasErrorValidation(usageShiftControl, "required")) {
-              <p class="text-sm text-red-500">Es requerido</p>
+            @if (usageShiftControl?.invalid && usageShiftControl?.touched) {
+              @if (hasErrorValidation(usageShiftControl, "required")) {
+                <p class="text-sm text-red-500">Es requerido</p>
+              }
             }
-          }
-        </div>
+          </div>
+        }
 
         <div class="flex flex-col gap-1">
           <gow-textarea-field

@@ -11,14 +11,16 @@
       }
     </div>
 
-    <p-button
-      severity="info"
-      styleClass="rounded-lg"
-      (click)="onOpenAddAbilityToLevelForm()"
-    >
-      <span pButtonLabel>Añadir habilidades</span>
-      <i-lucide [img]="addIcon" pButtonIcon />
-    </p-button>
+    @if (!hasActiveAcademicPeriod()) {
+      <p-button
+        severity="info"
+        styleClass="rounded-lg"
+        (click)="onOpenAddAbilityToLevelForm()"
+      >
+        <span pButtonLabel>Añadir habilidades</span>
+        <i-lucide [img]="addIcon" pButtonIcon />
+      </p-button>
+    }
   } @else {
     <div class="flex items-center gap-2.5">
       <p-progress-spinner

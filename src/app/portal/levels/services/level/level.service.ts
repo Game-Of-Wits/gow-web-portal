@@ -26,7 +26,7 @@ export class LevelService {
 
       return LevelMapper.toModel(level)
     } catch (err) {
-      const error = err as FirebaseError
+      const error = err as FirebaseError | ErrorResponse
       throw new ErrorResponse(error.code)
     }
   }

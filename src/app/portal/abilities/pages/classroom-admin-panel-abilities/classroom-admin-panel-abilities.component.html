@@ -1,9 +1,9 @@
-@if (context.classroom(); as classroom) {
+@if (classroomContext.classroom(); as classroom) {
   <section class="px-[26px] pt-[14px] pb-[6px]">
     <p-button
       styleClass="mb-2.5 rounded-xl"
       (click)="onOpenCreateAbilityForm()"
-      [disabled]="isAbilityDeletingLoading()"
+      [disabled]="isAbilityDeletingLoading() || hasActiveAcademicPeriod()"
     >
       <i-lucide pButtonIcon [img]="addIcon" class="fill-white" />
       <span pButtonLabel>Añadir habilidad</span>
@@ -22,7 +22,7 @@
           <th>Experiencia educacional</th>
           <th>Tipo de acciones</th>
           <th>¿Es inicial?</th>
-          <th>Opciones</th>
+          <th>Acciones</th>
         </tr>
       </ng-template>
 
@@ -43,7 +43,7 @@
               severity="info"
               size="large"
               [rounded]="true"
-              [disabled]="isAbilityDeletingLoading()"
+              [disabled]="isAbilityDeletingLoading() || hasActiveAcademicPeriod()"
               (click)="onOpenEditAbilityForm($event, ability)"
             >
               <i-lucide pButtonIcon [img]="editIcon" />
@@ -54,7 +54,7 @@
               severity="danger"
               size="large"
               [rounded]="true"
-              [disabled]="isAbilityDeletingLoading()"
+              [disabled]="isAbilityDeletingLoading() || hasActiveAcademicPeriod()"
               (click)="onDeleteAbility($event, ability.id)"
             >
               <i-lucide pButtonIcon [img]="deleteIcon" />

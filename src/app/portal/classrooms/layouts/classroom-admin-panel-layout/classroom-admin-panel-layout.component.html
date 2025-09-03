@@ -7,7 +7,7 @@
         <i-lucide [img]="classroomIcon" class="size-[30px]" />
 
         @if (!isClassroomLoading()) {
-          @if (context.classroom(); as classroom) {
+          @if (classroomContext.classroom(); as classroom) {
             <h1 class="text-3xl font-bold leading-none">
               {{ classroom.name }}
             </h1>
@@ -25,7 +25,7 @@
 </section>
 
 @if (!isClassroomLoading()) {
-  @if (context.classroom(); as classroom) {
+  @if (classroomContext.classroom(); as classroom) {
     <p-tabs
       [value]="activeTab()"
       class="bg-background-white"

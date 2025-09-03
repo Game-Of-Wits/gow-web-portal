@@ -2,23 +2,45 @@ import { Injectable, inject } from '@angular/core'
 import {
   collection,
   DocumentData,
+  DocumentReference,
+  DocumentSnapshot,
   doc,
+  documentId,
   Firestore,
   getDoc,
   getDocs,
   QuerySnapshot,
   query,
-  where
+  serverTimestamp,
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
+import { chuckArray } from '@shared/utils/chuckArray'
 import { from, map, Observable, switchMap } from 'rxjs'
 import { AcademicPeriodRespository } from '~/academic-periods/repositories/academic-period.repository'
+import { CharacterRepository } from '~/characters/repositories/character.repository'
+import { ClassroomDbModel } from '~/classrooms/models/ClassroomDb.model'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
-import { StudentPeriodStatesDbModel } from '../models/StudentPeriodStatesDb.model'
+import { LevelDbModel } from '~/levels/models/LevelDb.model'
+import { LevelRepository } from '~/levels/repositories/level.repository'
+import { LevelRewardRepository } from '~/levels/repositories/level-reward.repository'
+import { EducationalExperience } from '~/shared/models/EducationalExperience'
+import { PointsModifier } from '~/shared/models/PointsModifier'
+import { EliminationMotivation } from '../models/EliminationMotivation.model'
+import {
+  MasteryRoadExperienceStateDb,
+  ShadowWarfareExperienceStateDb,
+  StudentPeriodStatesDbModel
+} from '../models/StudentPeriodStatesDb.model'
+import { EliminatedStudentRepository } from './eliminated-student.repository'
 import { StudentRepository } from './student.repository'
 
 @Injectable({ providedIn: 'root' })
 export class StudentPeriodStateRepository {
   private readonly firestore = inject(Firestore)
+
+  private readonly levelRepository = inject(LevelRepository)
+  private readonly levelRewardRepository = inject(LevelRewardRepository)
 
   private static readonly collectionName = 'student_period_states'
   private readonly collectionName = StudentPeriodStateRepository.collectionName
@@ -35,6 +57,48 @@ export class StudentPeriodStateRepository {
       id: snapshot.id,
       ...snapshot.data()
     } as StudentPeriodStatesDbModel
+  }
+
+  public async getAllByRefsAndAcademicPeriod(
+    academicPeriodId: string,
+    ids: DocumentReference[]
+  ): Promise<StudentPeriodStatesDbModel[]> {
+    const collection = this.getCollectionRef()
+
+    const academicPeriodRef = AcademicPeriodRespository.getRefById(
+      this.firestore,
+      academicPeriodId
+    )
+
+    const studentPeriodStatesChunk = chuckArray(ids, 10)
+    const studentperiodStatesSnapshots: DocumentSnapshot[] = []
+
+    const studentPeriodStateChunkPromises = studentPeriodStatesChunk.map(
+      async chunk => {
+        const studentPeriodStatesQuery = query(
+          collection,
+          where(documentId(), 'in', chunk),
+          where('academicPeriod', '==', academicPeriodRef)
+        )
+        return await getDocs(studentPeriodStatesQuery)
+      }
+    )
+
+    const querySnapshots = await Promise.all(studentPeriodStateChunkPromises)
+
+    querySnapshots.forEach(querySnapshot => {
+      querySnapshot.docs.forEach(doc => studentperiodStatesSnapshots.push(doc))
+    })
+
+    return studentperiodStatesSnapshots
+      .filter(snapshot => snapshot.exists())
+      .map(
+        snapshot =>
+          ({
+            id: snapshot.id,
+            ...snapshot.data()
+          }) as StudentPeriodStatesDbModel
+      )
   }
 
   public getAllByClassroomIdAndExperienceSession({
@@ -100,6 +164,284 @@ export class StudentPeriodStateRepository {
     return studentPeriodStatesSnapshot.docs.map(
       doc => ({ id: doc.id, ...doc.data() }) as StudentPeriodStatesDbModel
     )
+  }
+
+  public async modifyStudentHealtPoints(
+    studentPeriodState: StudentPeriodStatesDbModel,
+    data: {
+      modifier: PointsModifier
+      points: number
+    }
+  ): Promise<number> {
+    const classroomSnapshot = await getDoc(studentPeriodState.classroom)
+
+    const classroom = classroomSnapshot.data() as ClassroomDbModel
+
+    const shadowWarfareStudentExperience = studentPeriodState.experiences[
+      EducationalExperience.SHADOW_WARFARE
+    ] as ShadowWarfareExperienceStateDb
+
+    let newStudentHealtPoints = shadowWarfareStudentExperience.healthPoints
+
+    if (data.modifier === PointsModifier.INCREMENT) {
+      newStudentHealtPoints = Math.min(
+        classroom.experiences.SHADOW_WARFARE.healthPointsBase,
+        newStudentHealtPoints + data.points
+      )
+    } else if (data.modifier === PointsModifier.DECREASE) {
+      newStudentHealtPoints = Math.max(0, newStudentHealtPoints - data.points)
+    }
+
+    if (shadowWarfareStudentExperience.healthPoints === newStudentHealtPoints)
+      return shadowWarfareStudentExperience.healthPoints
+
+    const batch = writeBatch(this.firestore)
+
+    const studentPeriodStateRef = this.getRefById(studentPeriodState.id)
+
+    batch.update(studentPeriodStateRef, {
+      experiences: {
+        ...studentPeriodState.experiences,
+        SHADOW_WARFARE: {
+          ...shadowWarfareStudentExperience,
+          healthPoints: newStudentHealtPoints
+        }
+      }
+    })
+
+    if (newStudentHealtPoints === 0) {
+      const eliminatedStudentRef = EliminatedStudentRepository.generateRef(
+        this.firestore
+      )
+
+      const studentCharacterRef = CharacterRepository.getRefById(
+        this.firestore,
+        shadowWarfareStudentExperience.character.id
+      )
+      const studentTeamRef = CharacterRepository.getRefById(
+        this.firestore,
+        shadowWarfareStudentExperience.team.id
+      )
+
+      batch.set(eliminatedStudentRef, {
+        studentState: studentPeriodStateRef,
+        classroom: studentPeriodState.classroom,
+        character: studentCharacterRef,
+        team: studentTeamRef,
+        eliminatedAt: serverTimestamp(),
+        motivation: {
+          motive: EliminationMotivation.HEALTH
+        }
+      })
+    }
+
+    await batch.commit()
+
+    return newStudentHealtPoints
+  }
+
+  public async eliminateStudentByVotes(
+    studentPeriodState: StudentPeriodStatesDbModel,
+    votes: number
+  ): Promise<void> {
+    const batch = writeBatch(this.firestore)
+
+    const shadowWarfareStudentExperience = studentPeriodState.experiences[
+      EducationalExperience.SHADOW_WARFARE
+    ] as ShadowWarfareExperienceStateDb
+
+    const studentPeriodStateRef = this.getRefById(studentPeriodState.id)
+
+    batch.update(studentPeriodStateRef, {
+      experiences: {
+        ...studentPeriodState.experiences,
+        SHADOW_WARFARE: {
+          ...shadowWarfareStudentExperience,
+          healthPoints: 0
+        }
+      }
+    })
+
+    const eliminatedStudentRef = EliminatedStudentRepository.generateRef(
+      this.firestore
+    )
+
+    const studentCharacterRef = CharacterRepository.getRefById(
+      this.firestore,
+      shadowWarfareStudentExperience.character.id
+    )
+    const studentTeamRef = CharacterRepository.getRefById(
+      this.firestore,
+      shadowWarfareStudentExperience.team.id
+    )
+
+    batch.set(eliminatedStudentRef, {
+      studentState: studentPeriodStateRef,
+      classroom: studentPeriodState.classroom,
+      character: studentCharacterRef,
+      team: studentTeamRef,
+      eliminatedAt: serverTimestamp(),
+      motivation: {
+        motive: EliminationMotivation.VOTE,
+        votes: votes
+      }
+    })
+
+    await batch.commit()
+  }
+
+  public async modifyStudentProgressPoints(
+    studentPeriodState: StudentPeriodStatesDbModel,
+    data: {
+      modifier: PointsModifier
+      points: number
+    }
+  ): Promise<number> {
+    const masteryRoadStudentExperience = studentPeriodState.experiences[
+      EducationalExperience.MASTERY_ROAD
+    ] as MasteryRoadExperienceStateDb
+
+    let newStudentProgressPoints = masteryRoadStudentExperience.progressPoints
+
+    if (data.modifier === PointsModifier.INCREMENT) {
+      newStudentProgressPoints = newStudentProgressPoints + data.points
+    } else if (data.modifier === PointsModifier.DECREASE) {
+      newStudentProgressPoints = Math.max(
+        0,
+        newStudentProgressPoints - data.points
+      )
+    }
+
+    if (
+      masteryRoadStudentExperience.progressPoints === newStudentProgressPoints
+    )
+      return masteryRoadStudentExperience.progressPoints
+
+    const batch = writeBatch(this.firestore)
+
+    const studentPeriodStateRef = this.getRefById(studentPeriodState.id)
+
+    const classroomLevels = await this.levelRepository.getAllByClassroomIdAsync(
+      studentPeriodState.classroom.id
+    )
+
+    const currentLevelSnapshot = await getDoc(
+      masteryRoadStudentExperience.currentLevel
+    )
+
+    const currentLevel = {
+      ...currentLevelSnapshot.data(),
+      id: currentLevelSnapshot.id
+    } as LevelDbModel
+
+    let newCurrentLevel: DocumentReference | null = null
+    const newLevelRewards: DocumentReference[] = []
+
+    if (data.modifier === PointsModifier.INCREMENT) {
+      const nextLevels = classroomLevels.filter(
+        level => currentLevel.requiredPoints < level.requiredPoints
+      )
+
+      const studentLevelRewards =
+        await this.levelRewardRepository.getAllByStudentPeriodStateIdAsync(
+          studentPeriodState.id
+        )
+
+      const levelsAchieved: LevelDbModel[] = []
+
+      for (const level of nextLevels) {
+        if (level.requiredPoints > newStudentProgressPoints) break
+
+        if (
+          studentLevelRewards.some(
+            levelReward => levelReward.achievedLevel.id === level.id
+          )
+        )
+          continue
+
+        levelsAchieved.push(level)
+      }
+
+      levelsAchieved.forEach(level => {
+        const levelRef = LevelRepository.getRefById(this.firestore, level.id)
+        const levelRewardRef = LevelRewardRepository.generateRef(this.firestore)
+
+        batch.set(levelRewardRef, {
+          achievedLevel: levelRef,
+          studentState: studentPeriodStateRef,
+          claimed: false
+        })
+
+        newLevelRewards.push(levelRewardRef)
+      })
+
+      const lastLevelAchieved = levelsAchieved.reduce(
+        (currentLevel, nextLevel) => {
+          if (!currentLevel) return nextLevel
+          return currentLevel.requiredPoints > nextLevel.requiredPoints
+            ? currentLevel
+            : nextLevel
+        },
+        null as LevelDbModel | null
+      )
+
+      if (lastLevelAchieved !== null)
+        newCurrentLevel = LevelRepository.getRefById(
+          this.firestore,
+          lastLevelAchieved.id
+        )
+    } else if (data.modifier === PointsModifier.DECREASE) {
+      const prevLevels = classroomLevels.filter(
+        level => level.requiredPoints <= currentLevel.requiredPoints
+      )
+
+      const missingLevels: LevelDbModel[] = []
+
+      for (const level of prevLevels) {
+        if (level.requiredPoints < newStudentProgressPoints) break
+        missingLevels.push(level)
+      }
+
+      const lastMissingLevel = missingLevels.reduce(
+        (currentLevel, nextLevel) => {
+          if (!currentLevel) return nextLevel
+          return currentLevel.requiredPoints > nextLevel.requiredPoints
+            ? currentLevel
+            : nextLevel
+        },
+        null as LevelDbModel | null
+      )
+
+      if (lastMissingLevel !== null)
+        newCurrentLevel = LevelRepository.getRefById(
+          this.firestore,
+          lastMissingLevel.id
+        )
+    }
+
+    if (newCurrentLevel === null)
+      return masteryRoadStudentExperience.progressPoints
+
+    const updatedLevelRewards = [
+      ...masteryRoadStudentExperience.levelRewards,
+      ...newLevelRewards
+    ]
+
+    batch.update(studentPeriodStateRef, {
+      experiences: {
+        ...studentPeriodState.experiences,
+        MASTERY_ROAD: {
+          ...masteryRoadStudentExperience,
+          levelRewards: updatedLevelRewards,
+          progressPoints: newStudentProgressPoints,
+          currentLevel: newCurrentLevel
+        }
+      }
+    })
+
+    await batch.commit()
+
+    return newStudentProgressPoints
   }
 
   private getCollectionRef() {

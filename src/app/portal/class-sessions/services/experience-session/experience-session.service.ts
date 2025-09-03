@@ -1,5 +1,9 @@
 import { Injectable, inject } from '@angular/core'
-import { FirestoreError, Timestamp } from '@angular/fire/firestore'
+import {
+  FirestoreError,
+  serverTimestamp,
+  Timestamp
+} from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable, take } from 'rxjs'
@@ -13,7 +17,6 @@ import { AuthStore } from '~/shared/store/auth.store'
 @Injectable({ providedIn: 'root' })
 export class ExperienceSessionService {
   private readonly classSessionRepository = inject(ClassSessionRepository)
-
   private readonly experienceSessionRepository = inject(
     ExperienceSessionRepository
   )
@@ -61,26 +64,20 @@ export class ExperienceSessionService {
   public async endOfExperienceSession(
     experienceSessionId: string
   ): Promise<void> {
-    if (!this.authStore.isAuth())
-      throw new ErrorResponse(ErrorCode.Unauthenticated)
-
-    let activeExperienceSessionExists: boolean
     try {
-      activeExperienceSessionExists =
+      if (!this.authStore.isAuth())
+        throw new ErrorResponse(ErrorCode.Unauthenticated)
+
+      const activeExperienceSessionExists =
         await this.experienceSessionRepository.existsActiveExperienceSessionById(
           experienceSessionId
         )
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
 
-    if (!activeExperienceSessionExists)
-      throw new ErrorResponse('experience-session-not-active')
+      if (!activeExperienceSessionExists)
+        throw new ErrorResponse('experience-session-not-active')
 
-    try {
       await this.experienceSessionRepository.updateById(experienceSessionId, {
-        endedAt: Timestamp.fromDate(new Date())
+        endedAt: serverTimestamp()
       })
     } catch (err) {
       const error = err as FirestoreError
@@ -91,41 +88,29 @@ export class ExperienceSessionService {
   public async startNewExperienceSession(
     data: CreateExperienceSession
   ): Promise<ExperienceSessionModel> {
-    if (!this.authStore.isAuth())
-      throw new ErrorResponse(ErrorCode.Unauthenticated)
-
-    let isActiveClassSession: boolean
-
     try {
-      isActiveClassSession =
+      if (!this.authStore.isAuth())
+        throw new ErrorResponse(ErrorCode.Unauthenticated)
+
+      const isActiveClassSession =
         await this.classSessionRepository.existsActiveClassSessionById(
           data.classSessionId
         )
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
 
-    if (!isActiveClassSession)
-      throw new ErrorResponse('class-session-not-active')
+      if (!isActiveClassSession)
+        throw new ErrorResponse('class-session-not-active')
 
-    let activeExperienceSessionExists: boolean
-    try {
-      activeExperienceSessionExists =
+      const activeExperienceSessionExists =
         await this.experienceSessionRepository.existsActiveExperienceSessionByClassSessionId(
           data.classSessionId
         )
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
 
-    if (activeExperienceSessionExists)
-      throw new ErrorResponse('active-experience-session-exist')
+      if (activeExperienceSessionExists)
+        throw new ErrorResponse('active-experience-session-exist')
 
-    try {
       const experienceSessionDb =
         await this.experienceSessionRepository.create(data)
+
       return ExperienceSessionMapper.toModel(experienceSessionDb)
     } catch (err) {
       const error = err as FirestoreError

@@ -9,7 +9,13 @@ import {
   signal
 } from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { EllipsisVertical, LucideAngularModule, Square } from 'lucide-angular'
+import {
+  Bolt,
+  EllipsisVertical,
+  Gavel,
+  LucideAngularModule,
+  Square
+} from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
@@ -20,6 +26,14 @@ import { AbilityUseCardComponent } from '~/abilities/components/ability-use-card
 import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
 import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.service'
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
+import {
+  ApplyPenaltyToStudentFormDialogComponent,
+  ApplyPenaltyToStudentSuccess
+} from '~/classrooms/components/apply-penalty-to-student-form-dialog/apply-penalty-to-student-form-dialog.component'
+import {
+  ModifyStudentProgressPointsFormDialogComponent,
+  ModifyStudentProgressPointsSuccess
+} from '~/classrooms/components/modify-student-progress-points-form-dialog/modify-student-progress-points-form-dialog.component'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { LevelModel } from '~/levels/models/Level.model'
 import { LevelService } from '~/levels/services/level/level.service'
@@ -50,6 +64,8 @@ const endOfExperienceSessionErrorMessages: ErrorMessages = {
     ButtonModule,
     Toast,
     NgOptimizedImage,
+    ModifyStudentProgressPointsFormDialogComponent,
+    ApplyPenaltyToStudentFormDialogComponent,
     LucideAngularModule
   ],
   providers: [MessageService]
@@ -57,6 +73,8 @@ const endOfExperienceSessionErrorMessages: ErrorMessages = {
 export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public readonly optionsIcon = EllipsisVertical
   public readonly stopIcon = Square
+  public readonly modifyPointsIcon = Bolt
+  public readonly applyPenaltyIcon = Gavel
 
   private destroy$ = new Subject<void>()
 
@@ -79,6 +97,28 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public levels = signal<LevelModel[]>([])
   public isLevelsLoading = signal<boolean>(true)
 
+  public showModifyStudentProgressPointsDialog = signal<boolean>(false)
+  public modifyStudentProgressPointsSelected = signal<{
+    studentPeriodStateId: string | null
+    fullName: string | null
+    currentProgressPoints: number
+  }>({
+    studentPeriodStateId: null,
+    fullName: null,
+    currentProgressPoints: 0
+  })
+
+  public showApplyStudentPenaltyDialog = signal<boolean>(false)
+  public applyStudentPenaltySelected = signal<{
+    studentPeriodStateId: string | null
+    fullName: string | null
+    currentProgressPoints: number
+  }>({
+    studentPeriodStateId: null,
+    fullName: null,
+    currentProgressPoints: 0
+  })
+
   public readonly levelsMap = computed(
     () => new Map(this.levels().map(level => [level.id, level.name]))
   )
@@ -98,6 +138,84 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   public getLevelName(levelId: string): string | null {
     return this.levelsMap().get(levelId) ?? null
+  }
+
+  public onSuccessModifyStudentProgressPoints(
+    result: ModifyStudentProgressPointsSuccess
+  ) {
+    this.students.update(students => {
+      const studentIndex = students.findIndex(
+        student => student.id === result.studentPeriodStateId
+      )
+
+      if (studentIndex === -1) return students
+
+      students[studentIndex].progressPoints = result.newStudentProgressPoints
+
+      return students
+    })
+  }
+
+  public onSuccessApplyPenaltyToStudent(result: ApplyPenaltyToStudentSuccess) {
+    this.students.update(students => {
+      const studentIndex = students.findIndex(
+        student => student.id === result.studentPeriodStateId
+      )
+
+      if (studentIndex === -1) return students
+
+      students[studentIndex].progressPoints = result.newStudentProgressPoints
+
+      return students
+    })
+  }
+
+  public onOpenModifyStudentProgressPointsDialog(studentPeriodStateId: string) {
+    const student = this.students().find(
+      student => student.id === studentPeriodStateId
+    )
+
+    if (student === undefined) return
+
+    this.showModifyStudentProgressPointsDialog.set(true)
+    this.modifyStudentProgressPointsSelected.set({
+      fullName: student.firstName + ' ' + student.lastName,
+      currentProgressPoints: student.progressPoints,
+      studentPeriodStateId: student.id
+    })
+  }
+
+  public onCloseModifyStudentProgressPointsDialog() {
+    this.showModifyStudentProgressPointsDialog.set(false)
+    this.modifyStudentProgressPointsSelected.set({
+      studentPeriodStateId: null,
+      currentProgressPoints: 0,
+      fullName: null
+    })
+  }
+
+  public onOpenApplyStudentPenaltyDialog(studentPeriodStateId: string) {
+    const student = this.students().find(
+      student => student.id === studentPeriodStateId
+    )
+
+    if (student === undefined) return
+
+    this.showApplyStudentPenaltyDialog.set(true)
+    this.applyStudentPenaltySelected.set({
+      fullName: student.firstName + ' ' + student.lastName,
+      currentProgressPoints: student.progressPoints,
+      studentPeriodStateId: student.id
+    })
+  }
+
+  public onCloseApplyStudentPenaltyDialog() {
+    this.showApplyStudentPenaltyDialog.set(false)
+    this.applyStudentPenaltySelected.set({
+      studentPeriodStateId: null,
+      currentProgressPoints: 0,
+      fullName: null
+    })
   }
 
   public onEndOfExperienceSession() {
@@ -150,7 +268,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   private loadStudents() {
     const classroomId = this.context.classroom()?.id ?? null
-    const academicPeriodId = this.context.academicPeriod()?.id ?? null
+    const academicPeriodId = this.context.activeAcademicPeriod()?.id ?? null
 
     if (classroomId === null || academicPeriodId === null) return
 

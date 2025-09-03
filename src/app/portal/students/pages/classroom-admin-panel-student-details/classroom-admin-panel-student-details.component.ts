@@ -166,16 +166,23 @@ export class ClassroomAdminPanelStudentDetailsPageComponent implements OnInit {
             const periods = this.academicPeriods()
             const states = this.studentPeriodStates()
 
+            if (states.length === 0) {
+              this.isStudentStadisticLoading.set(false)
+              return
+            }
+
             const periodIdsWithStates = new Set(
               states.map(s => s.academicPeriodId)
             )
 
-            periods.filter(period => periodIdsWithStates.has(period.id))
+            const studentAcademicPeriods = periods.filter(period =>
+              periodIdsWithStates.has(period.id)
+            )
 
             this.academicPeriodOptions.set(
-              periods.map(period => ({
+              studentAcademicPeriods.map(period => ({
                 code: period.id,
-                name: `${formatDate(period.startedAt)} - ${period.endedAt === null ? 'Actualidad' : formatDate(period.endedAt)}`
+                name: `${period.name} (${formatDate(period.startedAt)} - ${period.endedAt === null ? 'Actualidad' : formatDate(period.endedAt)})`
               }))
             )
             this.selectAcademicPeriodControl.setValue(
@@ -214,9 +221,9 @@ export class ClassroomAdminPanelStudentDetailsPageComponent implements OnInit {
   }
 
   private async loadSchoolAcademicPeriods() {
-    const schoolId = this.defaultSchoolStore.school()?.id
+    const schoolId = this.defaultSchoolStore.school()?.id ?? null
 
-    if (schoolId === undefined) return
+    if (schoolId === null) return
 
     try {
       const academicPeriods =

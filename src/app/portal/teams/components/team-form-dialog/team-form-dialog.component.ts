@@ -1,7 +1,9 @@
 import {
   Component,
+  computed,
   HostListener,
   Input,
+  inject,
   input,
   OnInit,
   output,
@@ -13,6 +15,7 @@ import { ConfirmationService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
 import { DialogModule } from 'primeng/dialog'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { teamForm } from '~/teams/forms/teamForm'
 import { TeamForm } from '~/teams/models/TeamForm.model'
@@ -42,6 +45,8 @@ export type TeamFormSubmit = {
 export class TeamFormDialogComponent implements OnInit {
   public readonly closeIcon = X
 
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
+
   @Input() teamForm?: FormGroup<TeamForm> | null = null
   public teamFormId = input<string | null>(null, { alias: 'id' })
 
@@ -55,6 +60,10 @@ export class TeamFormDialogComponent implements OnInit {
   public onSubmit = output<TeamFormSubmit>({
     alias: 'submit'
   })
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   ngOnInit(): void {
     if (this.teamForm === null) this.teamForm = teamForm()

@@ -1,4 +1,12 @@
-import { Component, Input, input, output, signal } from '@angular/core'
+import {
+  Component,
+  computed,
+  Input,
+  inject,
+  input,
+  output,
+  signal
+} from '@angular/core'
 import {
   ChevronDown,
   ChevronUp,
@@ -10,6 +18,7 @@ import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TagModule } from 'primeng/tag'
 import { AbilityModel } from '~/abilities/models/Ability.model'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { LevelModel } from '~/levels/models/Level.model'
 import {
   AddAbilityToLevelDialogComponent,
@@ -35,6 +44,8 @@ export class LevelItemDropdownComponent {
   public readonly downIcon = ChevronDown
   public readonly upIcon = ChevronUp
 
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
+
   public disable = input<boolean>(false, { alias: 'disable' })
   public level = input.required<LevelModel>({ alias: 'level' })
 
@@ -56,6 +67,10 @@ export class LevelItemDropdownComponent {
   })
 
   public isLevelAbilitiesShowing = signal<boolean>(false)
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   public onToggleShowAbilities() {
     this.isLevelAbilitiesShowing.update(value => !value)

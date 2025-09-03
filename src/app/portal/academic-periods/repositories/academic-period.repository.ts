@@ -1,9 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import {
-  addDoc,
   collection,
-  DocumentReference,
-  DocumentSnapshot,
   doc,
   Firestore,
   getDoc,
@@ -11,21 +8,24 @@ import {
   limit,
   Query,
   query,
+  serverTimestamp,
   Timestamp,
   updateDoc,
-  where
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
 import { from, map, type Observable } from 'rxjs'
-import type {
-  AcademicPeriodDbModel,
-  AcademicPeriodDbWithoutId
-} from '~/academic-periods/models/AcademicPeriodDb.model'
+import type { AcademicPeriodDbModel } from '~/academic-periods/models/AcademicPeriodDb.model'
+import { SchoolModel } from '~/schools/models/School.model'
 import { SchoolRepository } from '~/schools/repositories/school.repository'
+import { StudentRepository } from '~/students/repositories/student.repository'
 import type { CreateAcademicPeriod } from '../models/CreateAcademicPeriod.model'
 
 @Injectable({ providedIn: 'root' })
 export class AcademicPeriodRespository {
   private readonly firestore = inject(Firestore)
+
+  private readonly studentRepository = inject(StudentRepository)
 
   private static readonly collectionName = 'academic_periods'
   private readonly collectionName = AcademicPeriodRespository.collectionName
@@ -33,16 +33,14 @@ export class AcademicPeriodRespository {
   public async getByIdAsync(
     academicPeriodId: string
   ): Promise<AcademicPeriodDbModel | null> {
-    const snapshot = await getDoc(
-      this.getAcademicPeriodRefById(academicPeriodId)
-    )
+    const snapshot = await getDoc(this.getRefById(academicPeriodId))
 
     if (!snapshot.exists()) return null
 
     return {
       id: snapshot.id,
-      ...(snapshot.data() as AcademicPeriodDbWithoutId)
-    }
+      ...snapshot.data()
+    } as AcademicPeriodDbModel
   }
 
   public async getAllBySchoolId(
@@ -54,7 +52,7 @@ export class AcademicPeriodRespository {
     )
 
     const academicPeriodsQuery = query(
-      this.getAcademicPeriodsRef(),
+      this.getCollectionRef(),
       where('school', '==', schoolRef)
     )
 
@@ -67,7 +65,7 @@ export class AcademicPeriodRespository {
 
   public async existsById(academicPeriodId: string): Promise<boolean> {
     const academicPeriodSnapshot = await getDoc(
-      this.getAcademicPeriodRefById(academicPeriodId)
+      this.getRefById(academicPeriodId)
     )
 
     return academicPeriodSnapshot.exists()
@@ -81,28 +79,43 @@ export class AcademicPeriodRespository {
       data.schoolId
     )
 
-    const newAcademicPeriodRef = (await addDoc(this.getAcademicPeriodsRef(), {
+    const schoolSnapshot = await getDoc(schoolRef)
+
+    const school = {
+      ...schoolSnapshot.data(),
+      id: schoolSnapshot.id
+    } as SchoolModel
+
+    const batch = writeBatch(this.firestore)
+
+    const academicPeriodRef = this.generateRef()
+    batch.set(academicPeriodRef, {
       name: data.name,
       classSessions: [],
       endedAt: null,
-      startedAt: Timestamp.now(),
+      startedAt: serverTimestamp(),
       school: schoolRef
-    })) as DocumentReference<AcademicPeriodDbModel>
+    })
 
-    const newAcademicPeriodSnapshot: DocumentSnapshot<AcademicPeriodDbModel> =
-      await getDoc(newAcademicPeriodRef)
+    batch.update(schoolRef, {
+      academicPeriods: [...school.academicPeriods, academicPeriodRef]
+    })
+
+    await batch.commit()
+
+    const newAcademicPeriodSnapshot = await getDoc(academicPeriodRef)
 
     return {
-      id: newAcademicPeriodSnapshot.id,
-      ...(newAcademicPeriodSnapshot.data() as AcademicPeriodDbWithoutId)
-    }
+      ...newAcademicPeriodSnapshot.data(),
+      id: newAcademicPeriodSnapshot.id
+    } as AcademicPeriodDbModel
   }
 
   public async updateById(
     academicPeriodId: string,
     data: Partial<AcademicPeriodDbModel>
   ): Promise<void> {
-    await updateDoc(this.getAcademicPeriodRefById(academicPeriodId), data)
+    await updateDoc(this.getRefById(academicPeriodId), data)
   }
 
   public async existsByEqualNameAndEqualStartAtYear(
@@ -113,7 +126,7 @@ export class AcademicPeriodRespository {
     const endOfYear = Timestamp.fromDate(new Date(year + 1, 0, 1))
 
     const academicPeriodsQuery = query(
-      this.getAcademicPeriodsRef(),
+      this.getCollectionRef(),
       where('name', '==', name),
       where('startedAt', '>=', startOfYear),
       where('startedAt', '<', endOfYear)
@@ -123,13 +136,33 @@ export class AcademicPeriodRespository {
     return !academicPeriodsSnapshot.empty
   }
 
+  public async getSchoolActiveAcademicPeriodAsync(
+    schoolId: string
+  ): Promise<AcademicPeriodDbModel | null> {
+    const activeAcademicPeriodsQuery =
+      this.getSchoolActiveAcademicPeriodQuery(schoolId)
+
+    const activeAcademicPeriodsSnapshot = await getDocs(
+      activeAcademicPeriodsQuery
+    )
+
+    if (activeAcademicPeriodsSnapshot.size === 0) return null
+
+    const activeAcademicPeriodSnapshot = activeAcademicPeriodsSnapshot.docs[0]
+
+    return {
+      ...activeAcademicPeriodSnapshot.data(),
+      id: activeAcademicPeriodSnapshot.id
+    }
+  }
+
   public getSchoolActiveAcademicPeriod(
     schoolId: string
   ): Observable<AcademicPeriodDbModel[]> {
-    const activeAcademicPeroidsQuery =
+    const activeAcademicPeriodsQuery =
       this.getSchoolActiveAcademicPeriodQuery(schoolId)
 
-    return from(getDocs(activeAcademicPeroidsQuery)).pipe(
+    return from(getDocs(activeAcademicPeriodsQuery)).pipe(
       map(snapshots =>
         snapshots.docs.map(
           doc => ({ ...doc.data(), id: doc.id }) as AcademicPeriodDbModel
@@ -150,12 +183,35 @@ export class AcademicPeriodRespository {
     return !activeAcademicPeroidsSnapshot.empty
   }
 
-  private getAcademicPeriodsRef() {
-    return collection(this.firestore, this.collectionName)
-  }
+  public async endAcademicPeriod(
+    academicPeriodId: string,
+    classroomsIds: string[]
+  ): Promise<void> {
+    const academicPeriodRef = this.getRefById(academicPeriodId)
+    const schoolStudents =
+      await this.studentRepository.getAllByClassroomIdsAsync(classroomsIds)
 
-  private getAcademicPeriodRefById(id: string) {
-    return doc(this.firestore, `${this.collectionName}/${id}`)
+    const batch = writeBatch(this.firestore)
+
+    batch.update(academicPeriodRef, {
+      endedAt: serverTimestamp()
+    })
+
+    schoolStudents.forEach(student => {
+      const studentRef = StudentRepository.getRefById(
+        this.firestore,
+        student.id
+      )
+
+      batch.update(studentRef, {
+        experiences: {
+          SHADOW_WARFARE: null,
+          MASTERY_ROAD: null
+        }
+      })
+    })
+
+    await batch.commit()
   }
 
   private getSchoolActiveAcademicPeriodQuery(
@@ -167,11 +223,23 @@ export class AcademicPeriodRespository {
     )
 
     return query(
-      this.getAcademicPeriodsRef(),
+      this.getCollectionRef(),
       where('school', '==', schoolRef),
       where('endedAt', '==', null),
       limit(1)
     ) as Query<AcademicPeriodDbModel>
+  }
+
+  private generateRef() {
+    return doc(this.getCollectionRef())
+  }
+
+  private getCollectionRef() {
+    return collection(this.firestore, this.collectionName)
+  }
+
+  private getRefById(id: string) {
+    return doc(this.firestore, `${this.collectionName}/${id}`)
   }
 
   public static getRefById(db: Firestore, id: string) {

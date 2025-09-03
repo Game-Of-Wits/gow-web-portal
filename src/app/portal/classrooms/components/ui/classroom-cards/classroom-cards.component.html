@@ -20,10 +20,11 @@
     </a>
   }
 
-  <a
-    routerLink="/p/s/{{ defaultSchoolStore.school()?.id }}/classroom/create"
-    class="w-[320px] h-[160px] transition-colors rounded-lg flex items-center justify-center bg-primary-500 hover:bg-primary-600 cursor-pointer"
+  <button
+    routerLink="/p/s/{{ schoolId() }}/classroom/create"
+    class="w-[320px] h-[160px] transition-colors rounded-lg flex items-center justify-center bg-primary-500 hover:bg-primary-600 cursor-pointer disabled:bg-primary-300 disabled:cursor-not-allowed"
+    [disabled]="hasAcademicPeriod()"
   >
     <i-lucide [img]="addIcon" class="size-[40px] text-white" />
-  </a>
+  </button>
 </div>

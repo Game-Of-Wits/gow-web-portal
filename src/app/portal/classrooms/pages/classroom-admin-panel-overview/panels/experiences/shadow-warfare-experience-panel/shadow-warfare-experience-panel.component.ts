@@ -9,11 +9,19 @@ import {
   signal
 } from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { EllipsisVertical, LucideAngularModule, Square } from 'lucide-angular'
+import {
+  EllipsisVertical,
+  HeartPlus,
+  HeartPulse,
+  LucideAngularModule,
+  Square,
+  Vote
+} from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
+import { TagModule } from 'primeng/tag'
 import { Toast } from 'primeng/toast'
 import { Subject, takeUntil } from 'rxjs'
 import { AbilityUseCardComponent } from '~/abilities/components/ability-use-card/ability-use-card.component'
@@ -23,7 +31,13 @@ import { CharacterModel } from '~/characters/models/Character.model'
 import { CharacterService } from '~/characters/services/character/character.service'
 import { ExperienceSessionModel } from '~/class-sessions/models/ExperienceSession.model'
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
+import { EliminateStudentByVotesFormDialogComponent } from '~/classrooms/components/eliminate-student-by-votes-form-dialog/eliminate-student-by-votes-form-dialog.component'
+import {
+  ModifyStudentHealthPointsFormDialogComponent,
+  ModifyStudentHealthPointsSuccess
+} from '~/classrooms/components/modify-student-health-points-form-dialog/modify-student-health-points-form-dialog.component'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
+import { classShiftFormats } from '~/shared/data/classShiftFormats'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfareStudentPeriodState'
@@ -62,7 +76,10 @@ const teamsLoadingErrorMessages: ErrorMessages = {
     ButtonModule,
     Toast,
     NgOptimizedImage,
-    LucideAngularModule
+    LucideAngularModule,
+    ModifyStudentHealthPointsFormDialogComponent,
+    EliminateStudentByVotesFormDialogComponent,
+    TagModule
   ],
   providers: [MessageService]
 })
@@ -71,6 +88,11 @@ export class ShadowWarfareExperiencePanelComponent
 {
   public readonly optionsIcon = EllipsisVertical
   public readonly stopIcon = Square
+  public readonly modifyHealthPointsIcon = HeartPulse
+  public readonly eliminateForVotesIcon = Vote
+  public readonly reviveIcon = HeartPlus
+
+  public readonly classShiftFormats = classShiftFormats
 
   private destroy$ = new Subject<void>()
 
@@ -80,7 +102,7 @@ export class ShadowWarfareExperiencePanelComponent
   private readonly characterService = inject(CharacterService)
   private readonly teamService = inject(TeamService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
   public isStudentsLoading = signal<boolean>(true)
@@ -97,6 +119,30 @@ export class ShadowWarfareExperiencePanelComponent
   public isTeamsLoading = signal<boolean>(true)
   public teams = signal<TeamModel[]>([])
 
+  public showModifyStudentHealthPointsDialog = signal<boolean>(false)
+  public modifyStudentHealthPointsSelected = signal<{
+    periodStateId: string | null
+    fullName: string | null
+    currentHealthPoints: number
+  }>({
+    periodStateId: null,
+    fullName: null,
+    currentHealthPoints: 0
+  })
+
+  public showEliminateStudentByVotesDialog = signal<boolean>(false)
+  public eliminateStudentByVotesSelected = signal<{
+    periodStateId: string | null
+    fullName: string | null
+  }>({
+    periodStateId: null,
+    fullName: null
+  })
+
+  public experienceShiftRule = computed(
+    () => this.classContext.experienceSession()?.rules?.shift ?? null
+  )
+
   public readonly charactersMap = computed(
     () =>
       new Map(
@@ -111,9 +157,10 @@ export class ShadowWarfareExperiencePanelComponent
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
 
   ngOnInit(): void {
-    const classroomId = this.context.classroom()?.id ?? null
-    const academicPeriodId = this.context.academicPeriod()?.id ?? null
-    const experienceSession = this.context.experienceSession()
+    const classroomId = this.classContext.classroom()?.id ?? null
+    const academicPeriodId =
+      this.classContext.activeAcademicPeriod()?.id ?? null
+    const experienceSession = this.classContext.experienceSession()
 
     if (
       classroomId === null ||
@@ -133,8 +180,85 @@ export class ShadowWarfareExperiencePanelComponent
     this.destroy$.complete()
   }
 
+  public onSuccessModifyStudentHealthPoints(
+    result: ModifyStudentHealthPointsSuccess
+  ) {
+    this.students.update(students => {
+      const studentIndex = students.findIndex(
+        student => student.id === result.studentPeriodStateId
+      )
+
+      if (studentIndex === -1) return students
+
+      students[studentIndex].healthPoints = result.newStudentHealthPoints
+
+      return students
+    })
+  }
+
+  public onSuccessEliminateStudentByVotes(studentPeriodStateId: string) {
+    this.students.update(students => {
+      const studentIndex = students.findIndex(
+        student => student.id === studentPeriodStateId
+      )
+
+      if (studentIndex === -1) return students
+
+      students[studentIndex].healthPoints = 0
+
+      return students
+    })
+  }
+
+  public onOpenModifyStudentHealthPointsDialog(studentPeriodStateId: string) {
+    const student = this.students().find(
+      student => student.id === studentPeriodStateId
+    )
+
+    if (student === undefined) return
+
+    this.showModifyStudentHealthPointsDialog.set(true)
+    this.modifyStudentHealthPointsSelected.set({
+      currentHealthPoints: student.healthPoints,
+      fullName: student.firstName + ' ' + student.lastName,
+      periodStateId: student.id
+    })
+  }
+
+  public onCloseModifyStudentHealthPointsDialog() {
+    this.showModifyStudentHealthPointsDialog.set(false)
+    this.modifyStudentHealthPointsSelected.set({
+      currentHealthPoints: 0,
+      fullName: null,
+      periodStateId: null
+    })
+  }
+
+  public onOpenEliminateStudentByVotesDialog(studentPeriodStateId: string) {
+    const student = this.students().find(
+      student => student.id === studentPeriodStateId
+    )
+
+    if (student === undefined) return
+
+    this.showEliminateStudentByVotesDialog.set(true)
+    this.eliminateStudentByVotesSelected.set({
+      fullName: student.firstName + ' ' + student.lastName,
+      periodStateId: student.id
+    })
+  }
+
+  public onCloseEliminateStudentByVotesDialog() {
+    this.showEliminateStudentByVotesDialog.set(false)
+    this.eliminateStudentByVotesSelected.set({
+      fullName: null,
+      periodStateId: null
+    })
+  }
+
   public onEndOfExperienceSession() {
-    const experienceSessionId = this.context.experienceSession()?.id ?? null
+    const experienceSessionId =
+      this.classContext.experienceSession()?.id ?? null
 
     if (experienceSessionId === null) return
 
@@ -144,7 +268,7 @@ export class ShadowWarfareExperiencePanelComponent
       .endOfExperienceSession(experienceSessionId)
       .then(() => {
         this.adminPanelOverviewLoading.emit(true)
-        this.context.experienceSession.set(null)
+        this.classContext.experienceSession.set(null)
       })
       .catch(err => {
         const error = err as ErrorResponse
@@ -167,7 +291,6 @@ export class ShadowWarfareExperiencePanelComponent
   private loadAllTeams(classroomId: string) {
     this.teamService.getAllTeamsByClassroom(classroomId).subscribe({
       next: teams => {
-        console.log(teams)
         this.teams.set(teams)
         this.isTeamsLoading.set(false)
       },
@@ -181,7 +304,6 @@ export class ShadowWarfareExperiencePanelComponent
   private loadAllCharacters(classroomId: string) {
     this.characterService.getAllCharactersByClassroom(classroomId).subscribe({
       next: characters => {
-        console.log(characters)
         this.characters.set(characters)
         this.isCharactersLoading.set(false)
       },
@@ -201,7 +323,6 @@ export class ShadowWarfareExperiencePanelComponent
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: abilityUses => {
-          console.log(abilityUses)
           this.abilityUses.set(abilityUses)
           this.isAbilityUsesLoading.set(false)
         },
@@ -223,7 +344,6 @@ export class ShadowWarfareExperiencePanelComponent
       .getAllShadowWarfareStudentPeriodStates({ classroomId, academicPeriodId })
       .subscribe({
         next: students => {
-          console.log(students)
           this.students.set(students)
           this.isStudentsLoading.set(false)
         },

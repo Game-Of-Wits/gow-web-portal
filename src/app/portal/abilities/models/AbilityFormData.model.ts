@@ -17,7 +17,7 @@ export interface AbilityFormData {
   type: AbilityType
   usage: {
     type: AbilityUsage
-    shift: AbilityClassShift
+    shift?: AbilityClassShift
     interval?: AbilityUsageInterval
   }
   actions: AbilityActionFormData[]

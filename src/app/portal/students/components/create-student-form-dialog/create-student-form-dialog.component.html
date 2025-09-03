@@ -63,7 +63,7 @@
       <div class="flex flex-col gap-1">
         <gow-text-field
           label="Número telefónico"
-          placeholder="Ingrese el número telef́ónico del estudiante"
+          placeholder="000000000"
           formControlName="phoneNumber"
           [maxLength]="9"
         />
@@ -173,12 +173,11 @@
     </div>
 
     <p-button
-      type="submit"
       severity="primary"
       size="large"
       styleClass="w-full rounded-xl py-2.5"
       label="Guardar"
-      (loading)="isCreatingStudentLoading()"
+      [loading]="isCreatingStudentLoading()"
       (click)="onCreateStudent()"
       [disabled]="createStudentForm.invalid"
     />

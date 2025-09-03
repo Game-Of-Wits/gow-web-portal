@@ -3,6 +3,10 @@
     <div class="flex items-center gap-3">
       <h1 class="text-3xl font-bold">Guerra de Sombras</h1>
 
+      @if (experienceShiftRule(); as shift) {
+        <p-tag [value]="classShiftFormats[shift]" severity="secondary" styleClass="text-base" />
+      }
+
       <button pButton severity="secondary" size="small" class="rounded-full">
         <i-lucide pButtonIcon [img]="optionsIcon" class="size-4.5" />
       </button>
@@ -20,6 +24,7 @@
 
       <p-table
         [value]="students()"
+        [loading]="isStudentsLoading() || isCharactersLoading() || isTeamsLoading()"
         [scrollable]="true"
         scrollHeight="400px"
         [style]="{ height: '500px' }"
@@ -36,11 +41,48 @@
 
         <ng-template #body let-student>
           <tr>
-            <td>{{ student.firstName }} {{ student.lastName }}</td>
+            <td [class.text-red-500]="student.healthPoints === 0" [class.line-through]="student.healthPoints === 0">{{ student.firstName }} {{ student.lastName }}</td>
             <td>{{ getCharacterName(student.characterId) }}</td>
             <td>{{ getTeamName(student.teamId) }}</td>
             <td>{{ student.healthPoints }}</td>
-            <td></td>
+            <td class="flex items-center gap-2">
+              @if (student.healthPoints > 0) {
+                <p-button
+                  rounded
+                  outlined
+                  severity="info"
+                  styleClass="aspect-square"
+                  size="small"
+                  title="Modificar puntos de vida"
+                  (click)="onOpenModifyStudentHealthPointsDialog(student.id)"
+                >
+                  <i-lucide pButtonIcon [img]="modifyHealthPointsIcon" />
+                </p-button>
+
+                <p-button
+                  rounded
+                  outlined
+                  severity="danger"
+                  styleClass="aspect-square"
+                  size="small"
+                  title="Eliminar estudiante por votación"
+                  (click)="onOpenEliminateStudentByVotesDialog(student.id)"
+                >
+                  <i-lucide pButtonIcon [img]="eliminateForVotesIcon" />
+                </p-button>
+              } @else {
+                <p-button
+                  rounded
+                  outlined
+                  severity="success"
+                  styleClass="aspect-square"
+                  size="small"
+                  title="Revivir estudiante"
+                >
+                  <i-lucide pButtonIcon [img]="reviveIcon" />
+                </p-button>
+              }
+            </td>
           </tr>
         </ng-template>
       </p-table>
@@ -73,5 +115,22 @@
     </div>
   </div>
 </section>
+
+<gow-modify-student-health-points-form-dialog
+  [show]="showModifyStudentHealthPointsDialog()"
+  [studentPeriodStateId]="modifyStudentHealthPointsSelected().periodStateId"
+  [studentFullName]="modifyStudentHealthPointsSelected().fullName"
+  [currentStudentHealthPoints]="modifyStudentHealthPointsSelected().currentHealthPoints"
+  (close)="onCloseModifyStudentHealthPointsDialog()"
+  (success)="onSuccessModifyStudentHealthPoints($event)"
+/>
+
+<gow-eliminate-student-by-votes-form-dialog
+  [show]="showEliminateStudentByVotesDialog()"
+  [studentPeriodStateId]="eliminateStudentByVotesSelected().periodStateId"
+  [studentFullName]="eliminateStudentByVotesSelected().fullName"
+  (close)="onCloseEliminateStudentByVotesDialog()"
+  (success)="onSuccessEliminateStudentByVotes($event)"
+/>
 
 <p-toast position="top-right" />

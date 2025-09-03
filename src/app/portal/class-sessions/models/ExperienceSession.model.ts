@@ -1,3 +1,4 @@
+import { ClassShift } from '~/shared/models/ClassShift'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 
 export interface ExperienceSessionModel {
@@ -6,4 +7,5 @@ export interface ExperienceSessionModel {
   classSessionId: string
   startedAt: Date
   endedAt: Date | null
+  rules?: { shift: ClassShift }
 }

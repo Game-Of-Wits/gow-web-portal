@@ -1,5 +1,4 @@
 import { HomeworkModel } from '../models/Homework.model'
-import { HomeworkCategory } from '../models/HomeworkCategory.model'
 import { HomeworkDbModel } from '../models/HomeworkDb.model'
 
 export class HomeworkMapper {
@@ -12,7 +11,7 @@ export class HomeworkMapper {
         correctOptionId: homework.content.correctOption.id,
         optionIds: homework.content.options.map(option => option.id)
       },
-      imageUrl: homework.imageUrl,
+      image: homework.image,
       groupId: homework.group.id
     }
   }

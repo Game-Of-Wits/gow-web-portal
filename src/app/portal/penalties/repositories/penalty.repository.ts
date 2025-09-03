@@ -35,12 +35,12 @@ export class PenaltyRepository {
       classroomId
     )
 
-    const charactersQuery = query(
+    const penaltiesQuery = query(
       this.getCollectionRef(),
       where('classroom', '==', classroomRef)
     )
 
-    return from(getDocs(charactersQuery)).pipe(
+    return from(getDocs(penaltiesQuery)).pipe(
       map(snapshot =>
         snapshot.docs.map(
           doc =>
@@ -51,6 +51,36 @@ export class PenaltyRepository {
         )
       )
     )
+  }
+
+  public async getAllByClassroomIdAsync(
+    classroomId: string
+  ): Promise<PenaltyDbModel[]> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const penaltiesQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef)
+    )
+
+    const penaltiesSnapshot = await getDocs(penaltiesQuery)
+
+    return penaltiesSnapshot.docs.map(
+      doc => ({ ...doc.data(), id: doc.id }) as PenaltyDbModel
+    )
+  }
+
+  public async getByIdAsync(id: string): Promise<PenaltyDbModel | null> {
+    const penaltyRef = this.getRefById(id)
+    const penaltySnapshot = await getDoc(penaltyRef)
+    if (!penaltySnapshot.exists()) return null
+    return {
+      ...penaltySnapshot.data(),
+      id: penaltySnapshot.id
+    } as PenaltyDbModel
   }
 
   public async existsById(id: string): Promise<boolean> {

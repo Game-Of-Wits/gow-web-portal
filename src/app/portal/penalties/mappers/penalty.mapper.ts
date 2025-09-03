@@ -6,7 +6,8 @@ export class PenaltyMapper {
     return {
       id: penalty.id,
       name: penalty.name,
-      reducePoints: penalty.reducePoints
+      reducePoints: penalty.reducePoints,
+      classroomId: penalty.classroom.id
     }
   }
 

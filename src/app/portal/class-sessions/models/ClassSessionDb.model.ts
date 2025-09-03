@@ -8,5 +8,3 @@ export interface ClassSessionDbModel {
   experienceSessions: DocumentReference[]
   academicPeriod: DocumentReference
 }
-
-export type ClassSessionDbWithoutId = Omit<ClassSessionDbModel, 'id'>

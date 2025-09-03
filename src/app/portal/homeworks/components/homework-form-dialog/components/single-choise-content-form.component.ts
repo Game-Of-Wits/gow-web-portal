@@ -75,18 +75,32 @@ export class SingleChoiseContentFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['homeworkId']) {
-      const correctOption = this.contentFormGroup.getRawValue().correctOption
+      const contentFormData = this.contentFormGroup.getRawValue()
+
       const homeworkId = this.homeworkId
+      const correctOption = contentFormData.correctOption
+      const answerOptions = contentFormData.options
 
       if (
-        correctOption !== '' ||
+        correctOption === '' ||
         typeof homeworkId !== 'string' ||
-        homeworkId === '' ||
-        homeworkId === null
-      )
-        return
+        homeworkId === null ||
+        answerOptions.length !== 0
+      ) {
+        const selectOptions: SelectOption[] = answerOptions.map(option => ({
+          code: option.id || option.answer,
+          name: option.answer
+        }))
 
-      this.loadAnswers(homeworkId)
+        this.answerOptions.set(selectOptions)
+
+        if (correctOption !== '')
+          this.correctOptionControl.patchValue(correctOption)
+
+        return
+      }
+
+      this.loadAnswers(homeworkId, correctOption)
     }
   }
 
@@ -165,13 +179,14 @@ export class SingleChoiseContentFormComponent implements OnChanges {
     return control?.pristine || control?.hasError(validationKey)
   }
 
-  private loadAnswers(homeworkId: string) {
+  private loadAnswers(homeworkId: string, correctOptionId: string) {
     this.isAnswersLoading.set(true)
 
     this.answerOptionService
       .getAnswerOptionsByHomeworkIdAsync(homeworkId)
       .then(answerOptions => {
         this.setAnswerOptions(answerOptions)
+        this.correctOptionControl.setValue(correctOptionId)
         this.isAnswersLoading.set(false)
       })
       .catch(err => {

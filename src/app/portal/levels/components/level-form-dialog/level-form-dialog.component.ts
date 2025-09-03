@@ -1,7 +1,9 @@
 import {
   Component,
+  computed,
   HostListener,
   Input,
+  inject,
   input,
   OnChanges,
   OnInit,
@@ -14,6 +16,7 @@ import { Info, LucideAngularModule, X } from 'lucide-angular'
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { MessageModule } from 'primeng/message'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { levelForm } from '~/levels/forms'
 import { LevelForm } from '~/levels/models/LevelForm.model'
 import { LevelFormData } from '~/levels/models/LevelFormData.model'
@@ -47,6 +50,8 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
   public readonly closeIcon = X
   public readonly infoIcon = Info
 
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
+
   @Input() levelForm?: FormGroup<LevelForm> | null = null
   @Input() minRequiredPoints!: number
   @Input() maxRequiredPoints?: number | null = null
@@ -63,6 +68,10 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
   public onSubmit = output<LevelFormSubmit>({
     alias: 'submit'
   })
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   ngOnInit(): void {
     if (this.levelForm === null) {

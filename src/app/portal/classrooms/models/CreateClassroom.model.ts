@@ -1,4 +1,4 @@
-import { InitialAbilityFormData } from '~/abilities/models/InitialAbilityFormData.model'
+import { CreateInitialAbility } from '~/abilities/models/CreateInitialAbility.model'
 import { CharacterFormData } from '~/characters/models/CharacterFormData.model'
 import { LevelFormData } from '~/levels/models/LevelFormData.model'
 import { PenaltyFormData } from '~/penalties/models/PenaltyFormData.model'
@@ -24,7 +24,7 @@ export interface CreateClassroomShadowWarfareExperienceModel {
     limitAbilities: number
   }
   initialCharacters: CharacterFormData[]
-  initialAbilities: InitialAbilityFormData[]
+  initialAbilities: CreateInitialAbility[]
 }
 
 export interface CreateClassroomMasteryRoadExperienceModel {

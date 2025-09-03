@@ -5,7 +5,6 @@ import {
   DocumentReference,
   deleteDoc,
   doc,
-  documentId,
   Firestore,
   getDoc,
   getDocs,
@@ -37,6 +36,24 @@ export class TeamRepository {
       id: teamSnaphost.id,
       ...teamSnaphost.data()
     } as TeamDbModel
+  }
+
+  public async getAllByClassroomIdAsync(classroomId: string) {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const teamsQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef)
+    )
+
+    const teamsSnapshot = await getDocs(teamsQuery)
+
+    return teamsSnapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as TeamDbModel
+    )
   }
 
   public getAllByClassroomId(classroomId: string): Observable<TeamDbModel[]> {

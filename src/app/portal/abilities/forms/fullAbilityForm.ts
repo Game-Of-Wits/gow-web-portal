@@ -63,7 +63,10 @@ export const fullAbilityForm = (
       ),
       interval: new FormControl<AbilityUsageInterval>(
         defaultValues?.usage.interval ?? AbilityUsageInterval.SCHOOL_DAY,
-        { nonNullable: true, validators: [Validators.required] }
+        {
+          nonNullable: true,
+          validators: [Validators.required]
+        }
       ),
       shift: new FormControl<AbilityClassShift>(
         defaultValues?.usage.shift ?? AbilityClassShift.ALL,

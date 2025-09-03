@@ -10,6 +10,7 @@ import {
   query,
   where
 } from '@angular/fire/firestore'
+import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { StudentProfileRepository } from '~/student-profiles/repositories/student-profile.repository'
 import { StudentDbModel } from '../models/StudentDb.model'
 
@@ -39,20 +40,72 @@ export class StudentRepository {
       this.firestore,
       studentProfileId
     )
-    const studentQuery = query(
+
+    const studentsQuery = query(
       this.getCollectionRef(),
       where('profile', '==', studentProfileRef),
       limit(1)
     )
 
-    const studentSnapshot = await getDocs(studentQuery)
+    const studentsSnapshot = await getDocs(studentsQuery)
 
-    if (studentSnapshot.size === 0) return null
+    if (studentsSnapshot.size === 0) return null
+
+    const studentSnapshot = studentsSnapshot.docs[0]
 
     return {
-      id: studentSnapshot.docs[0].id,
-      ...studentSnapshot.docs[0].data()
+      ...studentSnapshot.data(),
+      id: studentSnapshot.id
     } as StudentDbModel
+  }
+
+  public async getAllByClassroomIdAsync(
+    classroomId: string
+  ): Promise<StudentDbModel[]> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const studentQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef)
+    )
+
+    const studentsSnapshot = await getDocs(studentQuery)
+
+    if (studentsSnapshot.size === 0) return []
+
+    return studentsSnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data()
+        }) as StudentDbModel
+    )
+  }
+
+  public async getAllByClassroomIdsAsync(
+    classroomsIds: string[]
+  ): Promise<StudentDbModel[]> {
+    const studentsPromises = classroomsIds.map(async classroomId => {
+      const classroomRef = this.getRefById(classroomId)
+      const studentsQuery = query(
+        this.getCollectionRef(),
+        where('classroom', '==', classroomRef)
+      )
+      return await getDocs(studentsQuery)
+    })
+
+    const studentsSnapshots = await Promise.all(studentsPromises)
+
+    const studentSnapshotDocs = studentsSnapshots
+      .map(student => student.docs)
+      .flat()
+
+    return studentSnapshotDocs.map(
+      doc => ({ ...doc.data(), id: doc.id }) as StudentDbModel
+    )
   }
 
   private getCollectionRef() {

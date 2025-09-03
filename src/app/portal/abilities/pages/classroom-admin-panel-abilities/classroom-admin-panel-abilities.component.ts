@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { RouterLink } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
@@ -73,7 +73,7 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
 
   private readonly abilityService = inject(AbilityService)
 
-  public readonly context = inject(ClassroomAdminPanelContextService)
+  public readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
   private readonly confirmationService = inject(ConfirmationService)
 
@@ -90,24 +90,28 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
 
   public isAbilityDeletingLoading = signal<boolean>(false)
 
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
+
   ngOnInit(): void {
     this.loadAbilities()
   }
 
-  public getAbilityTypeFormat(type: any) {
-    return abilityTypeFormats[type as AbilityType]
+  public getAbilityTypeFormat(type: AbilityType) {
+    return abilityTypeFormats[type]
   }
 
-  public getEducationalExperienceFormat(type: any) {
-    return educationalExperienceFormats[type as EducationalExperience]
+  public getEducationalExperienceFormat(type: EducationalExperience) {
+    return educationalExperienceFormats[type]
   }
 
-  public getAbilityUsageTypeFormat(type: any) {
-    return abilityUsageFormats[type as AbilityUsage]
+  public getAbilityUsageTypeFormat(type: AbilityUsage) {
+    return abilityUsageFormats[type]
   }
 
-  public getAbilityActionTypeFormat(type: any) {
-    return abilityActionTypeFormats[type as AbilityActionType]
+  public getAbilityActionTypeFormat(type: AbilityActionType) {
+    return abilityActionTypeFormats[type]
   }
 
   public onCloseFormDialog() {
@@ -134,7 +138,7 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
   }
 
   public onCreateAbility(submit: AbilityFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -157,7 +161,7 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
   }
 
   public onEditAbility(submit: AbilityFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
     const abilityId = submit.result.id
 
     if (classroomId === null || abilityId === null) return
@@ -233,7 +237,7 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
   }
 
   private loadAbilities() {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 

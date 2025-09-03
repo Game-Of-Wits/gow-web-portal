@@ -19,6 +19,7 @@ import { AbilityUsage } from '~/abilities/models/AbilityUsage.model'
 import { InitialCharacterListFormComponent } from '~/characters/components/initial-character-list-form/initial-character-list-form.component'
 import { CharacterForm } from '~/characters/models/CharacterForm.model'
 import { classroomForm } from '~/classrooms/forms/classroomForm'
+import { ClassroomFormMapper } from '~/classrooms/mappers/classroom-form.mapper'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
 import { ClassroomLevelListFormComponent } from '~/levels/components/classroom-level-list-form/classroom-level-list-form.component'
 import { LevelForm } from '~/levels/models/LevelForm.model'
@@ -131,14 +132,16 @@ export class PortalCreateClassroomPageComponent implements OnInit {
 
     if (schoolId === null || teacherId === null) return
 
+    const data = ClassroomFormMapper.toCreate(
+      schoolId,
+      teacherId,
+      this.classroomForm.getRawValue()
+    )
+
     this.isCreatingLoading.set(true)
 
     this.classroomService
-      .createClassroom({
-        schoolId: schoolId,
-        teacherId: teacherId,
-        ...this.classroomForm.getRawValue()
-      })
+      .createClassroom(data)
       .then(classroomId => {
         this.isCreatingLoading.set(false)
         this.router.navigate(['p', 's', schoolId, 'c', classroomId])

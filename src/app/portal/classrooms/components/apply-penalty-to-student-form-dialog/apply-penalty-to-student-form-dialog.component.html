@@ -1,0 +1,67 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ 'max-width': '550px', width: '100%' }"
+>
+  <ng-template #header>
+    <div class="flex justify-between w-full gap-3 items-center">
+      <span class="font-bold text-xl">
+        Aplicar penalización a "{{ studentFullName() }}"
+      </span>
+
+      <button
+        class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        type="button"
+        (click)="onCloseDialog()"
+        [disabled]="isApplingPenaltyLoading()"
+      >
+        <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-1 flex-1">
+      <gow-select-field
+        label="Penalización"
+        placeholder="Seleccione la penalización ha aplicar"
+        [formControl]="penaltyControl"
+        [options]="penaltiesOptions()"
+        [scrollHeight]="90"
+        focusColor="danger"
+      />
+
+      @if (penaltyControl.invalid && penaltyControl.touched) {
+        @if (hasErrorValidation(penaltyControl, "required")) {
+          <p class="text-sm text-danger-500">Es requerido</p>
+        }
+      }
+    </div>
+
+    <div class="flex items-center gap-1">
+      <span>Puntos de progreso del estudiante: </span>
+
+      <p-tag
+        value="{{ finalProgressPoints() }}"
+        [severity]="finalProgressPoints() >= currentStudentProgressPoints() ? 'secondary' : 'danger'"
+      />
+    </div>
+
+
+    <button
+      pButton
+      severity="danger"
+      class="w-full rounded-xl"
+      [loading]="isApplingPenaltyLoading()"
+      (click)="onApplyPenaltyToStudent()"
+      [disabled]="penaltyControl.invalid"
+    >
+      Aplicar penalización
+    </button>
+  </div>
+</p-dialog>
+
+<p-toast position="top-right" />

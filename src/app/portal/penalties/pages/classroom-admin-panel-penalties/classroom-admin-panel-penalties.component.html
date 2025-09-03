@@ -43,7 +43,7 @@
               severity="danger"
               [rounded]="true"
               (click)="onShowDeletePenaltyConfirmation(penalty.id, $event)"
-              [disabled]="deletingPenaltyLoading()"
+              [disabled]="deletingPenaltyLoading() || hasActiveAcademicPeriod()"
               styleClass="aspect-square"
             >
               <i-lucide pButtonIcon [img]="deleteIcon" />

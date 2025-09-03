@@ -75,8 +75,10 @@ export class AbilityService {
 
       const abilityData = structuredClone(data)
 
-      if (abilityData.usage.type === AbilityUsage.ONE_TIME)
+      if (abilityData.usage.type === AbilityUsage.ONE_TIME) {
         delete abilityData.usage.interval
+        delete abilityData.usage.shift
+      }
 
       const newAbility = await this.abilityRepository.create(abilityData)
 

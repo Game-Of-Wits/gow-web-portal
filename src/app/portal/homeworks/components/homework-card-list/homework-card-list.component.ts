@@ -1,13 +1,16 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core'
+import { Component, inject, input, OnInit, output, signal } from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
+import { homeworkCategoryFormats } from '~/homeworks/data/formats/homeworkCategoryFormats'
 import { HomeworkFormMapper } from '~/homeworks/mappers/homework-form.mapper'
 import { HomeworkModel } from '~/homeworks/models/Homework.model'
 import { HomeworkService } from '~/homeworks/services/homework/homework.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { HomeworkCardComponent } from '../homework-card/homework-card.component'
 import {
   HomeworkFormDialogComponent,
@@ -18,13 +21,23 @@ const homeworksLoadingErrorMessages = {
   ...commonErrorMessages
 }
 
-const createHomeworkErrorMessages = {
+const createHomeworkErrorMessages: ErrorMessages = {
+  'correct-option-not-fount': {
+    message:
+      'La opción correcta selecciona no ha sido encotrada entre las opciones puestas',
+    summary: 'Opción correcta no encontrada'
+  },
   ...commonErrorMessages
 }
 
 @Component({
   selector: 'gow-homework-card-list',
   templateUrl: './homework-card-list.component.html',
+  styles: `
+    :host ::ng-deep .p-card .p-card-body {
+      padding: 6px 16px;
+    }
+  `,
   imports: [
     Toast,
     LucideAngularModule,
@@ -40,6 +53,7 @@ export class HomeworkCardListComponent implements OnInit {
   private readonly homeworkService = inject(HomeworkService)
 
   private readonly toastService = inject(MessageService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public homeworkGroupId = input.required<string>({ alias: 'homeworkGroupId' })
 
@@ -47,6 +61,8 @@ export class HomeworkCardListComponent implements OnInit {
   public isHomeworksLoading = signal<boolean>(true)
 
   public showCreateHomework = signal<boolean>(false)
+
+  public onChangeHomeworksSize = output<number>({ alias: 'changeSize' })
 
   ngOnInit(): void {
     this.loadHomeworks()
@@ -61,15 +77,24 @@ export class HomeworkCardListComponent implements OnInit {
   }
 
   public onCreateHomework(submit: HomeworkFormSubmit) {
+    const classroom = this.classroomContext.classroom()
+
+    if (classroom === null) return
+
+    const homeworkData = HomeworkFormMapper.toCreate(
+      this.homeworkGroupId(),
+      submit.result.formData
+    )
+
     this.homeworkService
-      .create(
-        HomeworkFormMapper.toCreate(
-          this.homeworkGroupId(),
-          submit.result.formData
-        )
-      )
+      .createHomework({
+        schoolId: classroom.schoolId,
+        classroomId: classroom.id,
+        data: homeworkData
+      })
       .then(homework => {
         this.homeworks.update(homeworks => [...homeworks, homework])
+        this.onChangeHomeworksSize.emit(this.homeworks().length + 1)
         submit.onFinish()
       })
       .catch(err => {
@@ -84,6 +109,7 @@ export class HomeworkCardListComponent implements OnInit {
       .subscribe({
         next: homeworks => {
           this.homeworks.set(homeworks)
+          this.onChangeHomeworksSize.emit(homeworks.length)
           this.isHomeworksLoading.set(false)
         },
         error: err => {

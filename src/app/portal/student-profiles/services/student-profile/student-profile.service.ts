@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { map, Observable } from 'rxjs'
+import { catchError, map, Observable, throwError } from 'rxjs'
 import { StudentProfileMapper } from '~/student-profiles/mappers/student-profile.mapper'
 import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { StudentProfileRepository } from '~/student-profiles/repositories/student-profile.repository'
@@ -16,6 +16,7 @@ export class StudentProfileService {
     try {
       const studentProfile =
         await this.studentProfileRepository.getByIdAsync(studentProfileId)
+
       if (studentProfile === null)
         throw new ErrorResponse('student-profile-not-exist')
 
@@ -29,8 +30,13 @@ export class StudentProfileService {
   public getAllStudentProfilesByClassroomId(
     classroomId: string
   ): Observable<StudentProfileModel[]> {
-    return this.studentProfileRepository
-      .getAllByClassroomId(classroomId)
-      .pipe(map(profiles => StudentProfileMapper.toListModel(profiles)))
+    return this.studentProfileRepository.getAllByClassroomId(classroomId).pipe(
+      map(profiles => StudentProfileMapper.toListModel(profiles)),
+      catchError(err => {
+        if (err instanceof FirestoreError)
+          return throwError(() => new ErrorResponse(err.code))
+        return throwError(() => err)
+      })
+    )
   }
 }

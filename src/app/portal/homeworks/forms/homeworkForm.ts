@@ -29,8 +29,8 @@ export const homeworkForm = (
         Validators.maxLength(50)
       ]
     }),
-    image: new FormControl(defaultValues?.image ?? null, {
-      validators: [Validators.required]
+    image: new FormControl(null, {
+      validators: defaultValues ? [] : [Validators.required]
     }),
     category: new FormControl(HomeworkCategory.SINGLE_CHOISE, {
       nonNullable: true,

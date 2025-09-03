@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core'
-import { FirestoreError, Timestamp } from '@angular/fire/firestore'
-import { ErrorCode } from '@shared/types/ErrorCode'
+import { FirestoreError } from '@angular/fire/firestore'
+import { Functions, httpsCallable } from '@angular/fire/functions'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { map, Observable, take } from 'rxjs'
+import { catchError, map, Observable, take, throwError } from 'rxjs'
 import { AcademicPeriodMapper } from '~/academic-periods/mappers/academic-period.mapper'
 import type { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeriod.model'
 import type { CreateAcademicPeriod } from '~/academic-periods/models/CreateAcademicPeriod.model'
@@ -13,6 +13,8 @@ import { SchoolRepository } from '~/schools/repositories/school.repository'
 export class AcademicPeriodService {
   private readonly academicPeriodRepository = inject(AcademicPeriodRespository)
   private readonly schoolRepository = inject(SchoolRepository)
+
+  private readonly cloudFunctions = inject(Functions)
 
   public getSchoolActiveAcademicPeriod(
     schoolId: string
@@ -25,6 +27,11 @@ export class AcademicPeriodService {
           if (academicPeriods[0] === null || academicPeriods[0] === undefined)
             throw new ErrorResponse('active-academic-period-not-exist')
           return AcademicPeriodMapper.toModel(academicPeriods[0])
+        }),
+        catchError(err => {
+          if (err instanceof FirestoreError)
+            return throwError(() => new ErrorResponse(err.code))
+          return throwError(() => err)
         })
       )
   }
@@ -77,60 +84,33 @@ export class AcademicPeriodService {
     }
   }
 
-  public async endOfAcademicPeriod(
-    activeAcademicPeriodId: string
-  ): Promise<void> {
-    let academicPeriodExists: boolean
+  public async endOfAcademicPeriod(schoolId: string): Promise<void> {
     try {
-      academicPeriodExists = await this.academicPeriodRepository.existsById(
-        activeAcademicPeriodId
+      const endOfAcademicPeriodFn = httpsCallable(
+        this.cloudFunctions,
+        'endAcademicPeriod'
       )
-    } catch (err) {
-      const error = err as ErrorResponse
-      throw new ErrorResponse(error.code)
-    }
 
-    if (!academicPeriodExists)
-      throw new ErrorResponse('academic-period-not-exist')
-
-    try {
-      await this.academicPeriodRepository.updateById(activeAcademicPeriodId, {
-        endedAt: Timestamp.fromDate(new Date())
-      })
-    } catch (err) {
-      const error = err as ErrorResponse
-
-      if (error.code === ErrorCode.NotFound)
-        throw new ErrorResponse('academic-period-not-exist')
-
-      throw new ErrorResponse(error.code)
+      await endOfAcademicPeriodFn({ schoolId })
+    } catch (err: any) {
+      throw new ErrorResponse(err.code, err.message)
     }
   }
 
   public async startNewAcademicPeriod(
     data: CreateAcademicPeriod
   ): Promise<AcademicPeriodModel> {
-    let activeAcademicPeriodExists: boolean
-
     try {
-      activeAcademicPeriodExists =
-        await this.academicPeriodRepository.existsSchoolActiveAcademicPeriod(
-          data.schoolId
-        )
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
+      const startAcademicPeriodFn = httpsCallable(
+        this.cloudFunctions,
+        'startAcademicPeriod'
+      )
 
-    if (activeAcademicPeriodExists)
-      throw new ErrorResponse('academic-period-exist')
+      const result = await startAcademicPeriodFn(data)
 
-    try {
-      const newAcademicPeriod = await this.academicPeriodRepository.create(data)
-      return AcademicPeriodMapper.toModel(newAcademicPeriod)
-    } catch (err) {
-      const error = err as ErrorResponse
-      throw new ErrorResponse(error.code)
+      return result.data as AcademicPeriodModel
+    } catch (err: any) {
+      throw new ErrorResponse(err.code, err.message)
     }
   }
 }

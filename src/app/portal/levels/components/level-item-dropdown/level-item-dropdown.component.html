@@ -33,7 +33,7 @@
             <i-lucide pButtonIcon class="text-primary-500" [img]="editIcon" />
           </p-button>
 
-          @if (level().requiredPoints > 0) {
+          @if (level().requiredPoints > 0 && !hasActiveAcademicPeriod()) {
             <p-button
               [text]="true"
               (click)="onDelete($event, level().id)"

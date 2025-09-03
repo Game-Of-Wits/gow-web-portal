@@ -157,7 +157,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   private readonly characterService = inject(CharacterService)
   private readonly teamService = inject(TeamService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
   private readonly confirmationService = inject(ConfirmationService)
 
@@ -197,8 +197,19 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
     () => new Map(this.teams().map(team => [team.id, team.name]))
   )
 
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
+
+  public disableActions = computed(
+    () =>
+      this.deletingTeamLoading() ||
+      this.deletingCharacterLoading() ||
+      this.hasActiveAcademicPeriod()
+  )
+
   ngOnInit(): void {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -236,7 +247,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   }
 
   public onCreateTeam(submit: TeamFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -285,7 +296,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   }
 
   public onOpenDeleteTeamConfirmation(teamId: string, event: Event) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -328,7 +339,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
 
   public onOpenCreateCharacterFormDialog() {
     const limitAbilities =
-      this.context.classroom()?.experiences[
+      this.classroomContext.classroom()?.experiences[
         EducationalExperience.SHADOW_WARFARE
       ].limitAbilities
 
@@ -343,7 +354,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
 
   public onOpenEditCharacterFormDialog(character: CharacterModel) {
     const limitAbilities =
-      this.context.classroom()?.experiences[
+      this.classroomContext.classroom()?.experiences[
         EducationalExperience.SHADOW_WARFARE
       ].limitAbilities
 
@@ -370,7 +381,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   }
 
   public onCreateCharacter(submit: FullCharacterFormSubmit) {
-    const classroomId = this.context.classroom()?.id
+    const classroomId = this.classroomContext.classroom()?.id
 
     if (classroomId === undefined) return
 
@@ -394,7 +405,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   }
 
   public onEditCharacter(submit: FullCharacterFormSubmit) {
-    const classroomId = this.context.classroom()?.id
+    const classroomId = this.classroomContext.classroom()?.id
     const characterId = submit.result.id
 
     if (classroomId === undefined || characterId === null) return
@@ -434,7 +445,7 @@ export class ClassroomAdminPanelTeamsCharactersPageComponent implements OnInit {
   }
 
   public onOpenDeleteCharacterConfirmation(characterId: string, event: Event) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 

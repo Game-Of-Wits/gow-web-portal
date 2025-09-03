@@ -7,7 +7,6 @@ export interface ClassroomModel {
   teacherId: string
   schoolId: string
   gradeYearId: string
-  isSetupReady: boolean
   experiences: {
     [EducationalExperience.SHADOW_WARFARE]: ClassroomShadowWarfareExperienceModel
     [EducationalExperience.MASTERY_ROAD]: ClassroomMasteryRoadExperienceModel

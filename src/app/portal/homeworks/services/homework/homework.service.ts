@@ -7,7 +7,8 @@ import { HomeworkMapper } from '~/homeworks/mappers/homework.mapper'
 import { CreateHomework } from '~/homeworks/models/CreateHomework.model'
 import { HomeworkModel } from '~/homeworks/models/Homework.model'
 import { HomeworkInfo } from '~/homeworks/models/HomeworkInfo.model'
-import { AnswerOptionRepository } from '~/homeworks/repositories/answer-option.repository'
+import { UpdateHomework } from '~/homeworks/models/UpdateHomework.model'
+import { UpdateHomeworkParams } from '~/homeworks/models/UpdateHomeworkParams.model'
 import { HomeworkRepository } from '~/homeworks/repositories/homework.repository'
 import { HomeworkGroupRepository } from '~/homeworks/repositories/homework-group.repository'
 import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
@@ -17,13 +18,23 @@ import { StorageHomeworkService } from '../storage-homework/storage-homework.ser
 export class HomeworkService {
   private readonly homeworkRepository = inject(HomeworkRepository)
   private readonly homeworkGroupRepository = inject(HomeworkGroupRepository)
-  private readonly answerOptionRepository = inject(AnswerOptionRepository)
   private readonly classroomRepository = inject(ClassroomRepository)
   private readonly studentPeriodStateRepository = inject(
     StudentPeriodStateRepository
   )
 
   private readonly storageHomework = inject(StorageHomeworkService)
+
+  public async getHomeworkById(homeworkId: string): Promise<HomeworkModel> {
+    try {
+      const homework = await this.homeworkRepository.getByIdAsync(homeworkId)
+      if (homework === null) throw new ErrorResponse('homework-not-exist')
+      return HomeworkMapper.toModel(homework)
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
 
   public async getHomeworkInfoByStudentPeriodStateIdAndClassroomId(
     studentPeriodStateId: string,
@@ -67,44 +78,92 @@ export class HomeworkService {
       )
   }
 
-  public async create(data: CreateHomework): Promise<HomeworkModel> {
+  public async createHomework({
+    schoolId,
+    classroomId,
+    data
+  }: {
+    schoolId: string
+    classroomId: string
+    data: CreateHomework
+  }): Promise<HomeworkModel> {
     try {
+      const { image, ...createData } = data
+
       const homeworkGroupExist =
         await this.homeworkGroupRepository.existByIdAsync(data.groupId)
+
       if (!homeworkGroupExist)
         throw new ErrorResponse('homework-group-not-exist')
 
-      const homeworkId = this.homeworkRepository.generateId()
-
-      const answerOptions = await this.answerOptionRepository.createAll(
-        homeworkId,
-        data.content.options
-      )
-
-      const correctOption = answerOptions.find(
-        option => option.answer === data.content.correctOption
-      )
-
-      if (correctOption === undefined)
-        throw new ErrorResponse('correct-option-not-found')
+      const homeworkId = this.homeworkRepository.generateRef().id
 
       const homeworkProblemImagePath =
-        await this.storageHomework.uploadHomeworkProblem(homeworkId, data.image)
+        await this.storageHomework.uploadHomeworkProblem(
+          {
+            schoolId,
+            classroomId,
+            homeworkId
+          },
+          image
+        )
 
-      const homework = await this.homeworkRepository.create({
-        image: homeworkProblemImagePath,
-        name: data.name,
-        groupId: data.groupId,
-        category: data.category,
-        content: {
-          correctOption: this.homeworkRepository.getRefById(correctOption.id),
-          options: answerOptions.map(option =>
-            this.answerOptionRepository.getRefById(option.id)
-          )
-        }
+      const homework = await this.homeworkRepository.createById(homeworkId, {
+        ...createData,
+        image: homeworkProblemImagePath
       })
 
       return HomeworkMapper.toModel(homework)
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async updateHomeworkById(
+    pathIds: { schoolId: string; classroomId: string },
+    updateData: { homeworkId: string; data: Partial<UpdateHomework> }
+  ): Promise<void> {
+    try {
+      const { image, ...data } = updateData.data
+
+      const updateHomeworkData: Partial<UpdateHomeworkParams> = { ...data }
+
+      const homeworkExist = await this.homeworkRepository.existByIdAsync(
+        updateData.homeworkId
+      )
+
+      if (!homeworkExist) throw new ErrorResponse('homework-not-exist')
+
+      if (image) {
+        const homeworkProblemImagePath =
+          await this.storageHomework.uploadHomeworkProblem(
+            {
+              schoolId: pathIds.schoolId,
+              classroomId: pathIds.classroomId,
+              homeworkId: updateData.homeworkId
+            },
+            image
+          )
+
+        updateHomeworkData.image = homeworkProblemImagePath
+      }
+
+      await this.homeworkRepository.updateById(
+        updateData.homeworkId,
+        updateHomeworkData
+      )
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async deleteHomeworkById(homeworkId: string): Promise<void> {
+    try {
+      const homework = await this.homeworkRepository.getByIdAsync(homeworkId)
+      if (homework === null) throw new ErrorResponse('homework-not-exist')
+      await this.homeworkRepository.deleteById(homework.id)
     } catch (err) {
       const error = err as ErrorResponse | FirestoreError
       throw new ErrorResponse(error.code)

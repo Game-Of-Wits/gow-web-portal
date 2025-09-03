@@ -8,7 +8,6 @@ export interface ClassroomDbModel {
   teacher: DocumentReference
   school: DocumentReference
   gradeYear: DocumentReference
-  isSetupReady: boolean
   experiences: {
     [EducationalExperience.SHADOW_WARFARE]: ClassroomShadowWarfareExperienceDbModel
     [EducationalExperience.MASTERY_ROAD]: ClassroomMasteryRoadExperienceDbModel

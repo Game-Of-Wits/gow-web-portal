@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
@@ -110,7 +110,7 @@ export class ClassroomAdminPanelAbilityDetailsPageComponent implements OnInit {
   private readonly router = inject(Router)
   public readonly activatedRoute = inject(ActivatedRoute)
   public readonly defaultSchoolStore = inject(DefaultSchoolStore)
-  public readonly context = inject(ClassroomAdminPanelContextService)
+  public readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public ability = signal<AbilityModel | null>(null)
   public isAbilityLoading = signal<boolean>(false)
@@ -123,6 +123,10 @@ export class ClassroomAdminPanelAbilityDetailsPageComponent implements OnInit {
   public showEditAbilityFormDialog = signal<boolean>(false)
 
   public isAbilityDeletingLoading = signal<boolean>(false)
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   ngOnInit(): void {
     const abilityId = this.activatedRoute.snapshot.paramMap.get('abilityId')
@@ -154,7 +158,7 @@ export class ClassroomAdminPanelAbilityDetailsPageComponent implements OnInit {
   }
 
   public onEditAbility(submit: AbilityFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
     const abilityId = submit.result.id
 
     if (classroomId === null || abilityId === null) return

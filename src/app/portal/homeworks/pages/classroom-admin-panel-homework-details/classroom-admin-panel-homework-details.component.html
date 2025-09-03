@@ -1,0 +1,120 @@
+@if (!isHomeworkLoading()) {
+  @if (homework(); as homework) {
+    <section class="px-[26px] py-4 flex flex-col max-w-[110rem] mx-auto">
+      <gow-page-header
+        subtitle="Tareas"
+        [principalTitle]="homework.name"
+        [defaultBackPath]="defaultBackPath"
+      >
+        @if (!isHomeworkGroupLoading()) {
+          @if (homeworkGroup(); as homeworkGroup) {
+            @if (homeworkGroup.deliveredAt == null) {
+              <div class="flex items-center gap-2">
+                <p-button
+                  severity="info"
+                  styleClass="rounded-xl"
+                  (click)="onOpenEditHomework()"
+                >
+                  <i-lucide pButtonIcon [img]="editIcon" />
+                  <span pButtonLabel>Editar</span>
+                </p-button>
+
+                <p-button
+                  severity="danger"
+                  styleClass="rounded-xl"
+                  (click)="onDeleteHomework($event)"
+                >
+                  <i-lucide pButtonIcon [img]="deleteIcon" />
+                  <span pButtonLabel>Eliminar</span>
+                </p-button>
+              </div>
+            }
+          }
+        } @else {
+          <p-progress-spinner
+            ariaLabel="loading"
+            strokeWidth="4"
+            [style]="{ width: '42px', height: '42px' }"
+          ></p-progress-spinner>
+        }
+      </gow-page-header>
+
+      <div class="mt-5 flex flex-col gap-3">
+        @if (!isHomeworkImageLoading()) {
+          @if (homeworkImageUrl(); as homeworkImageUrl) {
+            <img
+              class="w-full h-[450px] object-contain bg-gray-100 aspect-auto"
+              [src]="homeworkImageUrl"
+              [width]="1200"
+              [height]="680"
+            />
+          }
+        } @else {
+          <div class="w-full h-[450px] bg-gray-100"></div>
+        }
+
+        <div class="flex justify-center">
+          <div class="max-w-[850px] w-full px-6 flex flex-col gap-2 text-xl">
+            <div>
+              <h2 class="font-bold mb-0.5">Categoria</h2>
+              <p>
+                {{ homeworkCategoryFormats[homework.category] }}
+              </p>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-bold mb-1.5">Respuestas</h2>
+              <ul class="flex flex-col gap-1">
+                @if (!isHomeworkAnswersLoading()) {
+                  @for (
+                    answerOption of homeworkAnswerOptions();
+                    track answerOption.id
+                  ) {
+                    <li class="flex items-center gap-2">
+                      @if (
+                        answerOption.id == homework.content.correctOptionId
+                      ) {
+                        <i-lucide
+                          [img]="checkIcon"
+                          class="size-6 text-success-500"
+                        />
+                      } @else {
+                        <i-lucide
+                          [img]="noCheckIcon"
+                          class="size-6 text-gray-400"
+                        />
+                      }
+
+                      <span>{{ answerOption.answer }}</span>
+                    </li>
+                  }
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    @if (!isHomeworkGroupLoading()) {
+      @if (homeworkGroup(); as homeworkGroup) {
+        <gow-homework-form-dialog
+          headerTitle="Editar tarea"
+          buttonText="Editar"
+          [id]="editHomework().id"
+          [homeworkForm]="editHomework().form"
+          [homeworkGroupId]="homeworkGroup.id"
+          [show]="showEditHomework()"
+          (close)="onCloseEdit()"
+          (submit)="onEditHomework($event)"
+        />
+      }
+    }
+
+    <p-confirm-dialog [draggable]="false" [closable]="false" />
+  }
+} @else {
+  <gow-classroom-admin-panel-loading />
+}
+
+<p-toast position="top-right" />

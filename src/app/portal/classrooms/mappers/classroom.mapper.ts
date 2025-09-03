@@ -16,7 +16,6 @@ export class ClassroomMapper {
       name: classroom.name,
       schoolId: classroom.school.id,
       gradeYearId: classroom.gradeYear.id,
-      isSetupReady: classroom.isSetupReady,
       teacherId: classroom.teacher.id,
       studentIds,
       experiences: {

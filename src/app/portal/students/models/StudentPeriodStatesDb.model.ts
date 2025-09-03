@@ -4,6 +4,7 @@ export interface StudentPeriodStatesDbModel {
   id: string
   student: DocumentReference
   academicPeriod: DocumentReference
+  classroom: DocumentReference
   experiences: { [key: string]: StudentPeriodStateDbExperience }
 }
 

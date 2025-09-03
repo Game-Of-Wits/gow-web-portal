@@ -1,10 +1,12 @@
 <section class="flex justify-center mt-[120px]">
   <div class="flex flex-col items-center">
     <h1 class="text-center font-bold mb-5">
-      <span class="text-6xl mb-1 block">{{ activeAcademicPeriod().name }}</span>
+      <span class="text-6xl mb-1 block">{{
+        activeAcademicPeriod()?.name
+      }}</span>
       <span class="text-2xl text-gray-500 block">
-        Semana {{ weekAndDayDifference().week }}· Día
-        {{ weekAndDayDifference().day }}
+        Semana {{ weekAndDayDifference()?.week }}· Día
+        {{ weekAndDayDifference()?.day }}
       </span>
     </h1>
 
@@ -17,11 +19,11 @@
 
       <div class="flex items-center gap-3">
         <button
+          (click)="onOpenStartShadowWarfareExperience()"
           class="bg-danger-50 rounded-xl relative w-[350px] h-[180px] cursor-pointer outline-4 outline-transparent hover:outline-danger-200 transition-colors disabled:hover:outline-transparent disabled:bg-gray-200 disabled:cursor-not-allowed group"
           [class.outline-danger-200]="
             isStartingShadowWarfareExperienceLoading()
           "
-          (click)="onStartShadowWarfareExperience()"
           [disabled]="
             isClassSessionEndingLoading() ||
             isStartingMasteryRoadExperienceLoading()
@@ -132,5 +134,10 @@
     </div>
   </div>
 </section>
+
+<gow-start-shadow-warfare-experience-form-dialog
+  [show]="showStartShadowWarfareExperienceDialog()"
+  (close)="onCloseStartShadowWarfareExperience()"
+/>
 
 <p-toast position="bottom-center" />

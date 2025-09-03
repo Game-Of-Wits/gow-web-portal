@@ -3,7 +3,7 @@ import { HomeworkCategory } from './HomeworkCategory.model'
 export interface HomeworkModel {
   id: string
   name: string
-  imageUrl: string
+  image: string
   category: HomeworkCategory
   groupId: string
   content: HomeworkContent

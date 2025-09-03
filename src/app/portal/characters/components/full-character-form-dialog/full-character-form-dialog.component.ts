@@ -71,7 +71,7 @@ export class FullCharacterFormDialogComponent implements OnInit {
 
   private readonly abilityService = inject(AbilityService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   @Input() fullCharacterForm: FormGroup<FullCharacterForm> | null = null
   public characterFormId = input<string | null>(null, { alias: 'id' })
@@ -104,10 +104,14 @@ export class FullCharacterFormDialogComponent implements OnInit {
   )
 
   public classroomLimitAbilities = computed(() => {
-    return this.context.classroom()?.experiences[
+    return this.classroomContext.classroom()?.experiences[
       EducationalExperience.SHADOW_WARFARE
     ].limitAbilities
   })
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   ngOnInit(): void {
     const limitAbilities = this.classroomLimitAbilities()
@@ -201,7 +205,7 @@ export class FullCharacterFormDialogComponent implements OnInit {
   }
 
   private loadAbilities() {
-    const classroomId = this.context.classroom()?.id
+    const classroomId = this.classroomContext.classroom()?.id
 
     if (classroomId === undefined) return
 

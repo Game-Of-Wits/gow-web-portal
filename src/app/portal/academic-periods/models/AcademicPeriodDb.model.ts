@@ -8,5 +8,3 @@ export interface AcademicPeriodDbModel {
   startedAt: Timestamp
   school: DocumentReference
 }
-
-export type AcademicPeriodDbWithoutId = Omit<AcademicPeriodDbModel, 'id'>

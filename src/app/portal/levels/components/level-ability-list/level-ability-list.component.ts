@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   Input,
   inject,
   input,
@@ -13,6 +14,7 @@ import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { AbilityModel } from '~/abilities/models/Ability.model'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
@@ -39,6 +41,7 @@ export class LevelAbilityListComponent implements OnInit {
   private readonly levelService = inject(LevelService)
 
   private readonly toastService = inject(MessageService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public levelId = input.required<string>({ alias: 'levelId' })
   @Input() levelAbilitiesMap!: Map<string, AbilityModel[]>
@@ -52,6 +55,10 @@ export class LevelAbilityListComponent implements OnInit {
   public onSelectLevelToAddAbility = output<void>({
     alias: 'selectLevelToAddAbility'
   })
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   public getLevelAbilities() {
     return this.levelAbilitiesMap.get(this.levelId()) ?? []

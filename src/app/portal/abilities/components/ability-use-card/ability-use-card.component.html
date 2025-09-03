@@ -21,16 +21,16 @@
       <i-lucide
         [img]="defaultAvatar"
         class="size-[20px] {{ colorSchemeMap[colorScheme()].text }}"
-      ></i-lucide>
+      />
     </div>
 
     <div class="flex flex-col w-full">
-      <span class="text-nowrap text-ellipsis"
-        >{{ abilityUse().student.firstName }}
-        {{ abilityUse().student.lastName }}</span
-      >
-      @if (abilityUse().characterId; as characterId) {
-        <span class="text-gray-600 text-sm"></span>
+      <span class="text-nowrap text-ellipsis">
+        {{ abilityUse().studentFullName }}
+      </span>
+
+      @if (abilityUse().characterName; as characterName) {
+        <span class="text-gray-600 text-sm">{{ characterName }}</span>
       }
     </div>
   </div>

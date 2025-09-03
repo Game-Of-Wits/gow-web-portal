@@ -69,6 +69,24 @@ export class LevelRepository {
     )
   }
 
+  public async getAllByClassroomIdAsync(classroomId: string) {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const levelsQuery = query(
+      this.getCollectionRef(),
+      where('classroom', '==', classroomRef)
+    )
+
+    const levelsSnapshot = await getDocs(levelsQuery)
+
+    return levelsSnapshot.docs
+      .map(doc => ({ ...doc.data(), id: doc.id }) as LevelDbModel)
+      .sort((a, b) => a.requiredPoints - b.requiredPoints)
+  }
+
   public async getAllAbilitiesFromLevelIdAsync(
     levelId: string
   ): Promise<AbilityDbModel[]> {

@@ -4,6 +4,7 @@ export interface StudentPeriodStatesModel {
   id: string
   studentId: string
   academicPeriodId: string
+  classroomId: string
   experiences: Map<EducationalExperience, StudentPeriodStateExperience>
 }
 

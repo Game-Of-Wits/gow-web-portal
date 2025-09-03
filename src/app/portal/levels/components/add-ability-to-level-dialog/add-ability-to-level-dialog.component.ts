@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   HostListener,
   inject,
   input,
@@ -61,7 +62,7 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
   private readonly levelService = inject(LevelService)
   private readonly abilityService = inject(AbilityService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
   public selectedAbilityControl = new FormControl<string>('', {
@@ -140,7 +141,7 @@ export class AddAbilityToLevelDialogComponent implements OnInit {
   }
 
   private loadAbilities() {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 

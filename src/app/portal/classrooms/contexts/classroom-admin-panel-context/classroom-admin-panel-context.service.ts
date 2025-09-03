@@ -8,7 +8,7 @@ import { ClassroomModel } from '~/classrooms/models/Classroom.model'
 @Injectable({ providedIn: 'root' })
 export class ClassroomAdminPanelContextService {
   public classroom = signal<ClassroomModel | null>(null)
-  public academicPeriod = signal<AcademicPeriodModel | null>(null)
+  public activeAcademicPeriod = signal<AcademicPeriodModel | null>(null)
   public classSession = signal<ClassSessionModel | null>(null)
   public experienceSession = signal<ExperienceSessionModel | null>(null)
 }

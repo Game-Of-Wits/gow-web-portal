@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import {
   addDoc,
-  CollectionReference,
   collection,
   DocumentReference,
   DocumentSnapshot,
@@ -10,12 +9,22 @@ import {
   getDoc,
   getDocs,
   query,
+  serverTimestamp,
   Timestamp,
-  where
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
+import { EducationalExperience } from '~/shared/models/EducationalExperience'
+import {
+  ShadowWarfareExperienceStateDb,
+  StudentPeriodStatesDbModel
+} from '~/students/models/StudentPeriodStatesDb.model'
+import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
 import { CreateHomeworkGroup } from '../models/CreateHomeworkGroup.model'
+import { HomeworkDbModel } from '../models/HomeworkDb.model'
 import { HomeworkGroupDbModel } from '../models/HomeworkGroupDb.model'
+import { HomeworkRepository } from './homework.repository'
 
 @Injectable({ providedIn: 'root' })
 export class HomeworkGroupRepository {
@@ -78,13 +87,10 @@ export class HomeworkGroupRepository {
       name: data.name,
       homeworks: [],
       classroom: classroomRef,
-      createdAt: Timestamp.now(),
+      createdAt: serverTimestamp(),
       baseDateLimit: null,
       deliveredAt: null
-    } as Omit<
-      HomeworkGroupDbModel,
-      'id'
-    >)) as DocumentReference<HomeworkGroupDbModel>
+    })) as DocumentReference<HomeworkGroupDbModel>
 
     const newHomeworkGroupSnapshot: DocumentSnapshot<HomeworkGroupDbModel> =
       await getDoc(newHomeworkGroupRef)
@@ -93,6 +99,81 @@ export class HomeworkGroupRepository {
       id: newHomeworkGroupSnapshot.id,
       ...newHomeworkGroupSnapshot.data()
     } as HomeworkGroupDbModel
+  }
+
+  public async saveRandomHomeworksToStudents(
+    deliveryHomeworkGroup: {
+      homeworkGroupId: string
+      baseDateLimit: Date
+    },
+    distribution: {
+      studentPeriodStates: StudentPeriodStatesDbModel[]
+      homeworks: HomeworkDbModel[]
+    }
+  ) {
+    const homeworkGroupRef = this.getRefById(
+      deliveryHomeworkGroup.homeworkGroupId
+    )
+
+    const shuffledStudents = [...distribution.studentPeriodStates].sort(
+      () => Math.random() - 0.5
+    )
+
+    const assignments: {
+      student: StudentPeriodStatesDbModel
+      homework: DocumentReference
+    }[] = []
+
+    const baseCount = Math.floor(
+      shuffledStudents.length / distribution.homeworks.length
+    )
+    const remainder = shuffledStudents.length % distribution.homeworks.length
+
+    let index = 0
+    distribution.homeworks.forEach((homework, i) => {
+      const count = baseCount + (i < remainder ? 1 : 0)
+      for (let j = 0; j < count; j++) {
+        assignments.push({
+          student: shuffledStudents[index++],
+          homework: HomeworkRepository.getRefById(this.firestore, homework.id)
+        })
+      }
+    })
+
+    const batch = writeBatch(this.firestore)
+
+    const baseDateLimit = Timestamp.fromDate(
+      deliveryHomeworkGroup.baseDateLimit
+    )
+
+    assignments.forEach(({ student, homework }) => {
+      const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
+        this.firestore,
+        student.id
+      )
+      const studentExperience = student.experiences[
+        EducationalExperience.SHADOW_WARFARE
+      ] as ShadowWarfareExperienceStateDb
+
+      const updateData = {
+        pendingHomeworks: [
+          ...(studentExperience.pendingHomeworks ?? []),
+          {
+            homework,
+            dateLimit: baseDateLimit
+          }
+        ]
+      }
+
+      batch.update(studentPeriodStateRef, updateData)
+    })
+
+    batch.update(homeworkGroupRef, {
+      baseDateLimit: baseDateLimit,
+      deliveredAt: serverTimestamp()
+    })
+
+    await batch.commit()
   }
 
   private getCollectionRef() {

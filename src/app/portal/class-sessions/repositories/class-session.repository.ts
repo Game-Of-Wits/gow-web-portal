@@ -1,9 +1,6 @@
 import { Injectable, inject } from '@angular/core'
 import {
-  addDoc,
   collection,
-  DocumentReference,
-  DocumentSnapshot,
   doc,
   Firestore,
   getDoc,
@@ -11,18 +8,19 @@ import {
   limit,
   Query,
   query,
+  serverTimestamp,
   Timestamp,
   updateDoc,
-  where
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
 import { from, map, Observable } from 'rxjs'
+import { AcademicPeriodDbModel } from '~/academic-periods/models/AcademicPeriodDb.model'
 import { AcademicPeriodRespository } from '~/academic-periods/repositories/academic-period.repository'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
-import {
-  ClassSessionDbModel,
-  ClassSessionDbWithoutId
-} from '../models/ClassSessionDb.model'
+import { ClassSessionDbModel } from '../models/ClassSessionDb.model'
 import { CreateClassSession } from '../models/CreateClassSession.model'
+import { UpdateClassSessionDb } from '../models/UpdateClassSession.model'
 
 @Injectable({ providedIn: 'root' })
 export class ClassSessionRepository {
@@ -37,9 +35,9 @@ export class ClassSessionRepository {
     if (!snapshot.exists()) return null
 
     return {
-      id: snapshot.id,
-      ...(snapshot.data() as ClassSessionDbWithoutId)
-    }
+      ...snapshot.data(),
+      id: snapshot.id
+    } as ClassSessionDbModel
   }
 
   public getActiveClassSessions({
@@ -96,30 +94,47 @@ export class ClassSessionRepository {
       data.academicPeriodId
     )
 
-    const newClassSessionRef = (await addDoc(this.getCollectionRef(), {
+    const academicPeriodSnapshot = await getDoc(academicPeriodRef)
+
+    const academicPeriod = {
+      ...academicPeriodSnapshot.data(),
+      id: academicPeriodSnapshot.id
+    } as AcademicPeriodDbModel
+
+    const batch = writeBatch(this.firestore)
+
+    const newClassSessionRef = this.generateRef()
+    batch.set(newClassSessionRef, {
       classroom: classroomRef,
       academicPeriod: academicPeriodRef,
       endedAt: null,
-      startedAt: Timestamp.now(),
+      startedAt: serverTimestamp(),
       experienceSessions: []
-    })) as DocumentReference<ClassSessionDbModel>
+    })
 
-    const newClassSessionSnapshot: DocumentSnapshot<ClassSessionDbModel> =
-      await getDoc(newClassSessionRef)
+    batch.update(academicPeriodRef, {
+      classSessions: [...academicPeriod.classSessions, newClassSessionRef]
+    })
 
-    const result = {
-      id: newClassSessionSnapshot.id,
-      ...(newClassSessionSnapshot.data() as ClassSessionDbWithoutId)
-    }
+    await batch.commit()
 
-    return result
+    const newClassSessionSnapshot = await getDoc(newClassSessionRef)
+
+    return {
+      ...newClassSessionSnapshot.data(),
+      id: newClassSessionSnapshot.id
+    } as ClassSessionDbModel
   }
 
   public updateById(
     experienceSessionId: string,
-    data: Partial<ClassSessionDbModel>
+    data: Partial<UpdateClassSessionDb>
   ) {
     return updateDoc(this.getRefById(experienceSessionId), data)
+  }
+
+  private generateRef() {
+    return doc(this.getCollectionRef())
   }
 
   private getRefById(id: string) {

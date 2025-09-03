@@ -1,11 +1,10 @@
 import { NgOptimizedImage } from '@angular/common'
-import { Component, inject, input, output, signal } from '@angular/core'
+import { Component, inject, output, signal } from '@angular/core'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Timer } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
-import { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeriod.model'
 import { ClassSessionService } from '~/class-sessions/services/class-session/class-session.service'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
@@ -98,31 +97,29 @@ export class StartClassSessionPanelComponent {
 
   private readonly classSessionService = inject(ClassSessionService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
   public startClassSessionLoading = signal<boolean>(false)
 
-  public academicPeriod = input.required<AcademicPeriodModel>({
-    alias: 'academicPeriod'
-  })
-
   public onLoading = output<boolean>({ alias: 'loading' })
 
   public async onStartClassSession() {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
+    const activeAcademicPeriodId =
+      this.classroomContext.activeAcademicPeriod()?.id ?? null
 
-    if (classroomId === null) return
+    if (classroomId === null || activeAcademicPeriodId === null) return
 
     this.startClassSessionLoading.set(true)
 
     try {
       const classSession = await this.classSessionService.startNewClassSession({
-        academicPeriodId: this.academicPeriod().id,
+        academicPeriodId: activeAcademicPeriodId,
         classroomId: classroomId
       })
       this.onLoading.emit(true)
-      this.context.classSession.set(classSession)
+      this.classroomContext.classSession.set(classSession)
     } catch (err) {
       const error = err as ErrorResponse
       this.onShowErrorMessage(error.code)

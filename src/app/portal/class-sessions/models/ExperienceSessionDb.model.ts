@@ -1,4 +1,5 @@
 import { DocumentReference, Timestamp } from '@angular/fire/firestore'
+import { ClassShift } from '~/shared/models/ClassShift'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 
 export interface ExperienceSessionDbModel {
@@ -7,6 +8,7 @@ export interface ExperienceSessionDbModel {
   classSession: DocumentReference
   startedAt: Timestamp
   endedAt: Timestamp | null
+  rules?: {
+    shift: ClassShift
+  }
 }
-
-export type ExperienceSessionDbWithoutId = Omit<ExperienceSessionDbModel, 'id'>

@@ -15,6 +15,7 @@ export enum ErrorCode {
 
   AuthInvalidEmail = 'auth/invalid-email',
   AuthUserDisabled = 'auth/user-disabled',
+  AuthInvalidCredential = 'auth/invalid-credential',
   AuthTooManyRequests = 'auth/too-many-requests',
   AuthPermissionDenied = 'auth/permission-denied',
 

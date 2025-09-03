@@ -6,7 +6,8 @@ import {
   OnChanges,
   OnInit,
   output,
-  SimpleChanges
+  SimpleChanges,
+  signal
 } from '@angular/core'
 import {
   AbstractControl,
@@ -121,6 +122,8 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
     form: AbilityActionForm
   }>({ alias: 'success' })
 
+  public showForm = signal<boolean>(true)
+
   public abilityActionTypeControl = new FormControl<AbilityActionType | null>(
     null,
     { validators: [Validators.required] }
@@ -132,13 +135,7 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
 
       abilityActionTypeControl.valueChanges.subscribe(value => {
         const defaultAbilityActionForm =
-          value !== null
-            ? value !== AbilityActionType.CLASSROOM
-              ? abilityActionFormMap[value](
-                  this.abilityActionForm?.getRawValue()
-                )
-              : abilityActionFormMap[value]()
-            : null
+          value !== null ? abilityActionFormMap[value]() : null
 
         this.abilityActionForm = defaultAbilityActionForm
       })

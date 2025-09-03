@@ -1,4 +1,4 @@
-import { DocumentReference } from '@angular/fire/firestore'
+import { CreateAnswerOption } from './CreateAnswerOption.model'
 import { HomeworkCategory } from './HomeworkCategory.model'
 
 export interface CreateHomeworkDb {
@@ -12,6 +12,6 @@ export interface CreateHomeworkDb {
 export type CreateHomeworkContentDb = CreateHomeworkSingleChoiseContentDb
 
 export interface CreateHomeworkSingleChoiseContentDb {
-  correctOption: DocumentReference
-  options: DocumentReference[]
+  correctOption: string
+  options: CreateAnswerOption[]
 }

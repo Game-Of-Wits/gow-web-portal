@@ -45,7 +45,31 @@
             <td>{{ student.firstName }} {{ student.lastName }}</td>
             <td>{{ getLevelName(student.levelId) }}</td>
             <td>{{ student.progressPoints }}</td>
-            <td></td>
+            <td class="flex items-center gap-2">
+                <p-button
+                  rounded
+                  outlined
+                  severity="info"
+                  styleClass="aspect-square"
+                  size="small"
+                  title="Modificar puntaje"
+                  (click)="onOpenModifyStudentProgressPointsDialog(student.id)"
+                >
+                  <i-lucide pButtonIcon [img]="modifyPointsIcon" />
+                </p-button>
+
+                <p-button
+                  rounded
+                  outlined
+                  severity="danger"
+                  styleClass="aspect-square"
+                  size="small"
+                  title="Aplicar penalización"
+                  (click)="onOpenApplyStudentPenaltyDialog(student.id)"
+                >
+                  <i-lucide pButtonIcon [img]="applyPenaltyIcon" />
+                </p-button>
+            </td>
           </tr>
         </ng-template>
       </p-table>
@@ -93,5 +117,22 @@
     </div>
   </div>
 </section>
+
+<gow-modify-student-progress-points-form-dialog
+  [show]="showModifyStudentProgressPointsDialog()"
+  [studentPeriodStateId]="modifyStudentProgressPointsSelected().studentPeriodStateId"
+  [studentFullName]="modifyStudentProgressPointsSelected().fullName"
+  (close)="onCloseModifyStudentProgressPointsDialog()"
+  (success)="onSuccessModifyStudentProgressPoints($event)"
+/>
+
+<gow-apply-penalty-to-student-form-dialog
+  [show]="showApplyStudentPenaltyDialog()"
+  [studentPeriodStateId]="applyStudentPenaltySelected().studentPeriodStateId"
+  [studentFullName]="applyStudentPenaltySelected().fullName"
+  [currentProgressPoints]="applyStudentPenaltySelected().currentProgressPoints"
+  (close)="onCloseApplyStudentPenaltyDialog()"
+  (success)="onSuccessApplyPenaltyToStudent($event)"
+/>
 
 <p-toast position="top-right" />

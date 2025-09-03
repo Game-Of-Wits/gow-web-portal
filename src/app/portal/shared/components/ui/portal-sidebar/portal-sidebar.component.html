@@ -5,25 +5,27 @@
     <gow-portal-sidebar-link href="/p/general">
       <i-lucide icon [img]="generalIcon" class="size-[28px]" /> General
     </gow-portal-sidebar-link>
+
     <gow-portal-sidebar-paper>
       <i-lucide icon [img]="classroomsIcon" class="size-[28px]" />
 
       Aulas
 
-      <a
+      <button
         actions
         pButton
+        severity="primary"
+        [disabled]="hasActiveAcademicPeriod()"
         routerLink="/p/s/{{ defaultSchoolStore.school()?.id }}/classroom/create"
         routerLinkActive="add-classroom-link-active"
-        class="cursor-pointer transition-colors hover:bg-primary-500 hover:text-white rounded-md size-7 inline-flex items-center justify-center"
+        class="cursor-pointer transition-colors rounded-md size-7"
       >
         <i-lucide
           pButtonIcon
           [img]="addClassroomIcon"
           class="size-[24px]"
         />
-      </a>
-
+      </button>
     </gow-portal-sidebar-paper>
 
     <div class="pl-5.5 flex flex-col">

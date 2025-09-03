@@ -55,6 +55,8 @@ export class CreateStudentFormDialogComponent implements OnInit {
   }
 
   public onCreateStudent() {
+    if (this.createStudentForm.invalid) return
+
     const createStudentData = this.createStudentForm.getRawValue()
 
     this.isCreatingStudentLoading.set(true)
@@ -62,12 +64,11 @@ export class CreateStudentFormDialogComponent implements OnInit {
     this.studentService
       .createStudent(this.classroomId(), createStudentData)
       .then(student => {
-        this.onSuccess.emit(student)
         this.isCreatingStudentLoading.set(false)
+        this.createStudentForm = createStudentForm()
+        this.onSuccess.emit(student)
       })
-      .catch(err => {
-        console.log(err)
-      })
+      .catch(err => {})
   }
 
   public onCloseDialog() {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
@@ -68,7 +68,7 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
 
   private readonly levelService = inject(LevelService)
 
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly confirmationService = inject(ConfirmationService)
   private readonly toastService = inject(MessageService)
 
@@ -94,8 +94,16 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
     maxPoints: null
   })
 
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
+
+  public disableActions = computed(
+    () => this.hasActiveAcademicPeriod() || this.deletingLevelLoading()
+  )
+
   ngOnInit(): void {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -160,7 +168,7 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   }
 
   public onCreateLevel(submit: LevelFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -188,7 +196,7 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
   }
 
   public onEditLevel(submit: LevelFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 

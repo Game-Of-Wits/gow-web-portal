@@ -6,11 +6,15 @@ export class StorageHomeworkService {
   private readonly storageService = inject(StorageService)
 
   public async uploadHomeworkProblem(
-    homeworkId: string,
+    ids: {
+      homeworkId: string
+      classroomId: string
+      schoolId: string
+    },
     image: Blob
   ): Promise<string> {
     return await this.storageService.upload(
-      `homeworks/${homeworkId}/${crypto.randomUUID()}`,
+      `schools/${ids.schoolId}/classrooms/${ids.classroomId}/homeworks/${ids.homeworkId}/problems/${crypto.randomUUID()}`,
       image,
       { contentType: image.type }
     )

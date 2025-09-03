@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core'
 import { ReactiveFormsModule } from '@angular/forms'
-import { Router, RouterLink } from '@angular/router'
+import { RouterLink } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { Circle, CircleCheckBig, LucideAngularModule } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
@@ -32,7 +32,6 @@ export class SignInFormComponent {
   private readonly authService = inject(AuthService)
 
   private readonly toastService = inject(MessageService)
-  private readonly router = inject(Router)
 
   readonly isValidIcon = CircleCheckBig
   readonly isNoValidIcon = Circle
@@ -49,8 +48,8 @@ export class SignInFormComponent {
 
     this.authService
       .signIn(signInCredentials.email, signInCredentials.password)
-      .then(() => {})
       .catch(err => {
+        this.signInLoading.set(false)
         const error = err as ErrorResponse
         this.showSignInErrorMessage(error.code)
       })

@@ -6,19 +6,44 @@
         [principalTitle]="homeworkGroup.name"
         defaultBackPath="defaultBackPath"
       >
-        <div class="flex items-center gap-4">
+        @if (homeworkGroup.deliveredAt; as deliveredAt) {
           <span class="text-xl font-bold">
-            <span aria-label="X">❌</span> No entregado
+            <span aria-label="Icono de grupo de tareas entregado">✅</span> Entregado ({{ deliveredAt | date:'dd/MM/yy' }})
           </span>
-          <p-button severity="danger" styleClass="rounded-xl">
-            <i-lucide pButtonIcon [img]="sendIcon" />
-            <span pButtonLabel>Entregar</span>
-          </p-button>
-        </div>
+        } @else {
+          <div class="flex items-center gap-4">
+            <span class="text-xl font-bold">
+              <span aria-label="Icono de grupo de tareas no entregado">❌</span> No entregado
+            </span>
+
+            @if (hasActiveAcademicPeriod()) {
+              <p-button
+                severity="danger"
+                styleClass="rounded-xl"
+                [disabled]="homeworksSize() < 1"
+                (click)="onOpenDeliveryHomeworkGroup()"
+              >
+                <i-lucide pButtonIcon [img]="sendIcon" />
+                <span pButtonLabel>Entregar</span>
+              </p-button>
+            }
+          </div>
+        }
       </gow-page-header>
 
-      <gow-homework-card-list [homeworkGroupId]="homeworkGroup.id" />
+      <gow-homework-card-list
+        [homeworkGroupId]="homeworkGroup.id"
+        (changeSize)="onChangeHomeworksSize($event)"
+      />
     </section>
+
+    @if (homeworkGroup.deliveredAt == null) {
+      <gow-delivery-homework-group-form-dialog
+        [show]="showDeliveryHomeworkGroup()"
+        [homeworkGroupId]="homeworkGroup.id"
+        (close)="onCloseDeliveryHomeworkGroup()"
+      />
+    }
   }
 } @else {
   <gow-classroom-admin-panel-loading />

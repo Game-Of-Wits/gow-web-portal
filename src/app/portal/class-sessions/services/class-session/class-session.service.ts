@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import { FirestoreError, Timestamp } from '@angular/fire/firestore'
+import { FirestoreError, serverTimestamp } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable, take } from 'rxjs'
@@ -37,7 +37,6 @@ export class ClassSessionService {
         map(classSessions => {
           if (classSessions[0] === null || classSessions[0] === undefined)
             throw new ErrorResponse('active-class-session-not-exist')
-
           return ClassSessionMapper.toModel(classSessions[0])
         })
       )
@@ -67,29 +66,23 @@ export class ClassSessionService {
   public async endOfActiveClassSession(
     activeClassSessionId: string
   ): Promise<void> {
-    if (!this.authStore.isAuth())
-      throw new ErrorResponse(ErrorCode.Unauthenticated)
-
-    let activeClassSessionExists: boolean
     try {
-      activeClassSessionExists =
+      if (!this.authStore.isAuth())
+        throw new ErrorResponse(ErrorCode.Unauthenticated)
+
+      const activeClassSessionExists =
         await this.classSessionRepository.existsActiveClassSessionById(
           activeClassSessionId
         )
-    } catch (err) {
-      const error = err as ErrorResponse
-      throw new ErrorResponse(error.code)
-    }
 
-    if (!activeClassSessionExists)
-      throw new ErrorResponse('class-session-not-active')
+      if (!activeClassSessionExists)
+        throw new ErrorResponse('class-session-not-active')
 
-    try {
       await this.classSessionRepository.updateById(activeClassSessionId, {
-        endedAt: Timestamp.now()
+        endedAt: serverTimestamp()
       })
     } catch (err) {
-      const error = err as FirestoreError
+      const error = err as FirestoreError | ErrorResponse
       throw new ErrorResponse(error.code)
     }
   }
@@ -97,54 +90,43 @@ export class ClassSessionService {
   public async startNewClassSession(
     data: CreateClassSession
   ): Promise<ClassSessionModel> {
-    if (!this.authStore.isAuth())
-      throw new ErrorResponse(ErrorCode.Unauthenticated)
-
-    const authUserId = this.authStore.authUser()?.id
-
-    let isActiveAcademicPeriod: boolean
     try {
-      isActiveAcademicPeriod =
+      if (!this.authStore.isAuth())
+        throw new ErrorResponse(ErrorCode.Unauthenticated)
+
+      const authUserId = this.authStore.authUser()?.id
+
+      const isActiveAcademicPeriod =
         await this.academicPeriodService.verifyAcademicPeriodIsActive(
           data.academicPeriodId
         )
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
 
-    if (!isActiveAcademicPeriod)
-      throw new ErrorResponse('academic-period-not-active')
+      if (!isActiveAcademicPeriod)
+        throw new ErrorResponse('academic-period-not-active')
 
-    const classroom = await this.classroomService.getClassroomByIdAsync(
-      data.classroomId
-    )
+      const classroom = await this.classroomService.getClassroomByIdAsync(
+        data.classroomId
+      )
 
-    if (classroom === null) throw new ErrorResponse('classroom-not-exist')
+      if (classroom === null) throw new ErrorResponse('classroom-not-exist')
 
-    if (classroom.teacherId !== authUserId)
-      throw new ErrorResponse('classroom-not-owned')
+      if (classroom.teacherId !== authUserId)
+        throw new ErrorResponse('classroom-not-owned')
 
-    let activeClassSessionExists: boolean
-    try {
-      activeClassSessionExists =
+      const activeClassSessionExists =
         await this.classSessionRepository.existsActiveClassSession({
           classroomId: classroom.id,
           academicPeriodId: data.academicPeriodId
         })
-    } catch (err) {
-      const error = err as FirestoreError
-      throw new ErrorResponse(error.code)
-    }
 
-    if (activeClassSessionExists)
-      throw new ErrorResponse('active-class-session-exist')
+      if (activeClassSessionExists)
+        throw new ErrorResponse('active-class-session-exist')
 
-    try {
       const classSessionDb = await this.classSessionRepository.create(data)
+
       return ClassSessionMapper.toModel(classSessionDb)
     } catch (err) {
-      const error = err as FirestoreError
+      const error = err as FirestoreError | ErrorResponse
       throw new ErrorResponse(error.code)
     }
   }

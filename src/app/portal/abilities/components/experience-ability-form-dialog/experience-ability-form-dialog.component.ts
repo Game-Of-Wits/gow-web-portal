@@ -52,6 +52,7 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
   public readonly closeIcon = X
   public readonly abilityTypeOptions = abilityTypeOptions
   public readonly abilityClassShiftOptions = abilityClassShiftOptions
+  public readonly usageType = AbilityUsage
 
   @Input() abilityForm?: FormGroup<AbilityForm> | null = null
 
@@ -151,6 +152,10 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
 
   get typeControl(): AbstractControl<AbilityType> | null {
     return this.abilityForm?.get('type') ?? null
+  }
+
+  get usageTypeControl(): AbstractControl<string> | null {
+    return this.abilityForm?.get('usage.type') ?? null
   }
 
   get usageShiftControl(): AbstractControl<string> | null {

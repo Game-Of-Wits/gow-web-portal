@@ -1,5 +1,6 @@
 import { Component, inject, input, output, signal } from '@angular/core'
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Dialog } from 'primeng/dialog'
@@ -8,6 +9,7 @@ import type { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeri
 import { AcademicPeriodService } from '~/academic-periods/services/academic-period/academic-period.service'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { DefaultSchoolStore } from '~/shared/store/default-school.store'
 import type { ErrorMessages } from '~/shared/types/ErrorMessages'
 
 const startAcademicPeriodErrorMessages: ErrorMessages = {
@@ -31,10 +33,11 @@ const startAcademicPeriodErrorMessages: ErrorMessages = {
   providers: [MessageService]
 })
 export class StartAcademicPeriodDialogComponent {
-  private readonly toastService = inject(MessageService)
   private readonly academicPeriodService = inject(AcademicPeriodService)
 
-  public schoolId = input.required<string | undefined>({ alias: 'schoolId' })
+  private readonly toastService = inject(MessageService)
+  private readonly defaultSchoolStore = inject(DefaultSchoolStore)
+
   public showDialog = input<boolean>(false, { alias: 'show' })
 
   public onClose = output<void>({ alias: 'close' })
@@ -47,8 +50,8 @@ export class StartAcademicPeriodDialogComponent {
     validators: [Validators.required, Validators.minLength(3)]
   })
 
-  public async createAcademicPeriod() {
-    const schoolId = this.schoolId()
+  public async onStartAcademicPeriod() {
+    const schoolId = this.defaultSchoolStore.school()?.id
 
     if (this.newAcademicPeriodName.invalid || !schoolId) return
 
@@ -64,22 +67,8 @@ export class StartAcademicPeriodDialogComponent {
       this.onSuccess.emit(newAcademicPeriod)
       this.onClose.emit()
     } catch (err) {
-      const error = err as Error
-      const { code: errorCode } = JSON.parse(error.message) as { code: string }
-
-      if (errorCode in startAcademicPeriodErrorMessages) {
-        this.onShowErrorMessage(
-          startAcademicPeriodErrorMessages[errorCode].summary,
-          startAcademicPeriodErrorMessages[errorCode].message
-        )
-
-        return
-      }
-
-      this.onShowErrorMessage(
-        'Error inesperado',
-        'Ha ocurrido un fallo al iniciar sesión, vuelva a intentarlo de nuevo'
-      )
+      const error = err as ErrorResponse
+      this.showErrorMessage('Conflicto con aulas', error.message)
     } finally {
       this.isLoading.set(false)
     }
@@ -93,7 +82,12 @@ export class StartAcademicPeriodDialogComponent {
     return this.newAcademicPeriodName.hasError(validationKey)
   }
 
-  private onShowErrorMessage(summary: string, message: string) {
+  private showStartAcademicPeriodErrorMessage(code: string) {
+    const { summary, message } = startAcademicPeriodErrorMessages[code]
+    this.showErrorMessage(summary, message)
+  }
+
+  private showErrorMessage(summary: string, message: string) {
     this.toastService.add({ summary, detail: message, severity: 'error' })
   }
 }

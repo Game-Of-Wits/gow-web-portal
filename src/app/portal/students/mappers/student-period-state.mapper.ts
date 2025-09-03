@@ -34,6 +34,7 @@ export class StudentPeriodStateMapper {
       experiences: this.studentPeriodStateExperiencesToModel(
         student.experiences
       ),
+      classroomId: student.classroom.id,
       studentId: student.student.id
     }
   }

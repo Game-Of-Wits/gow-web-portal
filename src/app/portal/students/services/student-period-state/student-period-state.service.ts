@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { catchError, Observable, switchMap, throwError } from 'rxjs'
+import { PenaltyRepository } from '~/penalties/repositories/penalty.repository'
+import { PointsModifier } from '~/shared/models/PointsModifier'
 import { StudentPeriodStateMapper } from '~/students/mappers/student-period-state.mapper'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
 import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfareStudentPeriodState'
@@ -16,6 +18,7 @@ export class StudentPeriodStateService {
   )
   private readonly studentRepository = inject(StudentRepository)
   private readonly studentPeriodStateMapper = inject(StudentPeriodStateMapper)
+  private readonly penaltyRepository = inject(PenaltyRepository)
 
   public async getAllStudentPeriodStatesByStudentId(
     studentProfileId: string
@@ -84,5 +87,108 @@ export class StudentPeriodStateService {
           return throwError(() => err)
         })
       )
+  }
+
+  public async modifyStudentHealthPoints(
+    studentPeriodStateId: string,
+    data: {
+      modifier: PointsModifier
+      points: number
+    }
+  ): Promise<number> {
+    try {
+      const studentPeriodState =
+        await this.studentPeriodStateRepository.getByIdAsync(
+          studentPeriodStateId
+        )
+      if (studentPeriodState === null)
+        throw new ErrorResponse('student-period-state-not-exist')
+
+      if (data.points <= 0) throw new ErrorResponse('points-must-be-positive')
+
+      return await this.studentPeriodStateRepository.modifyStudentHealtPoints(
+        studentPeriodState,
+        data
+      )
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async eliminateStudentByVotes(
+    studentPeriodStateId: string,
+    votes: number
+  ): Promise<void> {
+    try {
+      const studentPeriodState =
+        await this.studentPeriodStateRepository.getByIdAsync(
+          studentPeriodStateId
+        )
+      if (studentPeriodState === null)
+        throw new ErrorResponse('student-period-state-not-exist')
+
+      if (votes <= 0) throw new ErrorResponse('votes-must-be-positive')
+
+      await this.studentPeriodStateRepository.eliminateStudentByVotes(
+        studentPeriodState,
+        votes
+      )
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async modifyStudentProgressPoints(
+    studentPeriodStateId: string,
+    data: { modifier: PointsModifier; points: number }
+  ): Promise<number> {
+    try {
+      const studentPeriodState =
+        await this.studentPeriodStateRepository.getByIdAsync(
+          studentPeriodStateId
+        )
+      if (studentPeriodState === null)
+        throw new ErrorResponse('student-period-state-not-exist')
+
+      if (data.points <= 0) throw new ErrorResponse('points-must-be-positive')
+
+      return await this.studentPeriodStateRepository.modifyStudentProgressPoints(
+        studentPeriodState,
+        data
+      )
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async applyPenaltytoStudentPeriodStateById(
+    studentPeriodStateId: string,
+    penaltyId: string
+  ): Promise<number> {
+    try {
+      const studentPeriodState =
+        await this.studentPeriodStateRepository.getByIdAsync(
+          studentPeriodStateId
+        )
+      if (studentPeriodState === null)
+        throw new ErrorResponse('student-period-state-not-exist')
+
+      const penalty = await this.penaltyRepository.getByIdAsync(penaltyId)
+      if (penalty === null) throw new ErrorResponse('penalty-not-exist')
+
+      return await this.studentPeriodStateRepository.modifyStudentProgressPoints(
+        studentPeriodState,
+        {
+          modifier: PointsModifier.DECREASE,
+          points: penalty.reducePoints
+        }
+      )
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
   }
 }

@@ -1,6 +1,20 @@
-<p-card styleClass="overflow-hidden">
+<p-card styleClass="overflow-hidden h-[250px] hover:cursor-pointer" (click)="onGoHomeworkDetails()">
   <ng-template #header>
-    <img [alt]="homework().name" class="w-full" [ngSrc]="homework().imageUrl" />
+    @if (imageUrl(); as imageUrl) {
+      <img
+        [alt]="homework().name"
+        [src]="imageUrl"
+        [width]="1192"
+        [height]="670"
+        class="object-cover w-full h-[175px]"
+      />
+    } @else {
+      <div class="w-full h-[175px]"></div>
+    }
   </ng-template>
-  <ng-template #title>{{ homework().name }}</ng-template>
+
+  <div>
+    <span class="text-sm">{{ homeworkCategoryFormats[homework().category] }}</span>
+    <p class="font-bold text-lg line-clamp-1 text-ellipsis">{{ homework().name }}</p>
+  </div>
 </p-card>

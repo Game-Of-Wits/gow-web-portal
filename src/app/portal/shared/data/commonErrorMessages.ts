@@ -80,5 +80,9 @@ export const commonErrorMessages: ErrorMessages = {
   [ErrorCode.AuthPermissionDenied]: {
     summary: 'Permiso denegado',
     message: 'No tienes los permisos necesarios para realizar esta acción.'
+  },
+  [ErrorCode.AuthInvalidCredential]: {
+    summary: 'Credenciales incorrectas',
+    message: 'Las credenciales no coinciden o son invalidas.'
   }
 }

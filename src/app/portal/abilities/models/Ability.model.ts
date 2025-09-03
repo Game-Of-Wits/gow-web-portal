@@ -18,7 +18,7 @@ export interface AbilityModel {
   type: AbilityType
   usage: {
     type: AbilityUsage
-    shift: AbilityClassShift
+    shift?: AbilityClassShift
     interval?: AbilityUsageInterval
   }
   actions: AbilityActionModel[]

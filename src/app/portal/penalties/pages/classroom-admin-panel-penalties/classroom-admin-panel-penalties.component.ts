@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'
+import { Component, computed, inject, signal } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Pencil, Plus, Trash2 } from 'lucide-angular'
@@ -54,7 +54,7 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
   private readonly penaltyService = inject(PenaltyService)
 
   private readonly toastService = inject(MessageService)
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly confirmationService = inject(ConfirmationService)
 
   public penalties = signal<PenaltyModel[]>([])
@@ -72,6 +72,10 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
     id: '',
     form: null
   })
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   ngOnInit(): void {
     this.loadPenalties()
@@ -106,7 +110,7 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
   }
 
   public onCreatePenalty(submit: PenaltyFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 
@@ -125,14 +129,15 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
   }
 
   public onEditPenalty(submit: PenaltyFormSubmit) {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
+    const penaltyId = submit.result.id as string
 
-    if (classroomId === null) return
+    if (classroomId === null || penaltyId === '') return
 
     const formData = submit.result.form.getRawValue()
 
     this.penaltyService
-      .updatePenaltyById(submit.result.id as string, { ...formData })
+      .updatePenaltyById(penaltyId, { ...formData })
       .then(() => {
         this.penalties.update(penalties => {
           const penaltyIndex = penalties.findIndex(
@@ -141,9 +146,11 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
 
           if (penaltyIndex < 0) return penalties
 
+          const penalty = penalties[penaltyIndex]
           penalties[penaltyIndex] = {
+            id: penalty.id,
+            classroomId: penalty.classroomId,
             reducePoints: formData.reducePoints,
-            id: submit.result.id as string,
             name: formData.name
           }
           return penalties
@@ -192,7 +199,7 @@ export class ClassroomAdminPanelPenaltiesPageComponent {
   }
 
   private loadPenalties() {
-    const classroomId = this.context.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
 
     if (classroomId === null) return
 

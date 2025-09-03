@@ -4,7 +4,7 @@ import { HomeworkCategory } from './HomeworkCategory.model'
 export interface HomeworkDbModel {
   id: string
   name: string
-  imageUrl: string
+  image: string
   category: HomeworkCategory
   group: DocumentReference
   content: HomeworkDbContent

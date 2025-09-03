@@ -92,13 +92,19 @@ export const routes: Routes = [
                     component: ClassroomAdminPanelHomeworksPageComponent
                   },
                   {
-                    path: ':homeworkId',
-                    component: ClassroomAdminPanelHomeworkDetailsPageComponent
-                  },
-                  {
                     path: 'g/:homeworkGroupId',
-                    component:
-                      ClassroomAdminPanelHomeworkGroupDetailsPageComponent
+                    children: [
+                      {
+                        path: '',
+                        component:
+                          ClassroomAdminPanelHomeworkGroupDetailsPageComponent
+                      },
+                      {
+                        path: 'h/:homeworkId',
+                        component:
+                          ClassroomAdminPanelHomeworkDetailsPageComponent
+                      }
+                    ]
                   }
                 ]
               },

@@ -1,4 +1,4 @@
-import { Component, Input, input, OnInit } from '@angular/core'
+import { Component, Input, input } from '@angular/core'
 import {
   AbstractControl,
   FormControl,
@@ -24,7 +24,7 @@ import { AbilityActionColorSchema } from '../../ability-action-form-dialog.compo
   templateUrl: './reveal-action-form.component.html',
   imports: [SelectFieldComponent, ReactiveFormsModule, LucideAngularModule]
 })
-export class RevealActionFormComponent implements OnInit {
+export class RevealActionFormComponent {
   public readonly abilityTargetOptions = abilityTargetOptions
   public readonly discoveryInformationOptions: Array<{
     value: DiscoveryInformation
@@ -57,8 +57,6 @@ export class RevealActionFormComponent implements OnInit {
   public colorScheme = input<AbilityActionColorSchema>('primary', {
     alias: 'colorScheme'
   })
-
-  ngOnInit(): void {}
 
   public hasErrorValidation(
     control: AbstractControl | null,

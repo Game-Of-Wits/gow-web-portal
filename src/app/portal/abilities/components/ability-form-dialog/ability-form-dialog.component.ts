@@ -70,6 +70,7 @@ export class AbilityFormDialogComponent {
   public readonly abilityClassShiftOptions = abilityClassShiftOptions
   public readonly abilityUsageOptions = abilityUsageOptions
   public readonly educationalExperienceOptions = educationalExperienceOptions
+  public readonly usageType = AbilityUsage
 
   @Input() abilityForm?: FormGroup<AbilityForm> | null = null
 

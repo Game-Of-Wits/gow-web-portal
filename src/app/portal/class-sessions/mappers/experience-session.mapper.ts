@@ -10,7 +10,8 @@ export class ExperienceSessionMapper {
       startedAt: experienceSession.startedAt.toDate(),
       endedAt: experienceSession.endedAt?.toDate() ?? null,
       experience: experienceSession.experience,
-      classSessionId: experienceSession.classSession.id
+      classSessionId: experienceSession.classSession.id,
+      rules: experienceSession.rules
     }
   }
 

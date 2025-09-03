@@ -1,0 +1,95 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [formGroup]="modifyStudentHealthPointsForm"
+  [style]="{ 'max-width': '560px', width: '100%' }"
+>
+  <ng-template #header>
+    <div class="flex justify-between w-full gap-3">
+      <span class="font-bold text-xl">Modificar los puntos de vida de "{{ studentFullName() }}"</span>
+
+      <button
+        class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        type="button"
+        (click)="onCloseDialog()"
+        [disabled]="isLoading()"
+      >
+        <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-5">
+    <div class="flex gap-1.5">
+      <gow-select-field
+        label="Modificador"
+        placeholder="Seleccione un modificador"
+        formControlName="modifier"
+        class="w-[200px]"
+        focusColor="info"
+        [options]="pointsModifierOptions"
+        [enableClear]="false"
+        [scrollHeight]="70"
+      />
+
+      <div class="flex flex-col gap-1 flex-1">
+        <gow-number-field
+          label="Puntos"
+          placeholder="Ingrese la cantidad de puntos"
+          formControlName="points"
+          focusColor="info"
+        />
+
+        @if (pointsControl.invalid && pointsControl.touched) {
+          @if (hasErrorValidation(pointsControl, "required")) {
+            <p class="text-sm text-danger-500">Es requerido</p>
+          } @else if (hasErrorValidation(pointsControl, "min")) {
+            <p class="text-sm text-danger-500">Mínimo 1 punto</p>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 flex-col w-full">
+      @if (finalHealthPoints() == 0 && modifierControl.value === pointsModifier.DECREASE) {
+        <p-message severity="error">
+          <ng-template #icon>
+            <i-lucide [img]="dangerIcon" class="size-[20px]" />
+          </ng-template>
+          <span>El estudiante va ha ser eliminado de la experiencia</span>
+        </p-message>
+      }
+
+      <div class="flex items-center gap-1">
+        <span>Puntos de vida del estudiante: </span>
+
+        @if (pointsControl.value == 0) {
+          <p-tag value="{{ currentStudentHealthPoints() }}" severity="secondary" />
+        } @else if (modifierControl.value == pointsModifier.INCREMENT && pointsControl.value > 0) {
+          <p-tag value="{{ finalHealthPoints() }}" severity="success" />
+        } @else if (modifierControl.value == pointsModifier.DECREASE && pointsControl.value > 0) {
+          <p-tag value="{{ finalHealthPoints() }}" severity="danger" />
+        }
+      </div>
+
+      <button
+        pButton
+        severity="info"
+        class="w-full rounded-xl"
+        [loading]="isLoading()"
+        (click)="onModifyStudentHealthPoints()"
+        [disabled]="
+          modifyStudentHealthPointsForm.invalid ||
+          (currentStudentHealthPoints() == 0 && modifierControl.value == pointsModifier.DECREASE)
+        "
+      >
+        Modificar vida
+      </button>
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast position="top-right" />

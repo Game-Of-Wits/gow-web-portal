@@ -1,13 +1,10 @@
 import { NgOptimizedImage } from '@angular/common'
 import { Component, inject, OnInit, signal } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { MessageService } from 'primeng/api'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { Toast } from 'primeng/toast'
 import { firstValueFrom } from 'rxjs'
-import { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeriod.model'
-import { AcademicPeriodService } from '~/academic-periods/services/academic-period/academic-period.service'
 import { ClassSessionModel } from '~/class-sessions/models/ClassSession.model'
 import { ExperienceSessionModel } from '~/class-sessions/models/ExperienceSession.model'
 import { ClassSessionService } from '~/class-sessions/services/class-session/class-session.service'
@@ -52,56 +49,30 @@ export class ClassroomAdminPanelOverviewPageComponent implements OnInit {
 
   public readonly context = inject(ClassroomAdminPanelContextService)
 
-  private readonly academicPeriodService = inject(AcademicPeriodService)
   private readonly classSessionService = inject(ClassSessionService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
 
-  private readonly activatedRoute = inject(ActivatedRoute)
   private readonly toastService = inject(MessageService)
 
   public students = signal<StudentProfileModel[]>([])
   public isLoading = signal<boolean>(false)
 
   ngOnInit(): void {
-    const schoolId =
-      this.activatedRoute.parent?.parent?.snapshot.paramMap.get('schoolId') ??
-      null
-
-    if (schoolId === null) {
-      this.onShowErrorMessage('school-not-found')
-      return
-    }
-
-    this.verifyClassroomOverviewState(schoolId)
+    this.verifyClassroomOverviewState()
   }
 
   public onSetLoading(value: boolean) {
     this.isLoading.set(value)
   }
 
-  private async verifyClassroomOverviewState(schoolId: string) {
+  private async verifyClassroomOverviewState() {
     this.isLoading.set(true)
 
-    let activeAcademicPeriod: AcademicPeriodModel
-    try {
-      activeAcademicPeriod = await firstValueFrom(
-        this.academicPeriodService.getSchoolActiveAcademicPeriod(schoolId)
-      )
-      this.context.academicPeriod.set(activeAcademicPeriod)
-    } catch (err) {
-      const error = err as ErrorResponse
-      if (error.code === 'active-academic-period-not-exist') {
-        this.isLoading.set(false)
-        return
-      }
-
-      this.onShowErrorMessage(error.code)
-      return
-    }
-
     const classroomId = this.context.classroom()?.id ?? null
+    const activeAcademicPeriodId =
+      this.context.activeAcademicPeriod()?.id ?? null
 
-    if (classroomId === null) {
+    if (classroomId === null || activeAcademicPeriodId === null) {
       this.isLoading.set(false)
       return
     }
@@ -111,7 +82,7 @@ export class ClassroomAdminPanelOverviewPageComponent implements OnInit {
       activeClassSession = await firstValueFrom(
         this.classSessionService.getActiveClassSession({
           classroomId,
-          academicPeriodId: activeAcademicPeriod.id
+          academicPeriodId: activeAcademicPeriodId
         })
       )
       this.context.classSession.set(activeClassSession)

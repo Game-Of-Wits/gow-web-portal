@@ -33,6 +33,7 @@
               severity="info"
               [rounded]="true"
               [disabled]="true"
+              size="large"
             >
               <i-lucide pButtonIcon [img]="editIcon" />
             </button>
@@ -45,6 +46,7 @@
   @if (context.classroom(); as classroom) {
     <gow-create-student-form-dialog
       (close)="onCloseCreateStudentDialog()"
+      (success)="onCreateStudent($event)"
       [show]="showCreateStudentAccount()"
       [classroomId]="classroom.id"
     />

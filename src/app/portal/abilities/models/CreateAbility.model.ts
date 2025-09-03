@@ -12,7 +12,7 @@ export interface CreateAbility {
   classroomId: string
   usage: {
     type: AbilityUsage
-    shift: AbilityClassShift
+    shift?: AbilityClassShift
     interval?: AbilityUsageInterval
   }
   actions: AbilityActionModel[]

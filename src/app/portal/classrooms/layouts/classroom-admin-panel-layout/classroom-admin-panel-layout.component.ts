@@ -23,10 +23,12 @@ import { MessageService } from 'primeng/api'
 import { SkeletonModule } from 'primeng/skeleton'
 import { TabsModule } from 'primeng/tabs'
 import { Toast } from 'primeng/toast'
+import { AcademicPeriodService } from '~/academic-periods/services/academic-period/academic-period.service'
 import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/classroom-admin-panel-loading.component'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { ClassroomsService } from '~/classrooms/services/classrooms/classrooms.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { DefaultSchoolStore } from '~/shared/store/default-school.store'
 
 @Component({
   selector: 'gow-classroom-admin-panel-layout',
@@ -47,11 +49,13 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
   public readonly optionsIcon = Ellipsis
 
   public readonly classroomService = inject(ClassroomsService)
+  private readonly academicPeriodService = inject(AcademicPeriodService)
 
   private readonly router = inject(Router)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly toastService = inject(MessageService)
-  public readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly defaultSchoolStore = inject(DefaultSchoolStore)
+  public readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public isClassroomLoading = signal<boolean>(false)
 
@@ -109,24 +113,39 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
 
     const classroomId = this.activatedRoute.snapshot.paramMap.get('classroomId')
 
-    if (classroomId === null) {
-      this.onShowErrorMessage(
-        'Aula no encontrada',
-        'No se puedo obtener información del aula'
-      )
-      return
-    }
+    if (classroomId === null) return
 
     this.classroomService
       .getClassroomByIdAsync(classroomId)
       .then(classroom => {
-        this.context.classroom.set(classroom)
-        this.isClassroomLoading.set(false)
+        this.classroomContext.classroom.set(classroom)
+
+        const schoolId = this.defaultSchoolStore.school()?.id
+
+        if (schoolId === undefined) return
+
+        this.academicPeriodService
+          .getSchoolActiveAcademicPeriod(schoolId)
+          .subscribe({
+            next: academicPeriod => {
+              this.classroomContext.activeAcademicPeriod.set(academicPeriod)
+            },
+            complete: () => {
+              this.isClassroomLoading.set(false)
+            },
+            error: err => {
+              const error = err as ErrorResponse
+              if (error.code === 'active-academic-period-not-exist') {
+                this.isClassroomLoading.set(false)
+                return
+              }
+            }
+          })
       })
       .catch(err => {
         const error = err as ErrorResponse
         const { summary, message } = commonErrorMessages[error.code]
-        this.onShowErrorMessage(summary, message)
+        this.showErrorMessage(summary, message)
       })
   }
 
@@ -135,7 +154,7 @@ export class ClassroomAdminPanelLayoutComponent implements OnInit {
     this.activeTab.set(activeTabName)
   }
 
-  private onShowErrorMessage(summary: string, message: string) {
+  private showErrorMessage(summary: string, message: string) {
     this.toastService.add({ summary, detail: message, severity: 'error' })
   }
 }

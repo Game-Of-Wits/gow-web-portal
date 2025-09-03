@@ -1,6 +1,7 @@
 export interface AbilityUseDbModel {
-  studentId: string
+  studentFullName: string
   abilityId: string
-  characterId: string
+  abilityName: string
+  characterName: string | null
   createdAt: string
 }

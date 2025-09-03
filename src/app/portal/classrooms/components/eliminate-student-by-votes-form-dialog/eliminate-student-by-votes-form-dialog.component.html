@@ -1,0 +1,56 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ 'max-width': '550px', width: '100%' }"
+>
+  <ng-template #header>
+    <div class="flex justify-between w-full gap-3 items-center">
+      <span class="font-bold text-xl">
+        Eliminar a "{{ studentFullName() }}" por votación
+      </span>
+
+      <button
+        class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        type="button"
+        (click)="onCloseDialog()"
+        [disabled]="isLoading()"
+      >
+        <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700" />
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-1 flex-1">
+      <gow-number-field
+        label="Votos"
+        placeholder="Ingrese la cantidad de votos"
+        [formControl]="votesControl"
+      />
+
+      @if (votesControl.invalid && votesControl.touched) {
+        @if (hasErrorValidation(votesControl, "required")) {
+          <p class="text-sm text-danger-500">Es requerido</p>
+        } @else if (hasErrorValidation(votesControl, "min")) {
+          <p class="text-sm text-danger-500">Mínimo 1 voto</p>
+        }
+      }
+    </div>
+
+    <button
+      pButton
+      severity="danger"
+      class="w-full rounded-xl"
+      [loading]="isLoading()"
+      (click)="onEliminateStudentByVotes()"
+      [disabled]="votesControl.invalid"
+    >
+      Eliminar
+    </button>
+  </div>
+</p-dialog>
+
+<p-toast position="top-right" />

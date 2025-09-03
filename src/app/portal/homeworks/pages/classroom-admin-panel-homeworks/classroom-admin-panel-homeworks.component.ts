@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common'
 import { Component, computed, inject, OnInit, signal } from '@angular/core'
-import { Router, RouterLink } from '@angular/router'
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Plus } from 'lucide-angular'
 import { MessageService } from 'primeng/api'
@@ -44,6 +44,7 @@ export class ClassroomAdminPanelHomeworksPageComponent implements OnInit {
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
   private readonly router = inject(Router)
+  private readonly activatedRoute = inject(ActivatedRoute)
 
   public homeworkGroups = signal<HomeworkGroupModel[]>([])
   public isHomeworkGroupsLoading = signal<boolean>(true)
@@ -92,7 +93,9 @@ export class ClassroomAdminPanelHomeworksPageComponent implements OnInit {
     this.homeworkGroupService
       .create({ classroomId, name: submit.result.formData.name })
       .then(homeworkGroup => {
-        this.router.navigate(['../', `g/${homeworkGroup.id}`])
+        this.router.navigate([`g/${homeworkGroup.id}`], {
+          relativeTo: this.activatedRoute
+        })
         this.homeworkGroups.update(homeworkGroups => {
           return [...homeworkGroups, homeworkGroup]
         })

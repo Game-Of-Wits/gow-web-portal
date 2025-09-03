@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { DatePipe } from '@angular/common'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { LucideAngularModule, Send } from 'lucide-angular'
@@ -6,6 +7,8 @@ import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { Toast } from 'primeng/toast'
 import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/classroom-admin-panel-loading.component'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
+import { DeliveryHomeworkGroupFormDialog } from '~/homeworks/components/delivery-homework-group-form-dialog/delivery-homework-group-form-dialog.component'
 import { HomeworkCardListComponent } from '~/homeworks/components/homework-card-list/homework-card-list.component'
 import { HomeworkGroupModel } from '~/homeworks/models/HomeworkGroup.model'
 import { HomeworkGroupService } from '~/homeworks/services/homework-group/homework-group.service'
@@ -25,7 +28,9 @@ const homeworkGroupLoadingErrorMessages = {
     LucideAngularModule,
     Toast,
     HomeworkCardListComponent,
-    ClassroomAdminPanelLoadingComponent
+    ClassroomAdminPanelLoadingComponent,
+    DeliveryHomeworkGroupFormDialog,
+    DatePipe
   ],
   providers: [MessageService]
 })
@@ -38,9 +43,17 @@ export class ClassroomAdminPanelHomeworkGroupDetailsPageComponent
 
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly toastService = inject(MessageService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public homeworkGroup = signal<HomeworkGroupModel | null>(null)
   public isHomeworkGroupLoading = signal<boolean>(true)
+  public homeworksSize = signal<number>(0)
+
+  public showDeliveryHomeworkGroup = signal<boolean>(false)
+
+  public hasActiveAcademicPeriod = computed(
+    () => this.classroomContext.activeAcademicPeriod() !== null
+  )
 
   public defaultBackPath = {
     commands: ['../'],
@@ -49,6 +62,18 @@ export class ClassroomAdminPanelHomeworkGroupDetailsPageComponent
 
   ngOnInit(): void {
     this.loadHomeworkGroup()
+  }
+
+  public onChangeHomeworksSize(size: number) {
+    this.homeworksSize.set(size)
+  }
+
+  public onOpenDeliveryHomeworkGroup() {
+    this.showDeliveryHomeworkGroup.set(true)
+  }
+
+  public onCloseDeliveryHomeworkGroup() {
+    this.showDeliveryHomeworkGroup.set(false)
   }
 
   private loadHomeworkGroup() {

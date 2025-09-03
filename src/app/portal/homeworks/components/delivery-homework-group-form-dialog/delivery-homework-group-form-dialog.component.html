@@ -1,0 +1,80 @@
+<p-dialog
+  [modal]="true"
+  [visible]="showDialog()"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [formGroup]="deliveryHomeworkGroupForm"
+  [style]="{
+    'max-width': '580px',
+    width: '100%',
+    overflow: 'visible',
+  }"
+>
+  <ng-template #header>
+    <div class="flex justify-between items-center w-full">
+      <span class="font-bold text-xl">Entregar grupo de tareas</span>
+
+      <p-button
+        type="button"
+        size="small"
+        severity="secondary"
+        styleClass="aspect-square"
+        rounded
+        (click)="onCloseDialog()"
+        [disabled]="deliveringLoading()"
+      >
+        <i-lucide pButtonIcon [img]="closeIcon" class="text-gray-700" />
+      </p-button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-1">
+      <label for="base-date-limit">Fecha limite de entrega</label>
+      <p-date-picker
+        formControlName="baseDateLimit"
+        placeholder="Seleccione fecha y hora para la entrega de la tarea"
+        [showButtonBar]="true"
+        [showTime]="true"
+        hourFormat="12"
+        [minDate]="today()"
+        inputId="base-date-limit"
+        styleClass="w-full"
+      />
+
+      @if (baseDateLimitControl.invalid && baseDateLimitControl.touched) {
+        @if (hasErrorValidation(baseDateLimitControl, "required")) {
+          <p class="text-sm text-danger-500">Es requerido</p>
+        } @else if (hasErrorValidation(baseDateLimitControl, "isFutureDate")) {
+          <p class="text-sm text-danger-500">Debe ser una fecha futura</p>
+        }
+      }
+    </div>
+
+    @if (showDialog()) {
+      <p-message severity="warn">
+        <ng-template #icon>
+          <i-lucide [img]="alertIcon" class="size-[20px]" />
+        </ng-template>
+        <span>
+          La entrega de tareas se realizara de forma aleatorio entre todos los
+          estudiantes del periodo academico, sin importar su equipo, nivel,
+          vida, etc.
+        </span>
+      </p-message>
+    }
+
+    <p-button
+      severity="danger"
+      size="large"
+      styleClass="py-3 rounded-xl w-full mt-[380px]"
+      [disabled]="deliveryHomeworkGroupForm.invalid"
+      label="Entregar tareas"
+      [loading]="deliveringLoading()"
+      (click)="onDeliveryHomeworkGroup()"
+    />
+  </div>
+</p-dialog>
+
+<p-toast position="top-right" />

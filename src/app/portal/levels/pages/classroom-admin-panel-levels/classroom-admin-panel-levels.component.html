@@ -10,35 +10,26 @@
         (edit)="onOpenEditLevelDialog($event)"
       />
 
-      @if (isValidCreateLevelBetweenLevels(
-        level.requiredPoints,
-        levels().at(position + 1)?.requiredPoints ?? null
-      )) {
-        <div
-          class="content-[''] h-1.5 bg-info-100 w-full hover:bg-info-500 hover:outline-2 transition-all cursor-pointer outline-info-400 overflow-visible relative group"
-          [class.bg-gray-300]="deletingLevelLoading()"
-          [class.cursor-not-allowed]="deletingLevelLoading()"
-          (click)="onOpenCreateLevelDialog(position + 1)"
-        >
-          <button
-            class="bg-info-500 size-5.5 text-white items-center justify-center rounded-full cursor-pointer hidden group-hover:flex absolute -right-2 -top-2"
-            [disabled]="deletingLevelLoading()"
+      @if (!hasActiveAcademicPeriod()) {
+        @if (isValidCreateLevelBetweenLevels(
+          level.requiredPoints,
+          levels().at(position + 1)?.requiredPoints ?? null
+        )) {
+          <div
+            class="content-[''] h-1.5 bg-info-100 w-full hover:bg-info-500 hover:outline-2 transition-all cursor-pointer outline-info-400 overflow-visible relative group"
+            [class.bg-gray-300]="deletingLevelLoading()"
+            [class.cursor-not-allowed]="deletingLevelLoading()"
+            (click)="onOpenCreateLevelDialog(position + 1)"
           >
-            <i-lucide [img]="addIcon" class="size-4" />
-          </button>
-        </div>
+            <button
+              class="bg-info-500 size-5.5 text-white items-center justify-center rounded-full cursor-pointer hidden group-hover:flex absolute -right-2 -top-2"
+              [disabled]="deletingLevelLoading()"
+            >
+              <i-lucide [img]="addIcon" class="size-4" />
+            </button>
+          </div>
+        }
       }
-    } @empty {
-      <div
-        class="content-[''] h-1.5 bg-info-100 w-full hover:bg-info-500 hover:outline-2 transition-all cursor-pointer outline-info-400 overflow-visible relative group"
-        (click)="onOpenCreateLevelDialog(0)"
-      >
-        <button class="bg-info-500 size-5.5 text-white items-center justify-center rounded-full cursor-pointer hidden group-hover:flex absolute -right-2 -top-2">
-          <i-lucide [img]="addIcon" class="size-4" />
-        </button>
-      </div>
-
-      <p class="text-center text-lg py-4 text-gray-400">No se ha encontrado ninguna clase</p>
     }
   </div>
 

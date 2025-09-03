@@ -13,6 +13,7 @@ import { AuthStore } from '~/shared/store/auth.store'
 @Injectable({ providedIn: 'root' })
 export class ClassroomsService {
   private readonly classroomRepository = inject(ClassroomRepository)
+
   private readonly authStore = inject(AuthStore)
   private readonly cloudFunctions = inject(Functions)
 
@@ -24,12 +25,13 @@ export class ClassroomsService {
 
   public async getClassroomByIdAsync(
     classroomId: string
-  ): Promise<ClassroomModel | null> {
+  ): Promise<ClassroomModel> {
     try {
-      const classroomDb = await this.classroomRepository.getById(classroomId)
-      return classroomDb !== null ? ClassroomMapper.toModel(classroomDb) : null
+      const newClassroom = await this.classroomRepository.getById(classroomId)
+      if (newClassroom === null) throw new ErrorResponse('classroom-not-exist')
+      return ClassroomMapper.toModel(newClassroom)
     } catch (err) {
-      const error = err as FirestoreError
+      const error = err as FirestoreError | ErrorResponse
       throw new ErrorResponse(error.code)
     }
   }
@@ -64,9 +66,9 @@ export class ClassroomsService {
       const result = await createClassroomFn(data)
 
       const { classroomId } = result.data as { classroomId: string }
+
       return classroomId
     } catch (err) {
-      console.log(err)
       const error = err as { code: string; message: string }
       throw { code: error.code, message: error.message }
     }

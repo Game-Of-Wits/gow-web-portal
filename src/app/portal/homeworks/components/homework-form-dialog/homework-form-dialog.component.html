@@ -92,6 +92,7 @@
         styleClass="py-3 rounded-xl w-full mt-2.5"
         [disabled]="homeworkFormGroup.invalid"
         [label]="buttonText()"
+        [loading]="isSubmitLoading()"
         (click)="onSubmitForm()"
       />
     </div>

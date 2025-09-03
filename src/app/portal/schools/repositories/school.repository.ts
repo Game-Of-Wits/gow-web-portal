@@ -16,8 +16,17 @@ export class SchoolRepository {
   private static readonly collectionName = 'schools'
   private readonly collectionName = SchoolRepository.collectionName
 
-  public getSchoolById(schoolId: string): Observable<SchoolModel> {
-    const schoolRef = this.getRefById(schoolId)
+  public async getByIdAsync(id: string): Promise<SchoolModel | null> {
+    const schoolRef = this.getRefById(id)
+    const schoolSnapshot = await getDoc(schoolRef)
+
+    if (!schoolSnapshot.exists()) return null
+
+    return { ...schoolSnapshot.data(), id: schoolSnapshot.id } as SchoolModel
+  }
+
+  public getById(id: string): Observable<SchoolModel> {
+    const schoolRef = this.getRefById(id)
 
     return from(getDoc(schoolRef)).pipe(
       map(snapshot => ({ id: snapshot.id, ...snapshot.data() }) as SchoolModel)
