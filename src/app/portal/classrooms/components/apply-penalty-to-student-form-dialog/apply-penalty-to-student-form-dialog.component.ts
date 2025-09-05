@@ -42,6 +42,7 @@ const applyPenaltyToStudentErrorMessages: ErrorMessages = {
 export interface ApplyPenaltyToStudentSuccess {
   studentPeriodStateId: string
   newStudentProgressPoints: number
+  newLevelId: string
 }
 
 @Component({
@@ -142,8 +143,12 @@ export class ApplyPenaltyToStudentFormDialogComponent implements OnInit {
 
     this.studentPeriodStateService
       .applyPenaltytoStudentPeriodStateById(studentPeriodStateId, penaltyId)
-      .then(newStudentProgressPoints => {
-        this.onSuccess.emit({ newStudentProgressPoints, studentPeriodStateId })
+      .then(({ newProgressPoints, newLevelId }) => {
+        this.onSuccess.emit({
+          newStudentProgressPoints: newProgressPoints,
+          studentPeriodStateId,
+          newLevelId
+        })
         this.onCloseDialog()
       })
       .catch(err => {

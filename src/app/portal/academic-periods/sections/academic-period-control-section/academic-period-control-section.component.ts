@@ -96,12 +96,12 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
         loading: this.stopAcademicPeriodLoading()
       },
       accept: async () => {
-        const activeAcademicPeriod = this.activeAcademicPeriod()
+        const schoolId = this.school()?.id ?? null
 
-        if (!activeAcademicPeriod) return
+        if (schoolId === null) return
 
         this.stopAcademicPeriodLoading.set(true)
-        await this.onStopAcademicPeriod(activeAcademicPeriod.id)
+        await this.onStopAcademicPeriod(schoolId)
         this.stopAcademicPeriodLoading.set(false)
       }
     })
@@ -136,9 +136,9 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
       })
   }
 
-  private async onStopAcademicPeriod(academicPeriodId: string) {
+  private async onStopAcademicPeriod(schoolId: string) {
     try {
-      await this.academicPeriodService.endOfAcademicPeriod(academicPeriodId)
+      await this.academicPeriodService.endOfAcademicPeriod(schoolId)
       this.activeAcademicPeriod.set(null)
     } catch (err) {
       const error = err as Error

@@ -17,8 +17,9 @@ import {
   Square,
   Vote
 } from 'lucide-angular'
-import { MessageService } from 'primeng/api'
+import { ConfirmationService, MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
+import { ConfirmDialogModule } from 'primeng/confirmdialog'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
 import { TagModule } from 'primeng/tag'
@@ -44,6 +45,10 @@ import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfare
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
 import { TeamModel } from '~/teams/models/Team.model'
 import { TeamService } from '~/teams/services/team/team.service'
+
+const reviveStudentErrorMessages: ErrorMessages = {
+  ...commonErrorMessages
+}
 
 const abilityUsesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
@@ -79,9 +84,10 @@ const teamsLoadingErrorMessages: ErrorMessages = {
     LucideAngularModule,
     ModifyStudentHealthPointsFormDialogComponent,
     EliminateStudentByVotesFormDialogComponent,
+    ConfirmDialogModule,
     TagModule
   ],
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class ShadowWarfareExperiencePanelComponent
   implements OnInit, OnDestroy
@@ -102,8 +108,9 @@ export class ShadowWarfareExperiencePanelComponent
   private readonly characterService = inject(CharacterService)
   private readonly teamService = inject(TeamService)
 
-  private readonly classContext = inject(ClassroomAdminPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
+  private readonly confirmationService = inject(ConfirmationService)
 
   public isStudentsLoading = signal<boolean>(true)
   public students = signal<ShadowWarfareStudentPeriodState[]>([])
@@ -139,8 +146,10 @@ export class ShadowWarfareExperiencePanelComponent
     fullName: null
   })
 
+  public isRevivingStudentLoading = signal<boolean>(false)
+
   public experienceShiftRule = computed(
-    () => this.classContext.experienceSession()?.rules?.shift ?? null
+    () => this.classroomContext.experienceSession()?.rules?.shift ?? null
   )
 
   public readonly charactersMap = computed(
@@ -157,10 +166,10 @@ export class ShadowWarfareExperiencePanelComponent
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
 
   ngOnInit(): void {
-    const classroomId = this.classContext.classroom()?.id ?? null
+    const classroomId = this.classroomContext.classroom()?.id ?? null
     const academicPeriodId =
-      this.classContext.activeAcademicPeriod()?.id ?? null
-    const experienceSession = this.classContext.experienceSession()
+      this.classroomContext.activeAcademicPeriod()?.id ?? null
+    const experienceSession = this.classroomContext.experienceSession()
 
     if (
       classroomId === null ||
@@ -178,6 +187,60 @@ export class ShadowWarfareExperiencePanelComponent
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  public onOpenReviveStudent(studentPeriodStateId: string, event: Event) {
+    const student = this.students().find(
+      student => student.id === studentPeriodStateId
+    )
+
+    if (student === undefined) return
+
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `¿Estas seguro de revivir al estudiante "${student.firstName + ' ' + student.lastName}"?`,
+      header: 'Revivir estudiante',
+      rejectLabel: 'Cancelar',
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+        loading: this.isRevivingStudentLoading()
+      },
+      acceptButtonProps: {
+        label: 'Revivir',
+        severity: 'success',
+        loading: this.isRevivingStudentLoading()
+      },
+      accept: async () => {
+        this.isRevivingStudentLoading.set(true)
+
+        try {
+          await this.studentPeriodStateService.reviveStudentPeriodState(
+            studentPeriodStateId
+          )
+
+          this.students.update(students => {
+            const studentIndex = students.findIndex(
+              student => student.id === studentPeriodStateId
+            )
+
+            if (studentIndex === -1) return students
+
+            students[studentIndex].healthPoints =
+              this.classroomContext.classroom()?.experiences.SHADOW_WARFARE
+                .healthPointsBase ?? 0
+
+            return students
+          })
+        } catch (err) {
+          const error = err as ErrorResponse
+          this.onShowReviveStudentErrorMessage(error.code)
+        } finally {
+          this.isRevivingStudentLoading.set(false)
+        }
+      }
+    })
   }
 
   public onSuccessModifyStudentHealthPoints(
@@ -258,7 +321,7 @@ export class ShadowWarfareExperiencePanelComponent
 
   public onEndOfExperienceSession() {
     const experienceSessionId =
-      this.classContext.experienceSession()?.id ?? null
+      this.classroomContext.experienceSession()?.id ?? null
 
     if (experienceSessionId === null) return
 
@@ -268,7 +331,7 @@ export class ShadowWarfareExperiencePanelComponent
       .endOfExperienceSession(experienceSessionId)
       .then(() => {
         this.adminPanelOverviewLoading.emit(true)
-        this.classContext.experienceSession.set(null)
+        this.classroomContext.experienceSession.set(null)
       })
       .catch(err => {
         const error = err as ErrorResponse
@@ -352,6 +415,11 @@ export class ShadowWarfareExperiencePanelComponent
           this.onShowStudentsLoadingErrorMessage(error.code)
         }
       })
+  }
+
+  private onShowReviveStudentErrorMessage(code: string) {
+    const { summary, message } = reviveStudentErrorMessages[code]
+    this.toastService.add({ summary, detail: message })
   }
 
   private onShowStudentsLoadingErrorMessage(code: string) {

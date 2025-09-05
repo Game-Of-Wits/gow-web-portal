@@ -32,6 +32,7 @@ const modifyStudentProgressPointsErrorMessages: ErrorMessages = {
 export interface ModifyStudentProgressPointsSuccess {
   studentPeriodStateId: string
   newStudentProgressPoints: number
+  newLevelId: string
 }
 
 @Component({
@@ -108,10 +109,11 @@ export class ModifyStudentProgressPointsFormDialogComponent implements OnInit {
         modifier: formData.modifier,
         points: formData.points
       })
-      .then(newStudentProgressPoints => {
+      .then(({ newLevelId, newProgressPoints }) => {
         this.onSuccess.emit({
           studentPeriodStateId,
-          newStudentProgressPoints
+          newStudentProgressPoints: newProgressPoints,
+          newLevelId: newLevelId
         })
         this.onCloseDialog()
       })

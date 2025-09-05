@@ -99,14 +99,14 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
     )
       return
 
-    const data = this.modifyStudentHealthPointsForm.getRawValue()
+    const formData = this.modifyStudentHealthPointsForm.getRawValue()
 
     this.isLoading.set(true)
 
     this.studentPeriodStateService
       .modifyStudentHealthPoints(studentPeriodStateId, {
-        modifier: data.modifier,
-        points: data.points
+        modifier: formData.modifier,
+        points: formData.points
       })
       .then(newStudentHealthPoints => {
         this.onSuccess.emit({ studentPeriodStateId, newStudentHealthPoints })
