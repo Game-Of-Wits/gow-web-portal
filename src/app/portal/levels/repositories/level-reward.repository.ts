@@ -7,6 +7,7 @@ import {
   query,
   where
 } from '@angular/fire/firestore'
+import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
 import { LevelRewardDbModel } from '../models/LevelRewardDb.model'
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +20,10 @@ export class LevelRewardRepository {
   public async getAllByStudentPeriodStateIdAsync(
     studentPeriodStateId: string
   ): Promise<LevelRewardDbModel[]> {
-    const studentPeriodStateRef = this.getRefById(studentPeriodStateId)
+    const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
+      this.firestore,
+      studentPeriodStateId
+    )
 
     const levelRewardsQuery = query(
       this.getCollectionRef(),

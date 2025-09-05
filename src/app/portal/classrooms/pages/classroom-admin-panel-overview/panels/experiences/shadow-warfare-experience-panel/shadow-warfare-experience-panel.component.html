@@ -12,7 +12,14 @@
       </button>
     </div>
 
-    <button pButton severity="danger" class="rounded-xl" [loading]="isExperienceSessionEndingLoading()" (click)="onEndOfExperienceSession()">
+    <button
+      pButton
+      severity="danger"
+      class="rounded-xl"
+      [loading]="isExperienceSessionEndingLoading()"
+      (click)="onEndOfExperienceSession()"
+      [disabled]="isRevivingStudentLoading()"
+    >
       <i-lucide pButtonIcon [img]="stopIcon" class="fill-white" />
       <span pButtonLabel>Concluir experiencia</span>
     </button>
@@ -23,10 +30,10 @@
       <h2 class="text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
 
       <p-table
+        scrollHeight="400px"
         [value]="students()"
         [loading]="isStudentsLoading() || isCharactersLoading() || isTeamsLoading()"
         [scrollable]="true"
-        scrollHeight="400px"
         [style]="{ height: '500px' }"
       >
         <ng-template #header>
@@ -54,6 +61,7 @@
                   styleClass="aspect-square"
                   size="small"
                   title="Modificar puntos de vida"
+                  [disabled]="isRevivingStudentLoading()"
                   (click)="onOpenModifyStudentHealthPointsDialog(student.id)"
                 >
                   <i-lucide pButtonIcon [img]="modifyHealthPointsIcon" />
@@ -66,6 +74,7 @@
                   styleClass="aspect-square"
                   size="small"
                   title="Eliminar estudiante por votación"
+                  [disabled]="isRevivingStudentLoading()"
                   (click)="onOpenEliminateStudentByVotesDialog(student.id)"
                 >
                   <i-lucide pButtonIcon [img]="eliminateForVotesIcon" />
@@ -78,6 +87,8 @@
                   styleClass="aspect-square"
                   size="small"
                   title="Revivir estudiante"
+                  [disabled]="isRevivingStudentLoading()"
+                  (click)="onOpenReviveStudent(student.id, $event)"
                 >
                   <i-lucide pButtonIcon [img]="reviveIcon" />
                 </p-button>
@@ -132,5 +143,7 @@
   (close)="onCloseEliminateStudentByVotesDialog()"
   (success)="onSuccessEliminateStudentByVotes($event)"
 />
+
+<p-confirm-dialog [draggable]="false" [closable]="false" />
 
 <p-toast position="top-right" />

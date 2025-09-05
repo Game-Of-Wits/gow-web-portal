@@ -151,6 +151,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       if (studentIndex === -1) return students
 
       students[studentIndex].progressPoints = result.newStudentProgressPoints
+      students[studentIndex].levelId = result.newLevelId
 
       return students
     })
@@ -165,6 +166,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       if (studentIndex === -1) return students
 
       students[studentIndex].progressPoints = result.newStudentProgressPoints
+      students[studentIndex].levelId = result.newLevelId
 
       return students
     })

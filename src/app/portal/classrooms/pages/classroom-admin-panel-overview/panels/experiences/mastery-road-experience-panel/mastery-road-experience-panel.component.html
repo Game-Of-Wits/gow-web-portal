@@ -122,6 +122,7 @@
   [show]="showModifyStudentProgressPointsDialog()"
   [studentPeriodStateId]="modifyStudentProgressPointsSelected().studentPeriodStateId"
   [studentFullName]="modifyStudentProgressPointsSelected().fullName"
+  [currentStudentProgressPoints]="modifyStudentProgressPointsSelected().currentProgressPoints"
   (close)="onCloseModifyStudentProgressPointsDialog()"
   (success)="onSuccessModifyStudentProgressPoints($event)"
 />
