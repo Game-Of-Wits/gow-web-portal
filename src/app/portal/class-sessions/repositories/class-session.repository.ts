@@ -9,7 +9,6 @@ import {
   Query,
   query,
   serverTimestamp,
-  Timestamp,
   updateDoc,
   where,
   writeBatch
@@ -79,8 +78,13 @@ export class ClassSessionRepository {
   public async existsActiveClassSessionById(
     classSessionId: string
   ): Promise<boolean> {
-    const classSession = await this.getById(classSessionId)
-    return classSession?.endedAt === null
+    const classSessionRef = this.getRefById(classSessionId)
+
+    const classSessionSnapshot = await getDoc(classSessionRef)
+
+    const classSession = classSessionSnapshot.data() as ClassSessionDbModel
+
+    return classSession.endedAt === null
   }
 
   public async create(data: CreateClassSession): Promise<ClassSessionDbModel> {

@@ -106,15 +106,15 @@ export class ActiveClassSessionPanelComponent {
   }
 
   public async onEndingOfClassSession() {
-    const activeAcademicPeriod = this.classroomContext.activeAcademicPeriod()
+    const activeClassSession = this.classroomContext.classSession()
 
-    if (activeAcademicPeriod === null) return
+    if (activeClassSession === null) return
 
     this.isClassSessionEndingLoading.set(true)
 
     try {
       await this.classSessionService.endOfActiveClassSession(
-        activeAcademicPeriod.id
+        activeClassSession.id
       )
       this.isLoading.emit(true)
       this.classroomContext.classSession.set(null)

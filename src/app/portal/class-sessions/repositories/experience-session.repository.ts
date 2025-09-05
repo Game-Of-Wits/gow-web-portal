@@ -11,11 +11,13 @@ import {
   query,
   serverTimestamp,
   updateDoc,
-  where
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { from, map, Observable } from 'rxjs'
+import { ClassSessionDbModel } from '../models/ClassSessionDb.model'
 import { CreateExperienceSession } from '../models/CreateExperienceSession.model'
 import { CreateExperienceSessionDb } from '../models/CreateExperienceSessionDb.model'
 import { ExperienceSessionDbModel } from '../models/ExperienceSessionDb.model'
@@ -95,16 +97,30 @@ export class ExperienceSessionRepository {
       }
     }
 
-    const newExperienceSessionRef = await addDoc(
-      this.getCollectionRef(),
-      saveData
-    )
+    const batch = writeBatch(this.firestore)
+
+    const newExperienceSessionRef = this.generateRef()
+
+    batch.set(newExperienceSessionRef, saveData)
+
+    const classSessionSnapshot = await getDoc(classSessionRef)
+
+    const classSession = classSessionSnapshot.data() as ClassSessionDbModel
+
+    batch.update(classSessionRef, {
+      experienceSessions: [
+        ...classSession.experienceSessions,
+        newExperienceSessionRef
+      ]
+    })
+
+    await batch.commit()
 
     const newExperienceSessionSnapshot = await getDoc(newExperienceSessionRef)
 
     return {
-      id: newExperienceSessionSnapshot.id,
-      ...newExperienceSessionSnapshot.data()
+      ...newExperienceSessionSnapshot.data(),
+      id: newExperienceSessionSnapshot.id
     } as ExperienceSessionDbModel
   }
 
@@ -113,6 +129,14 @@ export class ExperienceSessionRepository {
     data: Partial<UpdateExperienceSessionDb>
   ) {
     return updateDoc(this.getRefById(experienceSessionId), data)
+  }
+
+  private generateRef() {
+    return doc(this.getCollectionRef())
+  }
+
+  public static generateRef(db: Firestore) {
+    return doc(ExperienceSessionRepository.getCollectionRef(db))
   }
 
   private getRefById(id: string) {
@@ -141,5 +165,9 @@ export class ExperienceSessionRepository {
 
   public static getRefById(db: Firestore, id: string) {
     return doc(db, `${ExperienceSessionRepository.collectionName}/${id}`)
+  }
+
+  public static getCollectionRef(db: Firestore) {
+    return collection(db, ExperienceSessionRepository.collectionName)
   }
 }
