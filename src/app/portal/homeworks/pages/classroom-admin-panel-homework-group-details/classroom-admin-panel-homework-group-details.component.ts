@@ -76,6 +76,14 @@ export class ClassroomAdminPanelHomeworkGroupDetailsPageComponent
     this.showDeliveryHomeworkGroup.set(false)
   }
 
+  public onSuccesssDeliveryHomeworkGroup(baseDateLimit: Date) {
+    this.showDeliveryHomeworkGroup.set(false)
+    this.homeworkGroup.update(homeworkGroup => {
+      if (homeworkGroup === null) return null
+      return { ...homeworkGroup, deliveredAt: new Date(), baseDateLimit }
+    })
+  }
+
   private loadHomeworkGroup() {
     const homeworkGroupId =
       this.activatedRoute.snapshot.paramMap.get('homeworkGroupId')

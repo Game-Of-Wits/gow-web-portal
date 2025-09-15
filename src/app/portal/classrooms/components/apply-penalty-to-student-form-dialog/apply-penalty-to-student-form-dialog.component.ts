@@ -129,20 +129,27 @@ export class ApplyPenaltyToStudentFormDialogComponent implements OnInit {
   }
 
   public onApplyPenaltyToStudent() {
+    const experienceSessionId =
+      this.classroomContext.experienceSession()?.id ?? null
     const studentPeriodStateId = this.studentPeriodStateId()
     const penaltyId = this.penaltyControl.getRawValue()
 
     if (
       this.penaltyControl.invalid ||
       studentPeriodStateId === null ||
-      penaltyId === null
+      penaltyId === null ||
+      experienceSessionId === null
     )
       return
 
     this.isApplingPenaltyLoading.set(true)
 
     this.studentPeriodStateService
-      .applyPenaltytoStudentPeriodStateById(studentPeriodStateId, penaltyId)
+      .applyPenaltytoStudentPeriodStateById(
+        studentPeriodStateId,
+        experienceSessionId,
+        penaltyId
+      )
       .then(({ newProgressPoints, newLevelId }) => {
         this.onSuccess.emit({
           newStudentProgressPoints: newProgressPoints,

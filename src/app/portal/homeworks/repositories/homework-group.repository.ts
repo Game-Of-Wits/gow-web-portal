@@ -156,13 +156,18 @@ export class HomeworkGroupRepository {
       ] as ShadowWarfareExperienceStateDb
 
       const updateData = {
-        pendingHomeworks: [
-          ...(studentExperience.pendingHomeworks ?? []),
-          {
-            homework,
-            dateLimit: baseDateLimit
+        experiences: {
+          SHADOW_WARFARE: {
+            ...studentExperience,
+            pendingHomeworks: [
+              ...(studentExperience.pendingHomeworks ?? []),
+              {
+                homework,
+                dateLimit: baseDateLimit
+              }
+            ]
           }
-        ]
+        }
       }
 
       batch.update(studentPeriodStateRef, updateData)

@@ -209,7 +209,7 @@ export class ClassroomAdminPanelStudentDetailsPageComponent implements OnInit {
   private async loadStudentPeriodStates(studentProfileId: string) {
     try {
       const studentPeriodStates =
-        await this.studentPeriodStateService.getAllStudentPeriodStatesByStudentId(
+        await this.studentPeriodStateService.getAllStudentPeriodStatesByStudentProfileId(
           studentProfileId
         )
 

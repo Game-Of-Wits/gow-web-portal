@@ -5,6 +5,7 @@ export interface EliminatedStudentDbModel {
   character: DocumentReference
   classroom: DocumentReference
   eliminatedAt: Timestamp
+  academicPeriod: DocumentReference
   motivation: any
   studentState: DocumentReference
   team: DocumentReference

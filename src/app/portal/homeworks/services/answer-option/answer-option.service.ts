@@ -20,8 +20,8 @@ export class AnswerOptionService {
 
       if (homework === null) throw new ErrorResponse('homework-not-exist')
 
-      if (homework.category !== HomeworkCategory.SINGLE_CHOISE)
-        throw new ErrorResponse('homework-is-not-single-choise')
+      if (homework.category !== HomeworkCategory.SINGLE_CHOICE)
+        throw new ErrorResponse('homework-is-not-single-choice')
 
       const answerOptions =
         await this.answerOptionRepository.getAllByHomeworkIdAsync(homeworkId)
