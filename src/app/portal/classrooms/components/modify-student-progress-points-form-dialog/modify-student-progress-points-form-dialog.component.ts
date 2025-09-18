@@ -16,6 +16,7 @@ import { DialogModule } from 'primeng/dialog'
 import { MessageModule } from 'primeng/message'
 import { TagModule } from 'primeng/tag'
 import { Toast } from 'primeng/toast'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { modifyStudentProgressPointsForm } from '~/classrooms/forms/modifyStudentProgressPointsForm'
 import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
 import { SelectFieldComponent } from '~/shared/components/ui/select-field/select-field.component'
@@ -61,6 +62,7 @@ export class ModifyStudentProgressPointsFormDialogComponent implements OnInit {
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
 
   private readonly toastService = inject(MessageService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   public showDialog = input.required<boolean>({ alias: 'show' })
   public studentPeriodStateId = input<string | null>(null, {
@@ -93,10 +95,13 @@ export class ModifyStudentProgressPointsFormDialogComponent implements OnInit {
 
   public onModifyStudentProgressPoints() {
     const studentPeriodStateId = this.studentPeriodStateId()
+    const experienceSessionId =
+      this.classroomContext.experienceSession()?.id ?? null
 
     if (
       this.modifyStudentProgressPointsForm.invalid ||
-      studentPeriodStateId === null
+      studentPeriodStateId === null ||
+      experienceSessionId === null
     )
       return
 
@@ -105,7 +110,7 @@ export class ModifyStudentProgressPointsFormDialogComponent implements OnInit {
     this.isLoading.set(true)
 
     this.studentPeriodStateService
-      .modifyStudentProgressPoints(studentPeriodStateId, {
+      .modifyStudentProgressPoints(studentPeriodStateId, experienceSessionId, {
         modifier: formData.modifier,
         points: formData.points
       })

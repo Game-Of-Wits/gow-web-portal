@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  reCaptchaKey: '6LejGK8rAAAAAI2OH_X-nti4H8QxCq4taWtjA2qh',
   firebase: {
     apiKey: 'AIzaSyCHug83aNuYtPtd52qDrdTAExqyCRCqk_A',
     authDomain: 'gameofwits-gow.firebaseapp.com',

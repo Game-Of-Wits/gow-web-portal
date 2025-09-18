@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { catchError, Observable, switchMap, throwError } from 'rxjs'
+import { ExperienceSessionRepository } from '~/class-sessions/repositories/experience-session.repository'
 import { PenaltyRepository } from '~/penalties/repositories/penalty.repository'
 import { PointsModifier } from '~/shared/models/PointsModifier'
 import { StudentPeriodStateMapper } from '~/students/mappers/student-period-state.mapper'
@@ -20,11 +21,14 @@ export class StudentPeriodStateService {
   private readonly studentRepository = inject(StudentRepository)
   private readonly studentPeriodStateMapper = inject(StudentPeriodStateMapper)
   private readonly penaltyRepository = inject(PenaltyRepository)
+  private readonly experienceSessionRepository = inject(
+    ExperienceSessionRepository
+  )
   private readonly eliminatedStudentRepository = inject(
     EliminatedStudentRepository
   )
 
-  public async getAllStudentPeriodStatesByStudentId(
+  public async getAllStudentPeriodStatesByStudentProfileId(
     studentProfileId: string
   ): Promise<StudentPeriodStatesModel[]> {
     try {
@@ -146,12 +150,15 @@ export class StudentPeriodStateService {
 
   public async modifyStudentProgressPoints(
     studentPeriodStateId: string,
+    experienceSessionId: string,
     data: { modifier: PointsModifier; points: number }
   ): Promise<{
     newProgressPoints: number
     newLevelId: string
   }> {
     try {
+      if (data.points <= 0) throw new ErrorResponse('points-must-be-positive')
+
       const studentPeriodState =
         await this.studentPeriodStateRepository.getByIdAsync(
           studentPeriodStateId
@@ -159,10 +166,18 @@ export class StudentPeriodStateService {
       if (studentPeriodState === null)
         throw new ErrorResponse('student-period-state-not-exist')
 
-      if (data.points <= 0) throw new ErrorResponse('points-must-be-positive')
+      const experienceSession =
+        await this.experienceSessionRepository.getById(experienceSessionId)
+
+      if (experienceSession === null)
+        throw new ErrorResponse('experience-session-not-exist')
+
+      if (experienceSession.endedAt !== null)
+        throw new ErrorResponse('experience-session-is-not-active')
 
       return await this.studentPeriodStateRepository.modifyStudentProgressPoints(
         studentPeriodState,
+        experienceSession.id,
         data
       )
     } catch (err) {
@@ -173,6 +188,7 @@ export class StudentPeriodStateService {
 
   public async applyPenaltytoStudentPeriodStateById(
     studentPeriodStateId: string,
+    experienceSessionId: string,
     penaltyId: string
   ): Promise<{
     newLevelId: string
@@ -189,8 +205,18 @@ export class StudentPeriodStateService {
       const penalty = await this.penaltyRepository.getByIdAsync(penaltyId)
       if (penalty === null) throw new ErrorResponse('penalty-not-exist')
 
+      const experienceSession =
+        await this.experienceSessionRepository.getById(experienceSessionId)
+
+      if (experienceSession === null)
+        throw new ErrorResponse('experience-session-not-exist')
+
+      if (experienceSession.endedAt !== null)
+        throw new ErrorResponse('experience-session-is-not-active')
+
       return await this.studentPeriodStateRepository.modifyStudentProgressPoints(
         studentPeriodState,
+        experienceSession.id,
         {
           modifier: PointsModifier.DECREASE,
           points: penalty.reducePoints

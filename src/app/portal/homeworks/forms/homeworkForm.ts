@@ -32,7 +32,7 @@ export const homeworkForm = (
     image: new FormControl(null, {
       validators: defaultValues ? [] : [Validators.required]
     }),
-    category: new FormControl(HomeworkCategory.SINGLE_CHOISE, {
+    category: new FormControl(HomeworkCategory.SINGLE_CHOICE, {
       nonNullable: true,
       validators: [Validators.required]
     }),

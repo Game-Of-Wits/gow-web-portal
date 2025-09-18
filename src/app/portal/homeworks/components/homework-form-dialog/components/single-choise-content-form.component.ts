@@ -34,7 +34,7 @@ const answerOptionsLoadingErrorMessages: ErrorMessages = {
     summary: 'Tarea no existente',
     message: 'La tarea ha sido encontrada'
   },
-  'homework-is-not-single-choise': {
+  'homework-is-not-single-choice': {
     summary: 'Conflicto con la tarea',
     message: 'La tarea debe ser de elección unica'
   },

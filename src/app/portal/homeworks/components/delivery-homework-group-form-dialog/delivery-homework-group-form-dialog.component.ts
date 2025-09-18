@@ -58,7 +58,7 @@ export class DeliveryHomeworkGroupFormDialog {
   public deliveringLoading = signal<boolean>(false)
 
   public onClose = output<void>({ alias: 'close' })
-  public onSubmit = output<void>({
+  public onSubmit = output<Date>({
     alias: 'submit'
   })
 
@@ -92,6 +92,7 @@ export class DeliveryHomeworkGroupFormDialog {
         homeworkGroupId: this.homeworkGroupId()
       })
       .then(() => {
+        this.onSubmit.emit(deliveryHomeworkGroupData.baseDateLimit)
         this.router.navigate([
           'p',
           's',

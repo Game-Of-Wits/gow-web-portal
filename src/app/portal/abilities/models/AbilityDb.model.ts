@@ -14,8 +14,8 @@ export interface AbilityDbModel {
   classroom: DocumentReference
   usage: {
     type: AbilityUsage
-    shift: AbilityClassShift
-    interval: AbilityUsageInterval
+    shift?: AbilityClassShift
+    interval?: AbilityUsageInterval
   }
   actions: AbilityActionModel[]
   experience: EducationalExperience

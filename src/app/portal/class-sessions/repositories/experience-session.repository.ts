@@ -14,8 +14,6 @@ import {
   where,
   writeBatch
 } from '@angular/fire/firestore'
-import { ErrorCode } from '@shared/types/ErrorCode'
-import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { from, map, Observable } from 'rxjs'
 import { ClassSessionDbModel } from '../models/ClassSessionDb.model'
 import { CreateExperienceSession } from '../models/CreateExperienceSession.model'
@@ -33,10 +31,10 @@ export class ExperienceSessionRepository {
 
   public async getById(
     experienceSessionId: string
-  ): Promise<ExperienceSessionDbModel> {
+  ): Promise<ExperienceSessionDbModel | null> {
     const snapshot = await getDoc(this.getRefById(experienceSessionId))
 
-    if (!snapshot.exists()) throw new ErrorResponse(ErrorCode.NotFound)
+    if (!snapshot.exists()) return null
 
     return {
       id: snapshot.id,
@@ -71,8 +69,13 @@ export class ExperienceSessionRepository {
     return !activeExperienceSessionSnapshot.empty
   }
 
-  public async existsActiveExperienceSessionById(experienceSessionId: string) {
+  public async existsActiveExperienceSessionById(
+    experienceSessionId: string
+  ): Promise<boolean> {
     const experienceSessionDb = await this.getById(experienceSessionId)
+
+    if (experienceSessionDb === null) return false
+
     return experienceSessionDb.endedAt === null
   }
 

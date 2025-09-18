@@ -19,11 +19,13 @@ import { chuckArray } from '@shared/utils/chuckArray'
 import { from, map, Observable, switchMap } from 'rxjs'
 import { AcademicPeriodRespository } from '~/academic-periods/repositories/academic-period.repository'
 import { CharacterRepository } from '~/characters/repositories/character.repository'
+import { ExperienceSessionRepository } from '~/class-sessions/repositories/experience-session.repository'
 import { ClassroomDbModel } from '~/classrooms/models/ClassroomDb.model'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { LevelDbModel } from '~/levels/models/LevelDb.model'
 import { LevelRepository } from '~/levels/repositories/level.repository'
 import { LevelRewardRepository } from '~/levels/repositories/level-reward.repository'
+import { ProgressPointsMovementsRepository } from '~/levels/repositories/progress-points-movements.repository'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { PointsModifier } from '~/shared/models/PointsModifier'
 import { EliminationMotivation } from '../models/EliminationMotivation.model'
@@ -228,6 +230,7 @@ export class StudentPeriodStateRepository {
 
       batch.set(eliminatedStudentRef, {
         studentState: studentPeriodStateRef,
+        academicPeriod: studentPeriodState.academicPeriod,
         classroom: studentPeriodState.classroom,
         character: studentCharacterRef,
         team: studentTeamRef,
@@ -280,6 +283,7 @@ export class StudentPeriodStateRepository {
 
     batch.set(eliminatedStudentRef, {
       studentState: studentPeriodStateRef,
+      academicPeriod: studentPeriodState.academicPeriod,
       classroom: studentPeriodState.classroom,
       character: studentCharacterRef,
       team: studentTeamRef,
@@ -295,6 +299,7 @@ export class StudentPeriodStateRepository {
 
   public async modifyStudentProgressPoints(
     studentPeriodState: StudentPeriodStatesDbModel,
+    experienceSessionId: string,
     data: {
       modifier: PointsModifier
       points: number
@@ -426,6 +431,24 @@ export class StudentPeriodStateRepository {
           lastMissingLevel.id
         )
     }
+
+    const experienceSessionRef = ExperienceSessionRepository.getRefById(
+      this.firestore,
+      experienceSessionId
+    )
+
+    const progressPointsMovementRef =
+      ProgressPointsMovementsRepository.generateRef(this.firestore)
+
+    batch.set(progressPointsMovementRef, {
+      studentState: studentPeriodStateRef,
+      experienceSession: experienceSessionRef,
+      pointsBefore: masteryRoadStudentExperience.progressPoints,
+      pointsAfter: newStudentProgressPoints,
+      pointsChanged: data.points,
+      createdAt: serverTimestamp(),
+      action: data.modifier
+    })
 
     const updatedLevelRewards = [
       ...masteryRoadStudentExperience.levelRewards,

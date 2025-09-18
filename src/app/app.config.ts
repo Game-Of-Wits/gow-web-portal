@@ -7,11 +7,6 @@ import {
   UserTrackingService
 } from '@angular/fire/analytics'
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app'
-import {
-  initializeAppCheck,
-  provideAppCheck,
-  ReCaptchaV3Provider
-} from '@angular/fire/app-check'
 import { getAuth, provideAuth } from '@angular/fire/auth'
 import { getDatabase, provideDatabase } from '@angular/fire/database'
 import { provideFirestore } from '@angular/fire/firestore'
@@ -22,16 +17,10 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter } from '@angular/router'
 import { initializeFirestore } from '@firebase/firestore'
 import { provideStore } from '@ngrx/store'
-import { setLogLevel } from 'firebase/app'
 import { providePrimeNG } from 'primeng/config'
 import { GoWTheme } from '~/shared/theme'
 import { environment } from '../environments/environment'
 import { routes } from './app.routes'
-
-if (!environment.production) {
-  ;(self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true
-  setLogLevel('debug')
-}
 
 const app = initializeApp({
   apiKey: environment.firebase.apiKey,
@@ -72,12 +61,6 @@ export const appConfig: ApplicationConfig = {
     provideDatabase(() => getDatabase()),
     provideFunctions(() => getFunctions(app, 'us-central1')),
     provideMessaging(() => getMessaging()),
-    provideStorage(() => getStorage()),
-    provideAppCheck(() =>
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(environment.reCaptchaKey),
-        isTokenAutoRefreshEnabled: true
-      })
-    )
+    provideStorage(() => getStorage())
   ]
 }
