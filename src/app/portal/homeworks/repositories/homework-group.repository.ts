@@ -151,12 +151,14 @@ export class HomeworkGroupRepository {
         this.firestore,
         student.id
       )
+
       const studentExperience = student.experiences[
         EducationalExperience.SHADOW_WARFARE
       ] as ShadowWarfareExperienceStateDb
 
       const updateData = {
         experiences: {
+          ...student.experiences,
           SHADOW_WARFARE: {
             ...studentExperience,
             pendingHomeworks: [
