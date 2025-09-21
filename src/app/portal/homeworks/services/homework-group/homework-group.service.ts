@@ -143,7 +143,7 @@ export class HomeworkGroupService {
         ] as ShadowWarfareExperienceStateDb
 
         if (
-          studentExperience.pendingHomeworks.length >
+          studentExperience.homeworks.length >
           classroom.experiences.SHADOW_WARFARE.limitAbilities
         )
           throw new ErrorResponse('limit-abilities-exceeded')

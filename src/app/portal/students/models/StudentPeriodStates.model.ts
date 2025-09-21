@@ -16,7 +16,7 @@ export interface ShadowWarfareExperienceState {
   healthPoints: number
   teamId: string
   characterId: string
-  pendingHomeworks: PendingHomework[]
+  homeworksIds: string[]
   abilityIds: string[]
 }
 
