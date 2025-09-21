@@ -16,7 +16,7 @@ export interface ShadowWarfareExperienceStateDb {
   healthPoints: number
   team: DocumentReference
   character: DocumentReference
-  pendingHomeworks: PendingHomeworkDb[]
+  homeworks: DocumentReference[]
   abilities: DocumentReference[]
 }
 

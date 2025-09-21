@@ -24,7 +24,9 @@ import { StudentPeriodStateRepository } from '~/students/repositories/student-pe
 import { CreateHomeworkGroup } from '../models/CreateHomeworkGroup.model'
 import { HomeworkDbModel } from '../models/HomeworkDb.model'
 import { HomeworkGroupDbModel } from '../models/HomeworkGroupDb.model'
+import { StudentHomeworkStatus } from '../models/StudentHomework.model'
 import { HomeworkRepository } from './homework.repository'
+import { StudentHomeworkRepository } from './student-homework.repository'
 
 @Injectable({ providedIn: 'root' })
 export class HomeworkGroupRepository {
@@ -120,7 +122,7 @@ export class HomeworkGroupRepository {
     )
 
     const assignments: {
-      student: StudentPeriodStatesDbModel
+      studentPeriodState: StudentPeriodStatesDbModel
       homework: DocumentReference
     }[] = []
 
@@ -134,7 +136,7 @@ export class HomeworkGroupRepository {
       const count = baseCount + (i < remainder ? 1 : 0)
       for (let j = 0; j < count; j++) {
         assignments.push({
-          student: shuffledStudents[index++],
+          studentPeriodState: shuffledStudents[index++],
           homework: HomeworkRepository.getRefById(this.firestore, homework.id)
         })
       }
@@ -146,33 +148,40 @@ export class HomeworkGroupRepository {
       deliveryHomeworkGroup.baseDateLimit
     )
 
-    assignments.forEach(({ student, homework }) => {
+    assignments.forEach(({ studentPeriodState, homework }) => {
       const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
         this.firestore,
-        student.id
+        studentPeriodState.id
       )
 
-      const studentExperience = student.experiences[
+      const studentExperience = studentPeriodState.experiences[
         EducationalExperience.SHADOW_WARFARE
       ] as ShadowWarfareExperienceStateDb
 
-      const updateData = {
+      const newStudentHomeworkRef = StudentHomeworkRepository.generateRef(
+        this.firestore
+      )
+
+      batch.set(newStudentHomeworkRef, {
+        studentState: studentPeriodStateRef,
+        homework: homework,
+        deadline: baseDateLimit,
+        answer: null,
+        status: StudentHomeworkStatus.PENDING
+      })
+
+      batch.update(studentPeriodStateRef, {
         experiences: {
-          ...student.experiences,
+          ...studentPeriodState.experiences,
           SHADOW_WARFARE: {
             ...studentExperience,
-            pendingHomeworks: [
-              ...(studentExperience.pendingHomeworks ?? []),
-              {
-                homework,
-                dateLimit: baseDateLimit
-              }
+            homeworks: [
+              ...(studentExperience.homeworks ?? []),
+              newStudentHomeworkRef
             ]
           }
         }
-      }
-
-      batch.update(studentPeriodStateRef, updateData)
+      })
     })
 
     batch.update(homeworkGroupRef, {

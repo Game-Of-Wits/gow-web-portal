@@ -5,14 +5,12 @@ import { MasteryRoadStudentPeriodState } from '../models/MasteryRoadStudentPerio
 import { ShadowWarfareStudentPeriodState } from '../models/ShadowWarfareStudentPeriodState'
 import {
   MasteryRoadExperienceState,
-  PendingHomework,
   ShadowWarfareExperienceState,
   StudentPeriodStateExperience,
   StudentPeriodStatesModel
 } from '../models/StudentPeriodStates.model'
 import {
   MasteryRoadExperienceStateDb,
-  PendingHomeworkDb,
   ShadowWarfareExperienceStateDb,
   StudentPeriodStateDbExperience,
   StudentPeriodStatesDbModel
@@ -140,15 +138,13 @@ export class StudentPeriodStateMapper {
       ] as ShadowWarfareExperienceStateDb
 
       const abilityIds = experience.abilities.map(ability => ability.id)
-      const pendingHomeworks = this.pendingHomeworkToListModel(
-        experience.pendingHomeworks
-      )
+      const homeworksIds = experience.homeworks.map(homework => homework.id)
 
       experienesMapped.set(EducationalExperience.SHADOW_WARFARE, {
         abilityIds,
+        homeworksIds,
         characterId: experience.character.id,
         healthPoints: experience.healthPoints,
-        pendingHomeworks,
         teamId: experience.team.id
       } as ShadowWarfareExperienceState)
     }
@@ -172,20 +168,5 @@ export class StudentPeriodStateMapper {
     }
 
     return experienesMapped
-  }
-
-  private pendingHomeworkToModel(
-    pendingHomework: PendingHomeworkDb
-  ): PendingHomework {
-    return {
-      dateLimit: pendingHomework.dateLimit.toDate(),
-      homeworkId: pendingHomework.homework.id
-    }
-  }
-
-  private pendingHomeworkToListModel(
-    pendingHomeworks: PendingHomeworkDb[]
-  ): PendingHomework[] {
-    return pendingHomeworks.map(this.pendingHomeworkToModel)
   }
 }
