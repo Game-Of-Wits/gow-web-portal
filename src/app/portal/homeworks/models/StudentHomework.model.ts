@@ -7,9 +7,11 @@ export enum StudentHomeworkStatus {
 
 export interface StudentHomeworkModel {
   id: string
-  studentStateId: String
-  homeworkId: String
+  studentStateId: string
+  homeworkId: string
   deadline: Date
-  answerId: String | null
+  deliveredAt: Date
+  rewardAbilityId: string
+  answerId: string | null
   status: StudentHomeworkStatus
 }

@@ -1,5 +1,13 @@
 import { Injectable, inject } from '@angular/core'
-import { collection, doc, Firestore } from '@angular/fire/firestore'
+import {
+  collection,
+  doc,
+  Firestore,
+  getDocs,
+  query,
+  where
+} from '@angular/fire/firestore'
+import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
 
 @Injectable({ providedIn: 'root' })
 export class StudentHomeworkRepository {
@@ -7,6 +15,24 @@ export class StudentHomeworkRepository {
 
   private static readonly collectionName = 'student_homeworks'
   private readonly collectionName = StudentHomeworkRepository.collectionName
+
+  public async countByStudentPeriodStateIdAsync(
+    studentPeriodStateId: string
+  ): Promise<number> {
+    const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
+      this.firestore,
+      studentPeriodStateId
+    )
+
+    const studentHomeworksQuery = query(
+      this.getCollectionRef(),
+      where('studentState', '==', studentPeriodStateRef)
+    )
+
+    const studentHomeworksSnapshot = await getDocs(studentHomeworksQuery)
+
+    return studentHomeworksSnapshot.size
+  }
 
   public generateRef() {
     return doc(this.getCollectionRef())

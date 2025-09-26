@@ -14,6 +14,7 @@ import {
   where,
   writeBatch
 } from '@angular/fire/firestore'
+import { CharacterRepository } from '~/characters/repositories/character.repository'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import {
@@ -31,6 +32,9 @@ import { StudentHomeworkRepository } from './student-homework.repository'
 @Injectable({ providedIn: 'root' })
 export class HomeworkGroupRepository {
   private readonly firestore = inject(Firestore)
+
+  private readonly studentHomeworkRepository = inject(StudentHomeworkRepository)
+  private readonly characterRepository = inject(CharacterRepository)
 
   private static readonly collectionName = 'homework_groups'
   private readonly collectionName = HomeworkGroupRepository.collectionName
@@ -148,7 +152,9 @@ export class HomeworkGroupRepository {
       deliveryHomeworkGroup.baseDateLimit
     )
 
-    assignments.forEach(({ studentPeriodState, homework }) => {
+    const deliveredAt = serverTimestamp()
+
+    for (const { studentPeriodState, homework } of assignments) {
       const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
         this.firestore,
         studentPeriodState.id
@@ -162,10 +168,23 @@ export class HomeworkGroupRepository {
         this.firestore
       )
 
+      const studentHomeworksCount =
+        await this.studentHomeworkRepository.countByStudentPeriodStateIdAsync(
+          studentPeriodStateRef.id
+        )
+
+      const character = await this.characterRepository.getByIdAsync(
+        studentExperience.character.id
+      )
+
+      const rewardAbility = character?.abilities[studentHomeworksCount] ?? null
+
       batch.set(newStudentHomeworkRef, {
         studentState: studentPeriodStateRef,
         homework: homework,
         deadline: baseDateLimit,
+        deliveredAt: deliveredAt,
+        rewardAbility: rewardAbility,
         answer: null,
         status: StudentHomeworkStatus.PENDING
       })
@@ -182,11 +201,11 @@ export class HomeworkGroupRepository {
           }
         }
       })
-    })
+    }
 
     batch.update(homeworkGroupRef, {
       baseDateLimit: baseDateLimit,
-      deliveredAt: serverTimestamp()
+      deliveredAt: deliveredAt
     })
 
     await batch.commit()
