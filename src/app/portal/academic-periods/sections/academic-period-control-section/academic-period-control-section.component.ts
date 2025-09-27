@@ -100,9 +100,7 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
 
         if (schoolId === null) return
 
-        this.stopAcademicPeriodLoading.set(true)
         await this.onStopAcademicPeriod(schoolId)
-        this.stopAcademicPeriodLoading.set(false)
       }
     })
   }
@@ -137,14 +135,20 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
   }
 
   private async onStopAcademicPeriod(schoolId: string) {
-    try {
-      await this.academicPeriodService.endOfAcademicPeriod(schoolId)
-      this.activeAcademicPeriod.set(null)
-    } catch (err) {
-      const error = err as Error
-      const { code: errorCode } = JSON.parse(error.message) as { code: string }
-      this.onShowErrorMessage(errorCode)
-    }
+    this.stopAcademicPeriodLoading.set(true)
+
+    this.academicPeriodService
+      .endOfAcademicPeriod(schoolId)
+      .then(() => {
+        this.activeAcademicPeriod.set(null)
+      })
+      .catch(err => {
+        const error = err as ErrorResponse
+        this.onShowErrorMessage(error.message)
+      })
+      .finally(() => {
+        this.stopAcademicPeriodLoading.set(false)
+      })
   }
 
   private onShowErrorMessage(code: string) {

@@ -411,7 +411,7 @@ export class StudentPeriodStateRepository {
       const missingLevels: LevelDbModel[] = []
 
       for (const level of prevLevels) {
-        if (level.requiredPoints < newStudentProgressPoints) break
+        if (level.requiredPoints < newStudentProgressPoints) continue
         missingLevels.push(level)
       }
 

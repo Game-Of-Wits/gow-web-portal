@@ -90,10 +90,11 @@ export class HomeworkService {
     try {
       const { image, ...createData } = data
 
-      const homeworkGroupExist =
-        await this.homeworkGroupRepository.existByIdAsync(data.groupId)
+      const homeworkGroup = await this.homeworkGroupRepository.getByIdAsync(
+        data.groupId
+      )
 
-      if (!homeworkGroupExist)
+      if (homeworkGroup === null)
         throw new ErrorResponse('homework-group-not-exist')
 
       const homeworkId = this.homeworkRepository.generateRef().id
@@ -108,10 +109,14 @@ export class HomeworkService {
           image
         )
 
-      const homework = await this.homeworkRepository.createById(homeworkId, {
-        ...createData,
-        image: homeworkProblemImagePath
-      })
+      const homework = await this.homeworkRepository.createById(
+        homeworkId,
+        homeworkGroup,
+        {
+          ...createData,
+          image: homeworkProblemImagePath
+        }
+      )
 
       return HomeworkMapper.toModel(homework)
     } catch (err) {

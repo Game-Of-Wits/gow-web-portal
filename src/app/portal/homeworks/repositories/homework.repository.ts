@@ -153,6 +153,7 @@ export class HomeworkRepository {
 
   public async createById(
     id: string,
+    homeworkGroup: HomeworkGroupDbModel,
     data: CreateHomeworkDb
   ): Promise<HomeworkDbModel> {
     const { content, groupId, ...homeworkData } = data
@@ -191,6 +192,10 @@ export class HomeworkRepository {
         options: answerOptionsRefs
       }
     } as HomeworkDbModel)
+
+    batch.update(homeworkGroupRef, {
+      homeworks: [...homeworkGroup.homeworks, newHomeworkRef]
+    })
 
     await batch.commit()
 
