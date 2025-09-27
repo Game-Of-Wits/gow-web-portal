@@ -11,8 +11,9 @@
         </p>
 
         <button
-          class="group cursor-pointer flex items-center gap-1.5"
+          class="group cursor-pointer flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-60"
           (click)="onShowStopAcademicPeriodConfimation($event)"
+          [disabled]="stopAcademicPeriodLoading()"
         >
           <div
             class="transition-colors bg-danger-400 group-hover:bg-danger-500 size-10 rounded-full flex items-center justify-center"
