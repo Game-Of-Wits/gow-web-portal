@@ -55,6 +55,7 @@ export interface HealthActionFormData {
   type: AbilityActionType.HEALTH
   modifier: AbilityModifier
   healthPoints: number
+  target: AbilityTarget
 }
 
 export interface ReviveActionFormData {

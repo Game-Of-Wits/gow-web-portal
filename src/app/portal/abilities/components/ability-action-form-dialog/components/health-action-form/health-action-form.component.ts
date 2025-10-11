@@ -1,8 +1,9 @@
 import { Component, Input, input } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
-import { abilityModifierOptions } from '~/abilities/data/options'
+import { abilityModifierOptions, abilityTargetOptions } from '~/abilities/data/options'
 import { AddHealthActionForm } from '~/abilities/models/AbilityForm.model'
 import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
+import { AbilityTarget } from '~/abilities/models/AbilityTarget.model'
 import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
 import { SelectFieldComponent } from '~/shared/components/ui/select-field/select-field.component'
 import { AbilityActionColorSchema } from '../../ability-action-form-dialog.component'
@@ -14,6 +15,7 @@ import { AbilityActionColorSchema } from '../../ability-action-form-dialog.compo
 })
 export class HealthActionFormComponent {
   public readonly abilityModifierOptions = abilityModifierOptions
+  public readonly abilityTargetOptions = abilityTargetOptions
 
   @Input() actionForm!: FormGroup<AddHealthActionForm>
 
@@ -35,5 +37,9 @@ export class HealthActionFormComponent {
 
   get modifierControl(): AbstractControl<AbilityModifier> | null {
     return this.actionForm.get('modifier')
+  }
+
+  get targetControl(): AbstractControl<AbilityTarget> | null {
+    return this.actionForm.get('target')
   }
 }

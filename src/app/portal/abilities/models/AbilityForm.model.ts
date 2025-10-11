@@ -71,6 +71,7 @@ export interface AddHealthActionForm {
   type: FormControl<AbilityActionType.HEALTH>
   modifier: FormControl<AbilityModifier>
   healthPoints: FormControl<number>
+  target: FormControl<AbilityTarget>
 }
 
 export interface AddReviveActionForm {
