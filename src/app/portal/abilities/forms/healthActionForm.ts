@@ -4,6 +4,7 @@ import { AddHealthActionForm } from '~/abilities/models/AbilityForm.model'
 import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
 import { FieldValidator } from '~/shared/validators/FieldValidator'
 import { HealthActionFormData } from '../models/AbilityFormData.model'
+import { AbilityTarget } from '../models/AbilityTarget.model'
 
 export const healthActionForm = (
   defaultValues?: HealthActionFormData
@@ -28,6 +29,10 @@ export const healthActionForm = (
         Validators.min(1),
         Validators.max(1000)
       ]
+    }),
+    target: new FormControl(defaultValues?.target ?? AbilityTarget.CLASSMATE, {
+      nonNullable: true,
+      validators: [Validators.required]
     })
   })
 }

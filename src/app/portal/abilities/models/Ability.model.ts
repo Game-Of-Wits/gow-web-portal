@@ -56,6 +56,7 @@ export interface HealthActionModel {
   type: AbilityActionType.HEALTH
   modifier: AbilityModifier
   healthPoints: number
+  target: AbilityTarget
 }
 
 export interface ReviveActionModel {
