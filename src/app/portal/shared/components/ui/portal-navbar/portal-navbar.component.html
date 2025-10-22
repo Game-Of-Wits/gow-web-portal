@@ -2,7 +2,7 @@
   class="h-[65px] bg-primary-600 sticky top-0 flex items-center justify-between pl-5 pr-7 z-50"
 >
   <div class="flex gap-5">
-    <button class="cursor-pointer" (click)="onToggleSidebar()">
+    <button class="cursor-pointer hidden sm:flex" (click)="onToggleSidebar()">
       <i-lucide
         [img]="sidebarStore.isClose() ? closePortalSidebar : openPortalSidebar"
         class="text-white hover:bg-transparent size-[32px]"

@@ -58,7 +58,7 @@ const startShadowWarfareExperienceErrorMessages = {
       </div>
     </ng-template>
 
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-[30px]">
       <div class="flex flex-col gap-1">
         <gow-select-field
           label="Horario"
@@ -80,7 +80,7 @@ const startShadowWarfareExperienceErrorMessages = {
       <p-button
         styleClass="w-full rounded-xl py-3"
         severity="danger"
-        label="Iniciar sesión"
+        label="Empezar experiencia"
         (click)="onStartShadowWarfareExperience()"
         [disabled]="experienceShiftControl.invalid"
         [loading]="isLoading()"

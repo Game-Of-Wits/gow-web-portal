@@ -404,32 +404,26 @@ export class StudentPeriodStateRepository {
           lastLevelAchieved.id
         )
     } else if (data.modifier === PointsModifier.DECREASE) {
-      const prevLevels = classroomLevels.filter(
-        level => level.requiredPoints <= currentLevel.requiredPoints
+      const eligibleLevels = classroomLevels.filter(
+        level => level.requiredPoints <= newStudentProgressPoints
       )
 
-      const missingLevels: LevelDbModel[] = []
-
-      for (const level of prevLevels) {
-        if (level.requiredPoints < newStudentProgressPoints) continue
-        missingLevels.push(level)
-      }
-
-      const lastMissingLevel = missingLevels.reduce(
-        (currentLevel, nextLevel) => {
-          if (!currentLevel) return nextLevel
-          return currentLevel.requiredPoints < nextLevel.requiredPoints
-            ? currentLevel
-            : nextLevel
+      const newLevel = eligibleLevels.reduce(
+        (highest, current) => {
+          if (!highest) return current
+          return current.requiredPoints > highest.requiredPoints
+            ? current
+            : highest
         },
         null as LevelDbModel | null
       )
 
-      if (lastMissingLevel !== null)
+      if (newLevel !== null) {
         newCurrentLevel = LevelRepository.getRefById(
           this.firestore,
-          lastMissingLevel.id
+          newLevel.id
         )
+      }
     }
 
     const experienceSessionRef = ExperienceSessionRepository.getRefById(
