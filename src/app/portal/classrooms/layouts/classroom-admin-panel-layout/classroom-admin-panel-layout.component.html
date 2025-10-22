@@ -1,5 +1,5 @@
 <section class="flex justify-between items-end w-full">
-  <div class="flex flex-col px-[26px] pt-[14px] pb-[6px]">
+  <div class="flex flex-col px-[15px] sm:px-[26px] pt-[14px] pb-[6px]">
     <span class="text-lg text-gray-400">Aulas</span>
 
     <div class="flex items-center gap-3">
@@ -16,10 +16,6 @@
           <p-skeleton width="22rem" height="2.2rem" borderRadius="12px" />
         }
       </div>
-
-      <button class="cursor-pointer p-1.5 rounded-full hover:bg-gray-100 transition-colors">
-        <i-lucide [img]="optionsIcon" class="size-6 text-gray-600" />
-      </button>
     </div>
   </div>
 </section>
@@ -28,7 +24,7 @@
   @if (classroomContext.classroom(); as classroom) {
     <p-tabs
       [value]="activeTab()"
-      class="bg-background-white"
+      class="bg-background-white hidden sm:block"
     >
       <p-tablist>
         @for (tab of navigationTabs; track tab.route) {
@@ -47,7 +43,7 @@
     <router-outlet></router-outlet>
   }
 } @else {
-  <div class="flex items-center gap-[16px] py-2.5 pl-4.5 border-b border-gray-400">
+  <div class="hidden items-center gap-[16px] py-2.5 pl-4.5 border-b border-gray-400 sm:flex">
     <p-skeleton height="1rem" width="4.5rem" />
     <p-skeleton height="1rem" width="7.25rem" />
     <p-skeleton height="1rem" width="11.94rem" />

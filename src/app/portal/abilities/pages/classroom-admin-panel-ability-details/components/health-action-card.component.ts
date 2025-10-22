@@ -1,8 +1,8 @@
 import { Component, computed, input } from '@angular/core'
-import { HeartMinus, HeartPlus, LucideAngularModule } from 'lucide-angular'
+import { HeartMinus, HeartPlus, LucideAngularModule, Target } from 'lucide-angular'
 import { CardModule } from 'primeng/card'
 import { TagModule } from 'primeng/tag'
-import { abilityActionTypeFormats } from '~/abilities/data/formats'
+import { abilityActionTypeFormats, abilityTargetFormats } from '~/abilities/data/formats'
 import { HealthActionModel } from '~/abilities/models/Ability.model'
 import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
 
@@ -22,6 +22,14 @@ import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
             <p-tag [severity]="isIncrementing() ? 'success' : 'danger'" [value]="healthPointsText()" />
           </div>
         </li>
+
+        <li class="flex items-center gap-2">
+          <i-lucide [img]="targetIcon" class="size-11" />
+          <div>
+            <span class="font-bold block">Objetivo</span>
+            <p>{{ abilityTargetFormats[action().target] }}</p>
+          </div>
+        </li>
       </ul>
     </p-card>
   `,
@@ -30,8 +38,10 @@ import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
 export class HealthActionCardComponent {
   public readonly decrementHealtlIcon = HeartMinus
   public readonly incrementHealtlIcon = HeartPlus
+  public readonly targetIcon = Target
 
   public readonly abilityActionTypeFormats = abilityActionTypeFormats
+  public readonly abilityTargetFormats = abilityTargetFormats
 
   public action = input.required<HealthActionModel>({
     alias: 'action'
