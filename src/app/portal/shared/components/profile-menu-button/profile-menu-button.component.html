@@ -25,8 +25,8 @@
       @if (authStore.authUser()?.photoUrl !== null) {
         <img [ngSrc]="authStore.authUser()!.photoUrl!" class="size-[20px] rounded-full" [alt]="authStore.authUser()?.firstName" />
       } @else {
-        <div class="bg-white rounded-full size-[80px] flex justify-center items-center border-2 border-primary-500 aspect-square">
-          <i-lucide [img]="defaultAvatar" class="size-[45px] text-primary"></i-lucide>
+        <div class="bg-white rounded-full size-[50px] md:size-[80px] flex justify-center items-center border-2 border-primary-500 aspect-square">
+          <i-lucide [img]="defaultAvatar" class="size-[25px] md:size-[45px] text-primary"></i-lucide>
         </div>
       }
 
