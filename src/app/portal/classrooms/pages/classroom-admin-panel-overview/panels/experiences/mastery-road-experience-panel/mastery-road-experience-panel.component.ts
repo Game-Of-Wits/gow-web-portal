@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common'
 import {
   Component,
   computed,
@@ -72,6 +73,7 @@ interface StudentPointsEdit {
     TableModule,
     ProgressSpinnerModule,
     ButtonModule,
+    NgOptimizedImage,
     Toast,
     ApplyPenaltyToStudentFormDialogComponent,
     LucideAngularModule

@@ -1,4 +1,4 @@
-<section class="sm:px-[26px] py-4.5">
+<section class="w-screen md:w-full md:px-[26px] py-4.5 overflow-hidden">
   <div class="flex w-full justify-between items-center mb-3.5 px-[15px] sm:px-0">
     <div class="flex items-center gap-3">
       <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestria</h1>
@@ -11,136 +11,145 @@
       [loading]="isExperienceSessionEndingLoading()"
       (click)="onEndOfExperienceSession()"
     >
-      <i-lucide pButtonIcon [img]="stopIcon" class="fill-white" />
+      <i-lucide pButtonIcon [img]="stopIcon" class="fill-white size-5 md:size-6" />
       <span pButtonLabel class="hidden sm:inline-flex">Concluir experiencia</span>
     </button>
   </div>
 
-  <div class="flex items-start gap-3 h-fit px-[15px] sm:px-0">
-    <div class="sm:flex-1 w-full">
+  <div class="md:flex md:items-start md:gap-3 md:px-0">
+    <div class="md:flex-1 md:w-full">
       <h2 class="hidden sm:block text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
 
-      <p-table
-        [value]="students()"
-        [loading]="isStudentsLoading()"
-        [scrollable]="true"
-      >
-        <ng-template #header>
-          <tr>
-            <th>Nombre completo</th>
-            <th>Nivel</th>
-            <th>Puntaje</th>
-            <th>Acciones</th>
-          </tr>
-        </ng-template>
+      <div class="overflow-x-auto md:overflow-visible w-full px-[15px] md:px-0">
+        <p-table
+          [value]="students()"
+          [loading]="isStudentsLoading()"
+          [scrollable]="true"
+          scrollHeight="700px"
+          [tableStyle]="{ 'min-width': '35rem' }"
+        >
+          <ng-template #header>
+            <tr class="text-sm sm:text-base">
+              <th pFrozenColumn>Nombre completo</th>
+              <th>Nivel</th>
+              <th>Puntaje</th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
 
-        <ng-template #body let-student>
-          <tr>
-            <td class="text-normal">{{ student.firstName }} {{ student.lastName }}</td>
-            <td class="text-normal">{{ getLevelName(student.levelId) }}</td>
-            <td>
-              <div class="flex items-center gap-1 sm:gap-5 flex-col sm:flex-row sm:w-[160px]">
-                <div class="flex items-center gap-1">
-                  <p-button
-                    rounded
-                    outlined
-                    severity="secondary"
-                    styleClass="aspect-square size-[32px]"
-                    size="small"
-                    title="Disminuir puntaje"
-                    (click)="onDecrementPoints(student)"
-                    [disabled]="isSavingPoints() || getDisplayPoints(student) <= 0"
-                  >
-                    <i-lucide pButtonIcon [img]="minusIcon" class="size-6" />
-                  </p-button>
-
-                  @if (getEditingStudent(student.id); as editingStudent) {
-                    <span class="font-bold text-lg min-w-[40px] text-center {{ editingStudent.originalPoints === editingStudent.currentPoints ? 'text-black' : editingStudent.originalPoints > editingStudent.currentPoints ? 'text-danger-500' : 'text-success-500' }}">
-                      {{ editingStudent.currentPoints }}
-                    </span>
-                  } @else {
-                    <span class="text-lg min-w-[40px] text-center">
-                      {{ student.progressPoints }}
-                    </span>
-                  }
-
-                  <p-button
-                    rounded
-                    outlined
-                    severity="secondary"
-                    styleClass="aspect-square size-[32px]"
-                    size="small"
-                    title="Incrementar puntaje"
-                    (click)="onIncrementPoints(student)"
-                    [disabled]="isSavingPoints()"
-                  >
-                    <i-lucide pButtonIcon [img]="plusIcon" class="size-6" />
-                  </p-button>
-                </div>
-
-                @if (getEditingStudent(student.id); as editingStudent) {
-                  <div class="flex items-center gap-2">
+          <ng-template #body let-student>
+            <tr>
+              <td
+                pFrozenColumn
+                class="text-sm sm:text-base min-w-[120px]"
+              >
+                {{ student.firstName }} {{ student.lastName }}
+              </td>
+              <td class="text-sm sm:text-base min-w-[80px]">{{ getLevelName(student.levelId) }}</td>
+              <td>
+                <div class="flex items-center gap-4 sm:gap-5 flex-row w-[200px]">
+                  <div class="flex items-center gap-0.5">
                     <p-button
                       rounded
                       outlined
-                      severity="danger"
-                      styleClass="aspect-square"
+                      severity="secondary"
+                      styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
-                      title="Cancelar"
-                      (click)="onCancelEditingPoints(student.id)"
+                      title="Disminuir puntaje"
+                      (click)="onDecrementPoints(student)"
+                      [disabled]="isSavingPoints() || getDisplayPoints(student) <= 0"
+                    >
+                      <i-lucide pButtonIcon [img]="minusIcon" class="size-5 sm:size-6" />
+                    </p-button>
+
+                    @if (getEditingStudent(student.id); as editingStudent) {
+                      <span class="font-bold text-sm md:text-base min-w-[40px] text-center {{ editingStudent.originalPoints === editingStudent.currentPoints ? 'text-black' : editingStudent.originalPoints > editingStudent.currentPoints ? 'text-danger-500' : 'text-success-500' }}">
+                        {{ editingStudent.currentPoints }}
+                      </span>
+                    } @else {
+                      <span class="text-sm sm:text-base min-w-[38px] text-center">
+                        {{ student.progressPoints }}
+                      </span>
+                    }
+
+                    <p-button
+                      rounded
+                      outlined
+                      severity="secondary"
+                      styleClass="aspect-square size-[30px] sm:size-[32px]"
+                      size="small"
+                      title="Incrementar puntaje"
+                      (click)="onIncrementPoints(student)"
                       [disabled]="isSavingPoints()"
                     >
-                      <i-lucide pButtonIcon [img]="cancelIcon" class="size-5" />
+                      <i-lucide pButtonIcon [img]="plusIcon" class="size-5 sm:size-6" />
                     </p-button>
-
-                    <p-button
-                      rounded
-                      outlined
-                      severity="success"
-                      styleClass="aspect-square"
-                      size="small"
-                      title="Aplicar cambios"
-                      (click)="onApplyPointsChange(student.id)"
-                      [disabled]="isSavingPoints() || editingStudent.currentPoints === editingStudent.originalPoints"
-                    >
-                      <i-lucide pButtonIcon [img]="applyIcon" class="size-5" />
-                    </p-button>
-
-                    @if (isSavingPoints()) {
-                      <p-progress-spinner
-                        ariaLabel="loading"
-                        strokeWidth="4"
-                        [style]="{
-                          width: '24px',
-                          height: '24px'
-                        }"
-                      ></p-progress-spinner>
-                    }
                   </div>
-                }
-              </div>
-            </td>
-            <td>
-              <div class="flex items-center gap-2">
-                <p-button
-                  rounded
-                  outlined
-                  severity="danger"
-                  styleClass="aspect-square"
-                  size="small"
-                  title="Aplicar penalización"
-                  (click)="onOpenApplyStudentPenaltyDialog(student.id)"
-                >
-                  <i-lucide pButtonIcon [img]="applyPenaltyIcon" class="size-5 sm:size-auto" />
-                </p-button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+
+                  @if (getEditingStudent(student.id); as editingStudent) {
+                    <div class="flex items-center gap-2">
+                      <p-button
+                        rounded
+                        outlined
+                        severity="danger"
+                        styleClass="aspect-square size-[30px] sm:size-[32px]"
+                        size="small"
+                        title="Cancelar"
+                        (click)="onCancelEditingPoints(student.id)"
+                        [disabled]="isSavingPoints()"
+                      >
+                        <i-lucide pButtonIcon [img]="cancelIcon" class="size-5" />
+                      </p-button>
+
+                      <p-button
+                        rounded
+                        outlined
+                        severity="success"
+                        styleClass="aspect-square size-[30px] sm:size-[32px]"
+                        size="small"
+                        title="Aplicar cambios"
+                        (click)="onApplyPointsChange(student.id)"
+                        [disabled]="isSavingPoints() || editingStudent.currentPoints === editingStudent.originalPoints"
+                      >
+                        <i-lucide pButtonIcon [img]="applyIcon" class="size-5" />
+                      </p-button>
+
+                      @if (isSavingPoints()) {
+                        <p-progress-spinner
+                          ariaLabel="loading"
+                          strokeWidth="4"
+                          [style]="{
+                            width: '24px',
+                            height: '24px'
+                          }"
+                        ></p-progress-spinner>
+                      }
+                    </div>
+                  }
+                </div>
+              </td>
+              <td class="min-w-[50px]">
+                <div class="flex items-center gap-2">
+                  <p-button
+                    rounded
+                    outlined
+                    severity="danger"
+                    styleClass="aspect-square"
+                    size="small"
+                    title="Aplicar penalización"
+                    (click)="onOpenApplyStudentPenaltyDialog(student.id)"
+                  >
+                    <i-lucide pButtonIcon [img]="applyPenaltyIcon" class="size-5 ms:size-auto" />
+                  </p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </div>
 
-    <div class="hidden sm:flex">
+    <div class="hidden md:flex">
       <h2 class="text-lg text-gray-700 font-bold mb-2">Habilidades usadas</h2>
 
       <div class="flex flex-col gap-3 w-[400px]">
