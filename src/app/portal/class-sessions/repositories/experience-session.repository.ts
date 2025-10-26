@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import {
-  addDoc,
   collection,
+  DocumentReference,
   doc,
   Firestore,
   getDoc,
@@ -166,7 +166,7 @@ export class ExperienceSessionRepository {
     ) as Query<ExperienceSessionDbModel>
   }
 
-  public static getRefById(db: Firestore, id: string) {
+  public static getRefById(db: Firestore, id: string): DocumentReference {
     return doc(db, `${ExperienceSessionRepository.collectionName}/${id}`)
   }
 

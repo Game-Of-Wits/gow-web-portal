@@ -5,10 +5,6 @@ export interface StudentAbilityModel {
   usageStatus: AbilityUsageStatus
   studentStateId: string
   abilityId: string
-  uses: AbilityUsedReference[]
-}
-
-export interface AbilityUsedReference {
-  usagedId: string
-  experienceSessionId: string
+  isDeleted: boolean
+  usesIds: string[]
 }

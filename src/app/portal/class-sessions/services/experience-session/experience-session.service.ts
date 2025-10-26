@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import {
   FirestoreError,
-  serverTimestamp,
-  Timestamp
+  serverTimestamp
 } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'

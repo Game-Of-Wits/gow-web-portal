@@ -1,16 +1,16 @@
 import { DatePipe } from '@angular/common'
 import { Component, input } from '@angular/core'
 import { LucideAngularModule, Sparkle, User } from 'lucide-angular'
-import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
+import { StudentAbilityUsageModel } from '~/abilities/models/StudentAbilityUsage.model'
 
 export type AbilityUseCardColorScheme = 'primary' | 'info' | 'danger'
 
 @Component({
-  selector: 'gow-ability-use-card',
-  templateUrl: './ability-use-card.component.html',
+  selector: 'gow-student-ability-usage-card',
+  templateUrl: './student-ability-usage-card.component.html',
   imports: [DatePipe, LucideAngularModule]
 })
-export class AbilityUseCardComponent {
+export class StudentAbilityUsageCardComponent {
   public readonly abilityIcon = Sparkle
   public readonly defaultAvatar = User
 
@@ -35,7 +35,7 @@ export class AbilityUseCardComponent {
   public colorScheme = input<AbilityUseCardColorScheme>('primary', {
     alias: 'colorScheme'
   })
-  public abilityUse = input.required<AbilityUseModel>({
-    alias: 'abilityUse'
+  public studentAbilityUsage = input.required<StudentAbilityUsageModel>({
+    alias: 'studentAbilityUsage'
   })
 }

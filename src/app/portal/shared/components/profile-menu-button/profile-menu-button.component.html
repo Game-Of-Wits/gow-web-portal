@@ -1,17 +1,19 @@
-@if (authStore.authUser()?.photoUrl !== null) {
-  <button
-    class="rounded-full cursor-pointer overflow-hidden"
-    (click)="menu.toggle($event)"
-  >
-    <img [ngSrc]="authStore.authUser()!.photoUrl!" class="size-[20px] rounded-full" [alt]="authStore.authUser()?.firstName" />
-  </button>
-} @else {
-  <button
-    class="flex items-center justify-center size-10 bg-white rounded-full cursor-pointer"
-    (click)="menu.toggle($event)"
-  >
-    <i-lucide [img]="defaultAvatar" class="size-[20px] text-primary"></i-lucide>
-  </button>
+@if (authStore.authUser(); as authUser) {
+  @if (authUser.photoUrl !== null) {
+    <button
+      class="rounded-full cursor-pointer overflow-hidden"
+      (click)="menu.toggle($event)"
+    >
+      <img [ngSrc]="authUser.photoUrl!" class="size-[20px] rounded-full" [alt]="authUser.firstName + ' ' + authUser.lastName" />
+    </button>
+  } @else {
+    <button
+      class="flex items-center justify-center size-10 bg-white rounded-full cursor-pointer"
+      (click)="menu.toggle($event)"
+    >
+      <i-lucide [img]="defaultAvatar" class="size-[20px] text-primary"></i-lucide>
+    </button>
+  }
 }
 
 <p-menu
@@ -21,22 +23,24 @@
   styleClass="max-w-[350px] w-full mt-2"
 >
   <ng-template #start>
-    <div class="inline-flex items-center gap-3 p-4">
-      @if (authStore.authUser()?.photoUrl !== null) {
-        <img [ngSrc]="authStore.authUser()!.photoUrl!" class="size-[20px] rounded-full" [alt]="authStore.authUser()?.firstName" />
-      } @else {
-        <div class="bg-white rounded-full size-[50px] md:size-[80px] flex justify-center items-center border-2 border-primary-500 aspect-square">
-          <i-lucide [img]="defaultAvatar" class="size-[25px] md:size-[45px] text-primary"></i-lucide>
-        </div>
-      }
+    @if (authStore.authUser(); as authUser) {
+      <div class="inline-flex items-center gap-3 p-4">
+        @if (authUser.photoUrl !== null) {
+          <img [ngSrc]="authUser.photoUrl!" class="size-[20px] rounded-full" [alt]="authUser.firstName" />
+        } @else {
+          <div class="bg-white rounded-full size-[50px] md:size-[55px] flex justify-center items-center border-2 border-primary-500 aspect-square">
+            <i-lucide [img]="defaultAvatar" class="size-[25px] md:size-[35px] text-primary"></i-lucide>
+          </div>
+        }
 
-      <div class="flex flex-col">
-        <p class="text-lg font-bold leading-tight">
-          {{ authStore.authUser()?.firstName + ' ' + authStore.authUser()?.lastName }}
-        </p>
-        <span class="text-base text-gray-400">Profesor</span>
+        <div class="flex flex-col">
+          <p class="text-xl font-bold leading-tight">
+            {{ authUser.firstName + ' ' + authUser.lastName }}
+          </p>
+          <span class="text-base text-gray-400">Profesor</span>
+        </div>
       </div>
-    </div>
+    }
   </ng-template>
 
   <ng-template #item let-item>

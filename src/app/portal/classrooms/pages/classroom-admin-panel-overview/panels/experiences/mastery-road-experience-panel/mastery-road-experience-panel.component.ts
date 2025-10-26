@@ -25,10 +25,10 @@ import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
 import { Toast } from 'primeng/toast'
-import { Subject, takeUntil } from 'rxjs'
-import { AbilityUseCardComponent } from '~/abilities/components/ability-use-card/ability-use-card.component'
-import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
-import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.service'
+import { Subject, takeUntil, tap } from 'rxjs'
+import { StudentAbilityUsageCardComponent } from '~/abilities/components/student-ability-usage-card/student-ability-usage-card.component'
+import { StudentAbilityUsageModel } from '~/abilities/models/StudentAbilityUsage.model'
+import { StudentAbilityUsageService } from '~/abilities/services/student-ability-usage/student-ability-usage.service'
 import { ExperienceSessionService } from '~/class-sessions/services/experience-session/experience-session.service'
 import {
   ApplyPenaltyToStudentFormDialogComponent,
@@ -43,7 +43,7 @@ import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
 
-const abilityUsesErrorMessages: ErrorMessages = {
+const studentAbilityUsagesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
 }
 
@@ -69,7 +69,7 @@ interface StudentPointsEdit {
   selector: 'gow-mastery-road-experience-panel',
   templateUrl: './mastery-road-experience-panel.component.html',
   imports: [
-    AbilityUseCardComponent,
+    StudentAbilityUsageCardComponent,
     TableModule,
     ProgressSpinnerModule,
     ButtonModule,
@@ -94,7 +94,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
-  private readonly abilityUseService = inject(AbilityUseService)
+  private readonly studentAbilityUsageService = inject(StudentAbilityUsageService)
   private readonly levelService = inject(LevelService)
 
   private readonly context = inject(ClassroomAdminPanelContextService)
@@ -105,8 +105,8 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public isStudentsLoading = signal<boolean>(true)
   public students = signal<MasteryRoadStudentPeriodState[]>([])
 
-  public isAbilityUsesLoading = signal<boolean>(true)
-  public abilityUses = signal<AbilityUseModel[]>([])
+  public isStudentAbilitiesUsagesLoading = signal<boolean>(true)
+  public studentAbilityUsages = signal<StudentAbilityUsageModel[]>([])
 
   public levels = signal<LevelModel[]>([])
   public isLevelsLoading = signal<boolean>(true)
@@ -136,7 +136,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadLevels()
     this.loadStudents()
-    this.loadAbilityUses()
+    this.loadStudentAbilityUsages()
   }
 
   ngOnDestroy(): void {
@@ -332,27 +332,30 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       })
   }
 
-  private loadAbilityUses() {
+  private loadStudentAbilityUsages() {
     const experienceSession = this.context.experienceSession()
 
     if (experienceSession === null) return
 
-    this.isAbilityUsesLoading.set(true)
-
-    this.abilityUseService
-      .getAllAbilityUsesByExperienceAndExperienceSessionId({
-        experience: experienceSession.experience,
-        experienceSessionId: experienceSession.id
-      })
-      .pipe(takeUntil(this.destroy$))
+    this.studentAbilityUsageService
+      .watchByExperienceSession(experienceSession.id)
+      .pipe(
+        takeUntil(this.destroy$),
+        tap(() => {
+          if (this.isStudentAbilitiesUsagesLoading()) {
+            this.isStudentAbilitiesUsagesLoading.set(false);
+          }
+        })
+      )
       .subscribe({
-        next: abilityUses => {
-          this.abilityUses.set(abilityUses)
-          this.isAbilityUsesLoading.set(false)
+        next: studentAbilityUsages => {
+          this.studentAbilityUsages.set(studentAbilityUsages)
+          this.isStudentAbilitiesUsagesLoading.set(false)
         },
         error: err => {
+          this.isStudentAbilitiesUsagesLoading.set(false)
           const error = err as ErrorResponse
-          this.onShowAbilityUsesLoadingErrorMessage(error.code)
+          this.onStudentAbilityUsagesErrorMessage(error.code)
         }
       })
   }
@@ -413,8 +416,8 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
     this.showErrorMessage(summary, message)
   }
 
-  private onShowAbilityUsesLoadingErrorMessage(code: string) {
-    const { summary, message } = abilityUsesErrorMessages[code]
+  private onStudentAbilityUsagesErrorMessage(code: string) {
+    const { summary, message } = studentAbilityUsagesErrorMessages[code]
     this.showErrorMessage(summary, message)
   }
 

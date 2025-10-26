@@ -75,6 +75,7 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
 
   public onSuccessStartAcademicPeriod(newAcademicPeriod: AcademicPeriodModel) {
     this.activeAcademicPeriod.set(newAcademicPeriod)
+    this.context.activeAcademicPeriod.set(newAcademicPeriod)
   }
 
   public onShowStopAcademicPeriodConfimation(event: Event) {
@@ -141,6 +142,7 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
       .endOfAcademicPeriod(schoolId)
       .then(() => {
         this.activeAcademicPeriod.set(null)
+        this.context.activeAcademicPeriod.set(null)
       })
       .catch(err => {
         const error = err as ErrorResponse

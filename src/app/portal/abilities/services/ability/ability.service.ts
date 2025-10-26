@@ -13,7 +13,6 @@ import { EducationalExperience } from '~/shared/models/EducationalExperience'
 @Injectable({ providedIn: 'root' })
 export class AbilityService {
   private readonly classroomService = inject(ClassroomsService)
-
   private readonly abilityRepository = inject(AbilityRepository)
 
   public async getAbilityByIdAsync(abilityId: string): Promise<AbilityModel> {
