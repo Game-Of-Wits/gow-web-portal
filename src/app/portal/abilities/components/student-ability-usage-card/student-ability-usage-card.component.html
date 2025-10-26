@@ -1,14 +1,14 @@
 <article
-  class="flex flex-col gap-2.5 shadow-md rounded-xl bg-white px-[20px] py-[16px] w-[400px]"
+  class="flex flex-col gap-2.5 shadow-md rounded-xl bg-white px-[20px] py-[16px] max-w-[400px] w-full"
 >
   <span class="text-sm text-gray-500">{{
-    abilityUse().createdAt | date: "shortTime"
+    studentAbilityUsage().usageAt| date: "shortTime"
   }}</span>
 
   <div class="flex items-start gap-2.5">
-    <i-lucide [img]="abilityIcon" class="size-[34px] fill-black" />
-    <p class="text-2xl font-bold" [title]="abilityUse().abilityName">
-      {{ abilityUse().abilityName }}
+    <i-lucide [img]="abilityIcon" class="size-[30px] fill-black" />
+    <p class="text-xl md:text-2xl font-bold" [title]="studentAbilityUsage().abilityName">
+      {{ studentAbilityUsage().abilityName }}
     </p>
   </div>
 
@@ -26,10 +26,10 @@
 
     <div class="flex flex-col w-full">
       <span class="text-nowrap text-ellipsis">
-        {{ abilityUse().studentFullName }}
+        {{ studentAbilityUsage().studentFullName }}
       </span>
 
-      @if (abilityUse().characterName; as characterName) {
+      @if (studentAbilityUsage().characterName; as characterName) {
         <span class="text-gray-600 text-sm">{{ characterName }}</span>
       }
     </div>

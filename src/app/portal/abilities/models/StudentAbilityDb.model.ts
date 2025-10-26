@@ -6,10 +6,6 @@ export interface StudentAbilityDb {
   usageStatus: AbilityUsageStatus
   studentState: DocumentReference
   ability: DocumentReference
-  uses: AbilityUsedReferenceDb[]
-}
-
-export interface AbilityUsedReferenceDb {
-  usagedId: string
-  experienceSession: DocumentReference
+  isDeleted: boolean
+  uses: DocumentReference[]
 }

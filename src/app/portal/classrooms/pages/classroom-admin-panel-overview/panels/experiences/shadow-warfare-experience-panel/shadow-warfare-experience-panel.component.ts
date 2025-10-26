@@ -24,10 +24,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
 import { TagModule } from 'primeng/tag'
 import { Toast } from 'primeng/toast'
-import { Subject, takeUntil } from 'rxjs'
-import { AbilityUseCardComponent } from '~/abilities/components/ability-use-card/ability-use-card.component'
-import { AbilityUseModel } from '~/abilities/models/AbilityUse.model'
-import { AbilityUseService } from '~/abilities/services/ability-use/ability-use.service'
+import { Subject, takeUntil, tap } from 'rxjs'
+import { StudentAbilityUsageCardComponent } from '~/abilities/components/student-ability-usage-card/student-ability-usage-card.component'
+import { StudentAbilityUsageModel } from '~/abilities/models/StudentAbilityUsage.model'
+import { StudentAbilityUsageService } from '~/abilities/services/student-ability-usage/student-ability-usage.service'
 import { CharacterModel } from '~/characters/models/Character.model'
 import { CharacterService } from '~/characters/services/character/character.service'
 import { ExperienceSessionModel } from '~/class-sessions/models/ExperienceSession.model'
@@ -50,7 +50,7 @@ const reviveStudentErrorMessages: ErrorMessages = {
   ...commonErrorMessages
 }
 
-const abilityUsesErrorMessages: ErrorMessages = {
+const studentAbilityUsagesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
 }
 
@@ -75,7 +75,7 @@ const teamsLoadingErrorMessages: ErrorMessages = {
   selector: 'gow-shadow-warfare-experience-panel',
   templateUrl: './shadow-warfare-experience-panel.component.html',
   imports: [
-    AbilityUseCardComponent,
+    StudentAbilityUsageCardComponent,
     TableModule,
     ProgressSpinnerModule,
     ButtonModule,
@@ -104,7 +104,9 @@ export class ShadowWarfareExperiencePanelComponent
 
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
-  private readonly abilityUseService = inject(AbilityUseService)
+  private readonly studentAbilityUsageService = inject(
+    StudentAbilityUsageService
+  )
   private readonly characterService = inject(CharacterService)
   private readonly teamService = inject(TeamService)
 
@@ -117,8 +119,8 @@ export class ShadowWarfareExperiencePanelComponent
 
   public isExperienceSessionEndingLoading = signal<boolean>(false)
 
-  public isAbilityUsesLoading = signal<boolean>(true)
-  public abilityUses = signal<AbilityUseModel[]>([])
+  public isStudentAbilitiesUsagesLoading = signal<boolean>(true)
+  public studentAbilityUsages = signal<StudentAbilityUsageModel[]>([])
 
   public isCharactersLoading = signal<boolean>(true)
   public characters = signal<CharacterModel[]>([])
@@ -181,7 +183,7 @@ export class ShadowWarfareExperiencePanelComponent
     this.loadAllTeams(classroomId)
     this.loadAllCharacters(classroomId)
     this.loadStudents({ classroomId, academicPeriodId })
-    this.loadAbilityUses(experienceSession)
+    this.loadStudentAbilitiesUsages(experienceSession)
   }
 
   ngOnDestroy(): void {
@@ -377,21 +379,27 @@ export class ShadowWarfareExperiencePanelComponent
     })
   }
 
-  private loadAbilityUses(experienceSession: ExperienceSessionModel) {
-    this.abilityUseService
-      .getAllAbilityUsesByExperienceAndExperienceSessionId({
-        experience: experienceSession.experience,
-        experienceSessionId: experienceSession.id
-      })
-      .pipe(takeUntil(this.destroy$))
+  private loadStudentAbilitiesUsages(
+    experienceSession: ExperienceSessionModel
+  ) {
+    this.studentAbilityUsageService
+      .watchByExperienceSession(experienceSession.id)
+      .pipe(
+        takeUntil(this.destroy$),
+        tap(() => {
+          if (this.isStudentAbilitiesUsagesLoading()) {
+            this.isStudentAbilitiesUsagesLoading.set(false);
+          }
+        })
+      )
       .subscribe({
-        next: abilityUses => {
-          this.abilityUses.set(abilityUses)
-          this.isAbilityUsesLoading.set(false)
+        next: studentAbilityUsages => {
+          this.studentAbilityUsages.set(studentAbilityUsages)
         },
         error: err => {
+         this.isStudentAbilitiesUsagesLoading.set(false)
           const error = err as ErrorResponse
-          this.onShowAbilityUsesLoadingErrorMessage(error.code)
+          this.onStudentAbilityUsagesErrorMessage(error.code)
         }
       })
   }
@@ -432,8 +440,8 @@ export class ShadowWarfareExperiencePanelComponent
     this.toastService.add({ summary, detail: message })
   }
 
-  private onShowAbilityUsesLoadingErrorMessage(code: string) {
-    const { summary, message } = abilityUsesErrorMessages[code]
+  private onStudentAbilityUsagesErrorMessage(code: string) {
+    const { summary, message } = studentAbilityUsagesErrorMessages[code]
     this.toastService.add({ summary, detail: message })
   }
 
