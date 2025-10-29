@@ -1,5 +1,6 @@
 import {
   Component,
+  effect,
   HostListener,
   inject,
   input,
@@ -75,7 +76,7 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
   })
 
   public isLoading = signal<boolean>(false)
-  public finalHealthPoints = signal<number>(-1)
+  public finalHealthPoints = signal<number>(0)
 
   public onClose = output<void>({ alias: 'close' })
   public onSuccess = output<ModifyStudentHealthPointsSuccess>({
@@ -83,6 +84,13 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
   })
 
   public modifyStudentHealthPointsForm = modifyStudentHealthPointsForm()
+
+  constructor() {
+    effect(() => {
+      this.currentStudentHealthPoints();
+      this.calcFinalHealthPoints();
+    })
+  }
 
   ngOnInit(): void {
     this.modifyStudentHealthPointsForm.valueChanges.subscribe(() => {
@@ -122,6 +130,7 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
   public onCloseDialog() {
     this.onClose.emit()
     this.modifyStudentHealthPointsForm = modifyStudentHealthPointsForm()
+    this.finalHealthPoints.set(this.currentStudentHealthPoints())
     this.isLoading.set(false)
   }
 
@@ -142,28 +151,27 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
       this.classroomContext.classroom()?.experiences.SHADOW_WARFARE
         .healthPointsBase
 
+    const base = this.currentStudentHealthPoints()
+
     if (maxHealthPoints === undefined) {
-      this.finalHealthPoints.set(this.currentStudentHealthPoints())
+      this.finalHealthPoints.set(base)
       return
     }
 
-    const studentHealthPoints = this.currentStudentHealthPoints()
     const modifier = this.modifierControl.getRawValue()
     const points = this.pointsControl.getRawValue()
 
     if (modifier === null || points === null) {
-      this.finalHealthPoints.set(this.currentStudentHealthPoints())
+      this.finalHealthPoints.set(base)
       return
     }
 
     if (modifier === PointsModifier.INCREMENT) {
-      this.finalHealthPoints.set(
-        Math.min(maxHealthPoints, studentHealthPoints + points)
-      )
+      this.finalHealthPoints.set(Math.min(maxHealthPoints, base + points))
       return
     }
 
-    this.finalHealthPoints.set(Math.max(0, studentHealthPoints - points))
+    this.finalHealthPoints.set(Math.max(0, base - points))
   }
 
   get modifierControl(): AbstractControl<PointsModifier> {

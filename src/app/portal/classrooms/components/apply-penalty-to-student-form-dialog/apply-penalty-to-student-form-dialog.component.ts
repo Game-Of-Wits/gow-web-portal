@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   HostListener,
   inject,
   input,
@@ -105,6 +106,12 @@ export class ApplyPenaltyToStudentFormDialogComponent implements OnInit {
     validators: [Validators.required]
   })
 
+  constructor() {
+    effect(() => {
+      this.finalProgressPoints.set(this.currentStudentProgressPoints())
+    })
+  }
+
   ngOnInit(): void {
     this.penaltyControl.valueChanges.subscribe(value => {
       if (value === null) return
@@ -188,10 +195,8 @@ export class ApplyPenaltyToStudentFormDialogComponent implements OnInit {
 
     if (penalty === undefined) return
 
-    const studentHealthPoints = this.currentStudentProgressPoints()
-
-    this.finalProgressPoints.set(
-      Math.max(0, studentHealthPoints - penalty.reducePoints)
+    this.finalProgressPoints.update(progressPoints =>
+      Math.max(0, progressPoints - penalty.reducePoints)
     )
   }
 

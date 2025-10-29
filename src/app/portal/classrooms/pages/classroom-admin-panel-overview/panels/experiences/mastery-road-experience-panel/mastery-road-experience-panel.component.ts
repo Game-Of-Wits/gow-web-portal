@@ -169,9 +169,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   public getDisplayPoints(student: MasteryRoadStudentPeriodState): number {
     const editing = this.editingStudentsPoints().get(student.id)
-    if (editing) {
-      return editing.currentPoints
-    }
+    if (editing) return editing.currentPoints
     return student.progressPoints
   }
 
