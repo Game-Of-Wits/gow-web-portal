@@ -1,12 +1,12 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core'
-import { ErrorResponse } from '@shared/types/ErrorResponse'
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core'
 import { CardModule } from 'primeng/card'
 import { SkeletonModule } from 'primeng/skeleton'
 import { TagModule } from 'primeng/tag'
 import { CharacterModel } from '~/characters/models/Character.model'
 import { CharacterService } from '~/characters/services/character/character.service'
-import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
-import { HomeworkService } from '~/homeworks/services/homework/homework.service'
+import { StudentHomeworkModel, StudentHomeworkStatus } from '~/homeworks/models/StudentHomework.model'
+import { StudentHomeworkService } from '~/homeworks/services/student-homework/student-homework.service'
+import { StudentHomeworksStats } from '~/students/models/StudentHomeworksStats.model'
 import { ShadowWarfareExperienceState } from '~/students/models/StudentPeriodStates.model'
 import { TeamModel } from '~/teams/models/Team.model'
 import { TeamService } from '~/teams/services/team/team.service'
@@ -70,7 +70,7 @@ import { TeamService } from '~/teams/services/team/team.service'
 
               @if (!isLoading()) {
                 <p-tag
-                  value="{{ homeworkInfo().completed }}"
+                  value="{{ homeworkInfo().completed == 0 ? 'Ninguno' : homeworkInfo().completed }}"
                   styleClass="bg-teal-100 text-teal-700 border-teal-200"
                 />
               } @else {
@@ -84,7 +84,7 @@ import { TeamService } from '~/teams/services/team/team.service'
 
               @if (!isLoading()) {
                 <p-tag
-                  value="{{ homeworkInfo().successful }}"
+                  value="{{ homeworkInfo().successful == 0 ? 'Ninguno' : homeworkInfo().successful }}"
                   styleClass="bg-green-100 text-green-700 border-green-200"
                 />
               } @else {
@@ -114,7 +114,7 @@ import { TeamService } from '~/teams/services/team/team.service'
 
               @if (!isLoading()) {
                 <p-tag
-                  value="{{ homeworkInfo().noSuccessful }}"
+                  value="{{ homeworkInfo().noSuccessful == 0 ? 'Ninguno' : homeworkInfo().noSuccessful }}"
                   styleClass="bg-red-100 text-red-700 border-red-200"
                 />
               } @else {
@@ -130,9 +130,7 @@ import { TeamService } from '~/teams/services/team/team.service'
 export class ShadowWarfareCardComponent implements OnInit {
   private readonly teamService = inject(TeamService)
   private readonly characterService = inject(CharacterService)
-  private readonly homeworkService = inject(HomeworkService)
-
-  private readonly context = inject(ClassroomAdminPanelContextService)
+  private readonly studentHomeworkService = inject(StudentHomeworkService)
 
   public studentPeriodStateId = input.required<string>({
     alias: 'studentPeriodStateId'
@@ -143,16 +141,38 @@ export class ShadowWarfareCardComponent implements OnInit {
 
   public character = signal<CharacterModel | null>(null)
   public team = signal<TeamModel | null>(null)
-  public homeworkInfo = signal<{
-    successful: number | null
-    noSuccessful: number | null
-    noCompleted: number | null
-    completed: number | null
-  }>({
-    successful: null,
-    noSuccessful: null,
-    noCompleted: null,
-    completed: null
+  public studentHomeworks = signal<StudentHomeworkModel[]>([])
+
+  public homeworkInfo = computed<StudentHomeworksStats>(() => {
+  const studentHomeworks = this.studentHomeworks();
+
+    if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
+
+  let successful = 0;
+  let noSuccessful = 0;
+  let completed = 0;
+  let noCompleted = 0;
+
+  for (const homework of studentHomeworks) {
+    switch (homework.status) {
+      case StudentHomeworkStatus.CORRECT_ANSWER:
+        successful++;
+        completed++;
+        break;
+      case StudentHomeworkStatus.WRONG_ANSWER:
+      case StudentHomeworkStatus.FAILED_DEADLINE:
+        noSuccessful++;
+        completed++;
+        break;
+      case StudentHomeworkStatus.PENDING:
+        noCompleted++;
+        break;
+      default:
+        break;
+    }
+  }
+
+  return { successful, noSuccessful, completed, noCompleted };
   })
 
   public isLoading = signal<boolean>(true)
@@ -161,7 +181,7 @@ export class ShadowWarfareCardComponent implements OnInit {
     Promise.all([
       this.loadTeam(),
       this.loadCharacter(),
-      this.loadHomeworkInformation()
+      this.loadStudentHomeworks()
     ]).then(() => {
       this.isLoading.set(false)
     })
@@ -181,17 +201,12 @@ export class ShadowWarfareCardComponent implements OnInit {
     this.character.set(character)
   }
 
-  private async loadHomeworkInformation() {
-    const classroomId = this.context.classroom()?.id
-
-    if (classroomId === undefined)
-      throw new ErrorResponse('classroom-not-exist')
-
+  private async loadStudentHomeworks() {
     const homeworkInfo =
-      await this.homeworkService.getHomeworkInfoByStudentPeriodStateIdAndClassroomId(
-        this.studentPeriodStateId(),
-        classroomId
+      await this.studentHomeworkService.getStudentHomeworksByStudentPeriodStateId(
+        this.studentPeriodStateId()
       )
-    this.homeworkInfo.set(homeworkInfo)
+
+    this.studentHomeworks.set(homeworkInfo)
   }
 }

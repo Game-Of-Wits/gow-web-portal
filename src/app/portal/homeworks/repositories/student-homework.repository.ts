@@ -8,6 +8,7 @@ import {
   where
 } from '@angular/fire/firestore'
 import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
+import { StudentHomeworkDb } from '../models/StudentHomeworkDb.model'
 
 @Injectable({ providedIn: 'root' })
 export class StudentHomeworkRepository {
@@ -15,6 +16,26 @@ export class StudentHomeworkRepository {
 
   private static readonly collectionName = 'student_homeworks'
   private readonly collectionName = StudentHomeworkRepository.collectionName
+
+  public async getAllByStudentPeriodStateId(
+    studentPeriodStateId: string
+  ): Promise<StudentHomeworkDb[]> {
+    const studentPeriodStateRef = StudentPeriodStateRepository.getRefById(
+      this.firestore,
+      studentPeriodStateId
+    )
+
+    const studentHomeworksQuery = query(
+      this.getCollectionRef(),
+      where('studentState', '==', studentPeriodStateRef)
+    )
+
+    const studentHomeworksSnapshot = await getDocs(studentHomeworksQuery)
+
+    return studentHomeworksSnapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as StudentHomeworkDb
+    )
+  }
 
   public async countByStudentPeriodStateIdAsync(
     studentPeriodStateId: string

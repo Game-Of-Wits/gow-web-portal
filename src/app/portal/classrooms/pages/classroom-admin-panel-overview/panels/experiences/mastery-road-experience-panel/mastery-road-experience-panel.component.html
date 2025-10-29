@@ -152,7 +152,7 @@
     <div class="flex flex-col px-[15px] md:px-0">
       <h2 class="text-lg text-gray-700 font-bold mb-1 md:mb-2">Habilidades usadas</h2>
 
-      <div class="flex flex-col gap-3 max-w-[400px] w-full">
+      <div class="flex flex-col gap-3 max-w-[400px] md:min-w-[400px] w-full">
         @if (!isStudentAbilitiesUsagesLoading()) {
           @for (
             studentAbilityUsage of studentAbilityUsages();

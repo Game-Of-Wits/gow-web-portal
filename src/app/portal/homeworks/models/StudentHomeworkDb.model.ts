@@ -1,10 +1,11 @@
-import { DocumentReference } from '@angular/fire/firestore'
+import { DocumentReference, Timestamp } from '@angular/fire/firestore'
 
 export interface StudentHomeworkDb {
+  id: string
   studentState: DocumentReference
   homework: DocumentReference
-  deadline: Date
-  deviveredAt: Date
+  deadline: Timestamp
+  deliveredAt: Timestamp
   answer: DocumentReference | null
   rewardAbility: DocumentReference
   status: string

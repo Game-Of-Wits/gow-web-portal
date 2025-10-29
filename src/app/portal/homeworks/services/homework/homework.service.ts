@@ -2,26 +2,19 @@ import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { catchError, map, Observable, throwError } from 'rxjs'
-import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { HomeworkMapper } from '~/homeworks/mappers/homework.mapper'
 import { CreateHomework } from '~/homeworks/models/CreateHomework.model'
 import { HomeworkModel } from '~/homeworks/models/Homework.model'
-import { HomeworkInfo } from '~/homeworks/models/HomeworkInfo.model'
 import { UpdateHomework } from '~/homeworks/models/UpdateHomework.model'
 import { UpdateHomeworkParams } from '~/homeworks/models/UpdateHomeworkParams.model'
 import { HomeworkRepository } from '~/homeworks/repositories/homework.repository'
 import { HomeworkGroupRepository } from '~/homeworks/repositories/homework-group.repository'
-import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
 import { StorageHomeworkService } from '../storage-homework/storage-homework.service'
 
 @Injectable({ providedIn: 'root' })
 export class HomeworkService {
   private readonly homeworkRepository = inject(HomeworkRepository)
   private readonly homeworkGroupRepository = inject(HomeworkGroupRepository)
-  private readonly classroomRepository = inject(ClassroomRepository)
-  private readonly studentPeriodStateRepository = inject(
-    StudentPeriodStateRepository
-  )
 
   private readonly storageHomework = inject(StorageHomeworkService)
 
@@ -30,33 +23,6 @@ export class HomeworkService {
       const homework = await this.homeworkRepository.getByIdAsync(homeworkId)
       if (homework === null) throw new ErrorResponse('homework-not-exist')
       return HomeworkMapper.toModel(homework)
-    } catch (err) {
-      const error = err as ErrorResponse | FirestoreError
-      throw new ErrorResponse(error.code)
-    }
-  }
-
-  public async getHomeworkInfoByStudentPeriodStateIdAndClassroomId(
-    studentPeriodStateId: string,
-    classroomId: string
-  ): Promise<HomeworkInfo> {
-    try {
-      const classroomExist =
-        await this.classroomRepository.existById(classroomId)
-      if (!classroomExist) throw new ErrorResponse('classroom-not-exist')
-
-      const studentPeriodState =
-        await this.studentPeriodStateRepository.getByIdAsync(
-          studentPeriodStateId
-        )
-
-      if (studentPeriodState === null)
-        throw new ErrorResponse('student-period-state-not-exist')
-
-      return await this.homeworkRepository.getHomeworkInfoByStudentPeriodAndClassroom(
-        studentPeriodState.id,
-        classroomId
-      )
     } catch (err) {
       const error = err as ErrorResponse | FirestoreError
       throw new ErrorResponse(error.code)

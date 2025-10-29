@@ -12,7 +12,6 @@ import {
 } from '@angular/fire/firestore'
 import { from, map, Observable } from 'rxjs'
 import { CreateHomeworkDb } from '../models/CreateHomeworkDb.model'
-import { HomeworkAnswerDbModel } from '../models/HomeworkAnswerDb.model'
 import { HomeworkDbModel } from '../models/HomeworkDb.model'
 import { HomeworkGroupDbModel } from '../models/HomeworkGroupDb.model'
 import { UpdateHomeworkDb } from '../models/UpdateHomeworkDb.model'
@@ -77,72 +76,6 @@ export class HomeworkRepository {
         )
       )
     )
-  }
-
-  public async getHomeworkInfoByStudentPeriodAndClassroom(
-    studentPeriodStateId: string,
-    classroomId: string
-  ) {
-    const groupsSnap = await getDocs(
-      query(
-        collection(this.firestore, 'homework_groups'),
-        where('deliveredAt', '!=', null),
-        where('classroom', '==', doc(this.firestore, 'classrooms', classroomId))
-      )
-    )
-    const groups = groupsSnap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    })) as HomeworkGroupDbModel[]
-
-    if (groups.length === 0) {
-      return { successful: 0, noSuccessful: 0, completed: 0, noCompleted: 0 }
-    }
-
-    const homeworksSnap = await getDocs(collection(this.firestore, 'homeworks'))
-    const homeworks = homeworksSnap.docs
-      .map(d => ({ id: d.id, ...d.data() }) as HomeworkDbModel)
-      .filter(hw => groups.some(g => g.id === hw.group?.id))
-
-    const answersSnap = await getDocs(
-      query(
-        collection(this.firestore, 'homework_answers'),
-        where(
-          'studentState',
-          '==',
-          doc(this.firestore, 'student_period_states', studentPeriodStateId)
-        )
-      )
-    )
-
-    const answers = answersSnap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    })) as HomeworkAnswerDbModel[]
-
-    let successful = 0
-    let noSuccessful = 0
-    let completed = 0
-
-    for (const hw of homeworks) {
-      const answer = answers.find(a => a.homework.id === hw.id)
-
-      if (answer) {
-        completed++
-        const selected = answer.content?.optionSelected?.id ?? null
-        const correct = hw.content?.correctOption?.id ?? null
-
-        if (selected && correct && selected === correct) {
-          successful++
-        } else {
-          noSuccessful++
-        }
-      }
-    }
-
-    const noCompleted = homeworks.length - completed
-
-    return { successful, noSuccessful, completed, noCompleted }
   }
 
   public async existByIdAsync(id: string): Promise<boolean> {
