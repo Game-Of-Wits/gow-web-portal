@@ -38,6 +38,7 @@
     headerTitle="Crear nivel"
     [show]="showCreateLevelFormDialog()"
     [id]="levelSelected().id"
+    [levelForm]="levelSelected().form"
     [minRequiredPoints]="levelSelected().minPoints"
     [maxRequiredPoints]="levelSelected().maxPoints"
     (close)="onCloseLevelFormDialog()"

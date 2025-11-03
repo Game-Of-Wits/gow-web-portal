@@ -51,7 +51,7 @@ export class PenaltyService {
 
   public async createPenalty(data: CreatePenalty): Promise<PenaltyModel> {
     try {
-      const classroom = await this.penaltyRepository.getByIdAsync(
+      const classroom = await this.classroomRepository.getById(
         data.classroomId
       )
       if (classroom === null) throw new ErrorResponse('classroom-not-exist')

@@ -4,7 +4,8 @@ import {
   inject,
   OnChanges,
   SimpleChanges,
-  signal
+  signal,
+  output
 } from '@angular/core'
 import {
   AbstractControl,
@@ -74,6 +75,8 @@ export class SingleChoiseContentFormComponent implements OnChanges {
   )
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.answerOptions.set([])
+
     if (changes['homeworkId']) {
       const contentFormData = this.contentFormGroup.getRawValue()
 

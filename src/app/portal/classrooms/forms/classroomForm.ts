@@ -70,7 +70,6 @@ export const classroomForm = (
               [],
               [
                 Validators.required,
-                Validators.minLength(1),
                 InitialAbilitiesValidator.noEqualNames()
               ]
             )
