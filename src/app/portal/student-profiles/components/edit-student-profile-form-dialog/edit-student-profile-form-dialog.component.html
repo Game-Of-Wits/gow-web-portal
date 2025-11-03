@@ -1,0 +1,96 @@
+<ng-template #closeButtonIcon>
+  <button
+    class="size-[40px] flex items-center justify-center rounded-full bg-transparent hover:bg-gray-50 cursor-pointer group"
+    (click)="onCloseDialog()"
+    [disabled]="isLoading()"
+  >
+    <i-lucide [img]="closeIcon" class="size-[20px] text-gray-700 group-disabled:text-gray-700/50" />
+  </button>
+</ng-template>
+
+<p-dialog
+  [modal]="true"
+  [visible]="studentProfile() !== null"
+  [draggable]="false"
+  [resizable]="false"
+  [closeIconTemplate]="closeButtonIcon"
+  [formGroup]="studentProfileEditForm"
+  [style]="{
+    'max-width': '600px',
+    width: '100%',
+  }"
+>
+  <ng-template #header>
+    <span class="font-bold text-xl">Editar perfil de estudiante</span>
+  </ng-template>
+
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Nombre"
+          placeholder="Ingrese el nombre del estudiante"
+          formControlName="firstName"
+        />
+
+        @if (firstNameControl.invalid && firstNameControl.touched) {
+          @if (hasErrorValidation(firstNameControl, "required")) {
+            <p class="text-sm text-danger-500">Es requerido</p>
+          } @else if (hasErrorValidation(firstNameControl, "minlength")) {
+            <p class="text-sm text-danger-500">Mínimo 2 caracteres</p>
+          } @else if (hasErrorValidation(firstNameControl, "maxlength")) {
+            <p class="text-sm text-danger-500">Máximo 100 icaracteres</p>
+          }
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Apellido"
+          placeholder="Ingrese el apellido del estudiante"
+          formControlName="lastName"
+        />
+
+        @if (lastNameControl.invalid && lastNameControl.touched) {
+          @if (hasErrorValidation(lastNameControl, "required")) {
+            <p class="text-sm text-danger-500">Es requerido</p>
+          } @else if (hasErrorValidation(lastNameControl, "minlength")) {
+            <p class="text-sm text-danger-500">Mínimo 2 caracteres</p>
+          } @else if (hasErrorValidation(lastNameControl, "maxlength")) {
+            <p class="text-sm text-danger-500">Máximo 100 icaracteres</p>
+          }
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <gow-text-field
+          label="Número telefónico"
+          placeholder="000000000"
+          formControlName="phoneNumber"
+          [maxLength]="9"
+        />
+
+        @if (phoneNumberControl.invalid && phoneNumberControl.touched) {
+          @if (hasErrorValidation(phoneNumberControl, "required")) {
+            <p class="text-sm text-danger-500">Es requerido</p>
+          } @else if (hasErrorValidation(phoneNumberControl, "phoneNumber")) {
+            <p class="text-sm text-danger-500">El número telefónico es invalido</p>
+          }
+        }
+      </div>
+    </div>
+
+    <p-button
+      type="button"
+      (click)="onEdit()"
+      [disabled]="studentProfileEditForm.invalid"
+      [loading]="isLoading()"
+      severity="info"
+      size="large"
+      styleClass="w-full rounded-lg"
+      label="Editar"
+    />
+  </div>
+</p-dialog>
+
+<p-toast position="top-right" />

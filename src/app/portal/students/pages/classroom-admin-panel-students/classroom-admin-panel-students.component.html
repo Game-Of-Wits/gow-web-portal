@@ -32,8 +32,8 @@
               pButton
               severity="info"
               [rounded]="true"
-              [disabled]="true"
               size="large"
+              (click)="onOpenEditStudentProfileDialog(student.id, $event)"
             >
               <i-lucide pButtonIcon [img]="editIcon" />
             </button>
@@ -42,6 +42,12 @@
       </ng-template>
     </p-table>
   </section>
+
+  <gow-edit-student-profile-form-dialog
+    [studentProfile]="studentProfileSelected()"
+    (close)="onCloseEditStudentProfileDialog()"
+    (success)="onSuccessStudentProfileDialog($event)"
+  />
 
   @if (context.classroom(); as classroom) {
     <gow-create-student-form-dialog
