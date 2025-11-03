@@ -6,11 +6,14 @@ import {
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where
 } from '@angular/fire/firestore'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { from, map, Observable } from 'rxjs'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
 import { StudentProfileDbModel } from '../models/StudentProfileDb.model'
+import { UpdateStudentProfileModel } from '../models/UpdateStudentProfile.model'
 
 @Injectable({ providedIn: 'root' })
 export class StudentProfileRepository {
@@ -57,10 +60,44 @@ export class StudentProfileRepository {
     )
   }
 
+  public async existByPhoneNumber(
+    classroomId: string,
+    phoneNumber: string
+  ): Promise<boolean> {
+    const classroomRef = ClassroomRepository.getRefById(
+      this.firestore,
+      classroomId
+    )
+
+    const studentsQuery = query(
+      this.getCollectionRef(),
+      where('classrooms', 'array-contains', classroomRef),
+      where('phoneNumber', '==', phoneNumber)
+    )
+
+    const studentProfilesSnapshot = await getDocs(studentsQuery)
+
+    return !studentProfilesSnapshot.empty
+  }
+
   public async existById(id: string): Promise<boolean> {
     const studentProfileRef = this.getRefById(id)
     const studentProfileSnapshot = await getDoc(studentProfileRef)
     return studentProfileSnapshot.exists()
+  }
+
+  public async update(
+    id: string,
+    data: Partial<UpdateStudentProfileModel>
+  ): Promise<StudentProfileDbModel> {
+    await updateDoc(this.getRefById(id), data)
+
+    const studentProfile = await this.getByIdAsync(id)
+
+    if (studentProfile === null)
+      throw new ErrorResponse('student-profile-not-exist')
+
+    return studentProfile
   }
 
   private getCollectionRef() {

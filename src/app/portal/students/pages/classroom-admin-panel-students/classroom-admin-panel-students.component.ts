@@ -10,6 +10,7 @@ import { ClassroomAdminPanelLoadingComponent } from '~/classrooms/components/ui/
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
+import { EditStudentProfileFormDialogComponent } from '~/student-profiles/components/edit-student-profile-form-dialog/edit-student-profile-form-dialog.component'
 import { StudentProfileModel } from '~/student-profiles/models/StudentProfile.model'
 import { StudentProfileService } from '~/student-profiles/services/student-profile/student-profile.service'
 import { CreateStudentFormDialogComponent } from '~/students/components/create-student-form-dialog/create-student-form-dialog.component'
@@ -24,6 +25,7 @@ const studentProfilesErrorMessages: ErrorMessages = {
   imports: [
     ClassroomAdminPanelLoadingComponent,
     CreateStudentFormDialogComponent,
+    EditStudentProfileFormDialogComponent,
     Toast,
     TableModule,
     ButtonModule,
@@ -45,6 +47,8 @@ export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
   public studentProfiles = signal<StudentProfileModel[]>([])
   public isStudentsLoading = signal<boolean>(false)
 
+  public studentProfileSelected = signal<StudentProfileModel | null>(null)
+
   public showCreateStudentAccount = signal<boolean>(false)
 
   ngOnInit(): void {
@@ -55,8 +59,40 @@ export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
     this.showCreateStudentAccount.set(true)
   }
 
+  public onOpenEditStudentProfileDialog(id: string, event: Event) {
+    event.stopPropagation()
+
+    const studentProfile =
+      this.studentProfiles().find(studentProfile => studentProfile.id === id) ??
+      null
+
+    if (studentProfile === null) return
+
+    this.studentProfileSelected.set(studentProfile)
+  }
+
   public onCloseCreateStudentDialog() {
     this.showCreateStudentAccount.set(false)
+  }
+
+  public onCloseEditStudentProfileDialog() {
+    this.studentProfileSelected.set(null)
+  }
+
+  public onSuccessStudentProfileDialog(studentProfile: StudentProfileModel) {
+    this.studentProfiles.update(studentProfiles => {
+      const studentProfileIndex = studentProfiles.findIndex(
+        student => student.id === studentProfile.id
+      )
+
+      if (studentProfileIndex === -1) return studentProfiles
+
+      studentProfiles[studentProfileIndex].firstName = studentProfile.firstName
+      studentProfiles[studentProfileIndex].lastName = studentProfile.lastName
+      studentProfiles[studentProfileIndex].phoneNumber = studentProfile.phoneNumber
+
+      return studentProfiles
+    })
   }
 
   public onCreateStudent(studentProfile: StudentProfileModel) {
