@@ -131,13 +131,16 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
 
     if (maxPoints !== null) maxPoints -= 1
 
-    this.showCreateLevelFormDialog.set(true)
     this.levelSelected.set({
-      id: 0,
-      form: null,
+      id: nextLevelPosition,
+      form: levelForm({
+        requiredPoints: minPoints,
+        max: maxPoints
+      }),
       minPoints,
       maxPoints
     })
+    this.showCreateLevelFormDialog.set(true)
   }
 
   public onOpenEditLevelDialog(levelId: string) {
@@ -145,15 +148,16 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
 
     if (level === undefined) return
 
+    let minPoints = 0
     let maxPoints: number | null = null
 
     const levelPosition = this.levels().findIndex(l => l.id === level.id)
 
+    minPoints = levelPosition === 0 ? 0 : (this.levels()[levelPosition - 1]?.requiredPoints ?? 0) + 1
     maxPoints = this.levels()[levelPosition + 1]?.requiredPoints ?? null
 
     if (maxPoints !== null) maxPoints -= 1
 
-    this.showEditLevelFormDialog.set(true)
     this.levelSelected.set({
       id: level.id,
       form: levelForm({
@@ -162,9 +166,10 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
         name: level.name,
         primaryColor: level.primaryColor
       }),
-      minPoints: level.requiredPoints,
+      minPoints,
       maxPoints
     })
+    this.showEditLevelFormDialog.set(true)
   }
 
   public onCreateLevel(submit: LevelFormSubmit) {

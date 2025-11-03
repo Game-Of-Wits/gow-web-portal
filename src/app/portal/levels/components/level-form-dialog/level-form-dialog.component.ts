@@ -6,7 +6,6 @@ import {
   inject,
   input,
   OnChanges,
-  OnInit,
   output,
   SimpleChanges,
   signal
@@ -17,7 +16,6 @@ import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
 import { MessageModule } from 'primeng/message'
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
-import { levelForm } from '~/levels/forms'
 import { LevelForm } from '~/levels/models/LevelForm.model'
 import { LevelFormData } from '~/levels/models/LevelFormData.model'
 import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
@@ -46,7 +44,7 @@ export type LevelFormSubmit = {
     LucideAngularModule
   ]
 })
-export class LevelFormDialogComponent implements OnChanges, OnInit {
+export class LevelFormDialogComponent implements OnChanges {
   public readonly closeIcon = X
   public readonly infoIcon = Info
 
@@ -73,36 +71,16 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
     () => this.classroomContext.activeAcademicPeriod() !== null
   )
 
-  ngOnInit(): void {
-    if (this.levelForm === null) {
-      this.levelForm = levelForm({
-        requiredPoints: this.minRequiredPoints,
-        max: null
-      })
-    }
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.levelForm === null) {
-      if (changes['minRequiredPoints']) {
-        const currentMinRequiredPoints =
-          changes['minRequiredPoints'].currentValue
-
-        this.levelForm = levelForm({
-          requiredPoints: currentMinRequiredPoints,
-          max: this.maxRequiredPoints ?? null
-        })
-      }
-    }
-
     if (changes['levelForm']) {
-      const levelForm = changes['levelForm']
+      const levelFormGroup = changes['levelForm']
         .currentValue as FormGroup<LevelForm> | null
 
-      if (levelForm === null) return
+      if (levelFormGroup === null) return
 
-      const levelFormData = levelForm.getRawValue()
+      const levelFormData = levelFormGroup.getRawValue()
 
+      this.levelForm = levelFormGroup
       this.isInitialLevel.set(levelFormData.requiredPoints === 0)
     }
   }
@@ -139,10 +117,7 @@ export class LevelFormDialogComponent implements OnChanges, OnInit {
   }
 
   public onCloseDialog() {
-    this.levelForm = levelForm({
-      requiredPoints: this.minRequiredPoints,
-      max: null
-    })
+    this.levelForm = null
     this.onClose.emit()
     this.isInitialLevel.set(false)
     this.formLoading.set(false)
