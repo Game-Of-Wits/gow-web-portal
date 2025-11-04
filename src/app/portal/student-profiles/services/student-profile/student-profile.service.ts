@@ -64,7 +64,11 @@ export class StudentProfileService {
 
       const updateStudentProfile = await this.studentProfileRepository.update(
         id,
-        data
+        {
+          phoneNumber: data.phoneNumber,
+          firstName: data.firstName,
+          lastName: data.lastName
+        }
       )
 
       return StudentProfileMapper.toModel(updateStudentProfile)
