@@ -12,6 +12,8 @@ import { ErrorResponse } from '@shared/types/ErrorResponse'
 import {
   Bolt,
   Check,
+  CheckCheck,
+  Download,
   EllipsisVertical,
   Gavel,
   LucideAngularModule,
@@ -24,6 +26,7 @@ import { MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
+import { TagModule } from 'primeng/tag'
 import { Toast } from 'primeng/toast'
 import { Subject, takeUntil, tap } from 'rxjs'
 import { StudentAbilityUsageCardComponent } from '~/abilities/components/student-ability-usage-card/student-ability-usage-card.component'
@@ -40,8 +43,11 @@ import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { PointsModifier } from '~/shared/models/PointsModifier'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
+import { rankingStyles } from '~/students/data/rankingStyles'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
+import { MasteryRoadStudentPeriodStateRanking } from '~/students/models/MasteryRoadStudentPeriodStateRanking'
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
+import { calcMasteryRoadStudentPeriodStatesRanking } from '~/students/utils/calcMasteryRoadStudentPeriodStatesRanking'
 
 const studentAbilityUsagesErrorMessages: ErrorMessages = {
   ...commonErrorMessages
@@ -65,6 +71,12 @@ interface StudentPointsEdit {
   currentPoints: number
 }
 
+interface StudentPointsUpdateResult {
+  studentId: string
+  newLevelId: string
+  newProgressPoints: number
+}
+
 @Component({
   selector: 'gow-mastery-road-experience-panel',
   templateUrl: './mastery-road-experience-panel.component.html',
@@ -75,6 +87,7 @@ interface StudentPointsEdit {
     ButtonModule,
     NgOptimizedImage,
     Toast,
+    TagModule,
     ApplyPenaltyToStudentFormDialogComponent,
     LucideAngularModule
   ],
@@ -86,24 +99,31 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public readonly plusIcon = Plus
   public readonly minusIcon = Minus
   public readonly applyIcon = Check
+  public readonly applyAllIcon = CheckCheck
   public readonly cancelIcon = X
   public readonly modifyPointsIcon = Bolt
   public readonly applyPenaltyIcon = Gavel
+  public readonly rankingStyles = rankingStyles
+  public readonly downloadIcon = Download
 
   private destroy$ = new Subject<void>()
 
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
   private readonly experienceSessionService = inject(ExperienceSessionService)
-  private readonly studentAbilityUsageService = inject(StudentAbilityUsageService)
+  private readonly studentAbilityUsageService = inject(
+    StudentAbilityUsageService
+  )
   private readonly levelService = inject(LevelService)
 
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
 
+  public isDownloadingReport = signal<boolean>(false)
+
   public isExperienceSessionEndingLoading = signal<boolean>(false)
 
   public isStudentsLoading = signal<boolean>(true)
-  public students = signal<MasteryRoadStudentPeriodState[]>([])
+  public studentsRanking = signal<MasteryRoadStudentPeriodStateRanking[]>([])
 
   public isStudentAbilitiesUsagesLoading = signal<boolean>(true)
   public studentAbilityUsages = signal<StudentAbilityUsageModel[]>([])
@@ -111,7 +131,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public levels = signal<LevelModel[]>([])
   public isLevelsLoading = signal<boolean>(true)
 
-  public editingStudentsPoints = signal<Map<string, StudentPointsEdit>>(
+  public editingStudentsPointsMap = signal<Map<string, StudentPointsEdit>>(
     new Map()
   )
   public isSavingPoints = signal<boolean>(false)
@@ -131,6 +151,10 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
     () => new Map(this.levels().map(level => [level.id, level.name]))
   )
 
+  public readonly hasEditingStudentsPoints = computed(
+    () => this.editingStudentsPointsMap().size > 0
+  )
+
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
 
   ngOnInit(): void {
@@ -148,37 +172,86 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
     return this.levelsMap().get(levelId) ?? null
   }
 
+  public async onDownloadReport() {
+    const classroomId = this.context.classroom()?.id ?? null
+    const academicPeriodId = this.context.activeAcademicPeriod()?.id ?? null
+
+    if (classroomId === null || academicPeriodId === null) {
+      this.toastService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo obtener la información del aula o período académico'
+      })
+      return
+    }
+
+    this.isDownloadingReport.set(true)
+
+    try {
+      const { downloadReportUrl } =
+        await this.studentPeriodStateService.downloadReportOfMasteryRoadStudentPeriodStates(
+          {
+            classroomId,
+            academicPeriodId
+          }
+        )
+
+      window.open(downloadReportUrl, '_blank')
+
+      this.toastService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Reporte generado correctamente'
+      })
+    } catch (err) {
+      const error = err as ErrorResponse
+      this.showErrorMessage(
+        'Error',
+        error.message || 'No se pudo generar el reporte'
+      )
+    } finally {
+      this.isDownloadingReport.set(false)
+    }
+  }
+
   public onSuccessApplyPenaltyToStudent(result: ApplyPenaltyToStudentSuccess) {
-    this.students.update(students => {
+    this.studentsRanking.update(students => {
       const studentIndex = students.findIndex(
-        student => student.id === result.studentPeriodStateId
+        student => student.state.id === result.studentPeriodStateId
       )
 
       if (studentIndex === -1) return students
 
-      students[studentIndex].progressPoints = result.newStudentProgressPoints
-      students[studentIndex].levelId = result.newLevelId
+      students[studentIndex].state.progressPoints =
+        result.newStudentProgressPoints
+      students[studentIndex].state.levelId = result.newLevelId
 
       return students
     })
+
+    const studentStates = this.studentsRanking().map(student => student.state)
+    const updateRankingStudents =
+      calcMasteryRoadStudentPeriodStatesRanking(studentStates)
+
+    this.studentsRanking.set(updateRankingStudents)
   }
 
   public isEditingStudent(studentId: string): boolean {
-    return this.editingStudentsPoints().has(studentId)
+    return this.editingStudentsPointsMap().has(studentId)
   }
 
   public getDisplayPoints(student: MasteryRoadStudentPeriodState): number {
-    const editing = this.editingStudentsPoints().get(student.id)
+    const editing = this.editingStudentsPointsMap().get(student.id)
     if (editing) return editing.currentPoints
     return student.progressPoints
   }
 
   public getEditingStudent(studentId: string): StudentPointsEdit | null {
-    return this.editingStudentsPoints().get(studentId) ?? null
+    return this.editingStudentsPointsMap().get(studentId) ?? null
   }
 
   public onIncrementPoints(student: MasteryRoadStudentPeriodState) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       const editing = newMap.get(student.id)
 
@@ -200,7 +273,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public onDecrementPoints(student: MasteryRoadStudentPeriodState) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       const editing = newMap.get(student.id)
 
@@ -222,7 +295,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public onCancelEditingPoints(studentId: string) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       newMap.delete(studentId)
       return newMap
@@ -230,12 +303,14 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public async onApplyPointsChange(studentId: string) {
-    const editing = this.editingStudentsPoints().get(studentId)
+    const editing = this.editingStudentsPointsMap().get(studentId)
     const experienceSessionId = this.context.experienceSession()?.id ?? null
 
     if (!editing || experienceSessionId === null) return
 
-    const pointsDifference = Math.abs(editing.currentPoints - editing.originalPoints)
+    const pointsDifference = Math.abs(
+      editing.currentPoints - editing.originalPoints
+    )
 
     if (pointsDifference === 0) {
       this.onCancelEditingPoints(studentId)
@@ -253,17 +328,31 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
         points: pointsDifference
       })
       .then(({ newLevelId, newProgressPoints }) => {
-        this.students.update(students => {
+        this.studentsRanking.update(students => {
           const studentIndex = students.findIndex(
-            student => student.id === editing.studentId
+            student => student.state.id === editing.studentId
           )
 
           if (studentIndex === -1) return students
 
-          students[studentIndex].progressPoints = newProgressPoints
-          students[studentIndex].levelId = newLevelId
+          students[studentIndex].state.progressPoints = newProgressPoints
+          students[studentIndex].state.levelId = newLevelId
 
           return students
+        })
+
+        const studentStates = this.studentsRanking().map(
+          student => student.state
+        )
+        const updateRankingStudents =
+          calcMasteryRoadStudentPeriodStatesRanking(studentStates)
+
+        this.studentsRanking.set(updateRankingStudents)
+
+        this.editingStudentsPointsMap.update(map => {
+          const newMap = new Map(map)
+          newMap.delete(studentId)
+          return newMap
         })
 
         this.toastService.add({
@@ -271,8 +360,6 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
           summary: 'Éxito',
           detail: 'Puntos modificados correctamente'
         })
-
-        this.onCancelEditingPoints(studentId)
       })
       .catch(err => {
         const error = err as ErrorResponse
@@ -283,18 +370,119 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       })
   }
 
+  public async onApplyAllPointsChanges() {
+    const editingStudentsPointsMap = this.editingStudentsPointsMap()
+    const experienceSessionId = this.context.experienceSession()?.id ?? null
+
+    if (editingStudentsPointsMap.size === 0 || experienceSessionId === null)
+      return
+
+    this.isSavingPoints.set(true)
+
+    const studentsPointsToUpdate = Array.from(
+      editingStudentsPointsMap.entries()
+    ).filter(
+      ([_, editingPoints]) =>
+        editingPoints.currentPoints !== editingPoints.originalPoints
+    )
+
+    if (studentsPointsToUpdate.length === 0) {
+      this.editingStudentsPointsMap.set(new Map())
+      this.isSavingPoints.set(false)
+      return
+    }
+
+    const updatePromises = studentsPointsToUpdate.map(
+      async ([studentId, editingPoints]) => {
+        const pointsDifference = Math.abs(
+          editingPoints.currentPoints - editingPoints.originalPoints
+        )
+
+        return this.studentPeriodStateService
+          .modifyStudentProgressPoints(studentId, experienceSessionId, {
+            points: pointsDifference,
+            modifier:
+              editingPoints.originalPoints < editingPoints.currentPoints
+                ? PointsModifier.INCREMENT
+                : PointsModifier.DECREASE
+          })
+          .then(({ newLevelId, newProgressPoints }) => ({
+            studentId,
+            newLevelId,
+            newProgressPoints
+          }))
+          .catch(err => {
+            const error = err as ErrorResponse
+            this.showModifyStudentProgressPointsErrorMessage(error.code)
+            return null
+          })
+      }
+    )
+
+    Promise.all(updatePromises)
+      .then(studentPointsUpdateResults => {
+        const successfulUpdates = studentPointsUpdateResults.filter(
+          (result): result is StudentPointsUpdateResult => result !== null
+        )
+
+        this.studentsRanking.update(students => {
+          successfulUpdates.forEach(
+            ({ studentId, newLevelId, newProgressPoints }) => {
+              const studentIndex = students.findIndex(
+                student => student.state.id === studentId
+              )
+
+              if (studentIndex === -1) return
+
+              students[studentIndex].state.progressPoints = newProgressPoints
+              students[studentIndex].state.levelId = newLevelId
+            }
+          )
+
+          return students
+        })
+
+        this.editingStudentsPointsMap.update(map => {
+          const newMap = new Map(map)
+          successfulUpdates.forEach(({ studentId }) => {
+            newMap.delete(studentId)
+          })
+          return newMap
+        })
+
+        if (successfulUpdates.length > 0) {
+          const studentStates = this.studentsRanking().map(
+            student => student.state
+          )
+          const updateRankingStudents =
+            calcMasteryRoadStudentPeriodStatesRanking(studentStates)
+
+          this.studentsRanking.set(updateRankingStudents)
+
+          this.toastService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: `Puntos modificados correctamente para ${successfulUpdates.length} estudiante(s)`
+          })
+        }
+      })
+      .finally(() => {
+        this.isSavingPoints.set(false)
+      })
+  }
+
   public onOpenApplyStudentPenaltyDialog(studentPeriodStateId: string) {
-    const student = this.students().find(
-      student => student.id === studentPeriodStateId
+    const student = this.studentsRanking().find(
+      student => student.state.id === studentPeriodStateId
     )
 
     if (student === undefined) return
 
     this.showApplyStudentPenaltyDialog.set(true)
     this.applyStudentPenaltySelected.set({
-      fullName: student.firstName + ' ' + student.lastName,
-      currentProgressPoints: student.progressPoints,
-      studentPeriodStateId: student.id
+      fullName: student.state.firstName + ' ' + student.state.lastName,
+      currentProgressPoints: student.state.progressPoints,
+      studentPeriodStateId: student.state.id
     })
   }
 
@@ -341,7 +529,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         tap(() => {
           if (this.isStudentAbilitiesUsagesLoading()) {
-            this.isStudentAbilitiesUsagesLoading.set(false);
+            this.isStudentAbilitiesUsagesLoading.set(false)
           }
         })
       )
@@ -370,7 +558,9 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       .getAllMasteryRoadStudentPeriodStates({ classroomId, academicPeriodId })
       .subscribe({
         next: students => {
-          this.students.set(students)
+          const rankingStudents =
+            calcMasteryRoadStudentPeriodStatesRanking(students)
+          this.studentsRanking.set(rankingStudents)
           this.isStudentsLoading.set(false)
         },
         error: err => {

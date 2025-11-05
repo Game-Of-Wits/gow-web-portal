@@ -1,28 +1,57 @@
 <section class="w-screen md:w-full md:px-[26px] py-4.5 overflow-hidden">
-  <div class="flex w-full justify-between items-center mb-3.5 px-[15px] sm:px-0">
-    <div class="flex items-center gap-3">
-      <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestria</h1>
-    </div>
+  <div
+    class="flex w-full justify-between items-center mb-3.5 px-[15px] sm:px-0"
+  >
+    <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestría</h1>
 
-    <button
-      pButton
-      severity="danger"
-      class="rounded-xl"
-      [loading]="isExperienceSessionEndingLoading()"
-      (click)="onEndOfExperienceSession()"
-    >
-      <i-lucide pButtonIcon [img]="stopIcon" class="fill-white size-5 md:size-6" />
-      <span pButtonLabel class="hidden sm:inline-flex">Concluir experiencia</span>
-    </button>
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        severity="secondary"
+        outlined
+        class="rounded-xl"
+        [loading]="isDownloadingReport()"
+        (click)="onDownloadReport()"
+        title="Descargar reporte de Excel"
+      >
+        <i-lucide
+          pButtonIcon
+          [img]="downloadIcon"
+          class="fill-white size-5 md:size-6"
+        />
+        <span pButtonLabel class="hidden sm:inline-flex"
+          >Descargar reporte</span
+        >
+      </button>
+
+      <button
+        pButton
+        severity="danger"
+        class="rounded-xl"
+        [loading]="isExperienceSessionEndingLoading()"
+        (click)="onEndOfExperienceSession()"
+      >
+        <i-lucide
+          pButtonIcon
+          [img]="stopIcon"
+          class="fill-white size-5 md:size-6"
+        />
+        <span pButtonLabel class="hidden sm:inline-flex"
+          >Concluir experiencia</span
+        >
+      </button>
+    </div>
   </div>
 
   <div class="flex-col md:flex-row flex md:items-start gap-4 md:gap-6 md:px-0">
     <div class="md:flex-1 md:w-full">
-      <h2 class="hidden sm:block text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
+      <h2 class="hidden sm:block text-lg text-gray-700 font-bold mb-2">
+        Estudiantes
+      </h2>
 
       <div class="overflow-x-auto md:overflow-visible w-full px-[15px] md:px-0">
         <p-table
-          [value]="students()"
+          [value]="studentsRanking()"
           [loading]="isStudentsLoading()"
           [scrollable]="true"
           scrollHeight="700px"
@@ -31,23 +60,62 @@
           <ng-template #header>
             <tr class="text-sm sm:text-base">
               <th pFrozenColumn>Nombre completo</th>
+              <th>Ranking</th>
               <th>Nivel</th>
-              <th>Puntaje</th>
+              <th>Nota academica</th>
+              <th>
+                <div class="flex items-center gap-3">
+                  <span>Puntaje</span>
+                  <p-button
+                    rounded
+                    severity="success"
+                    styleClass="aspect-square size-[30px] sm:size-[32px]"
+                    size="small"
+                    title="Aplicar cambios a todos"
+                    (click)="onApplyAllPointsChanges()"
+                    [disabled]="!hasEditingStudentsPoints() || isSavingPoints()"
+                  >
+                    <i-lucide
+                      pButtonIcon
+                      [img]="applyAllIcon"
+                      class="size-5 sm:size-6"
+                    />
+                  </p-button>
+                </div>
+              </th>
               <th>Acciones</th>
             </tr>
           </ng-template>
 
           <ng-template #body let-student>
             <tr>
-              <td
-                pFrozenColumn
-                class="text-sm sm:text-base min-w-[120px]"
-              >
-                {{ student.firstName }} {{ student.lastName }}
+              <td pFrozenColumn class="text-sm sm:text-base min-w-[120px]">
+                {{ student.state.firstName }} {{ student.state.lastName }}
               </td>
-              <td class="text-sm sm:text-base min-w-[80px]">{{ getLevelName(student.levelId) }}</td>
+              <td class="text-sm sm:text-base min-w-[50px]">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">{{
+                    rankingStyles[student.rank]?.textIcon ?? "🚀"
+                  }}</span>
+                  <p-tag
+                    value="#{{ student.rank }}"
+                    styleClass="text-sm sm:text-base {{
+                      rankingStyles[student.rank].styleClass ??
+                        'bg-transparent text-black'
+                    }}"
+                  />
+                </div>
+              </td>
+              <td class="text-sm sm:text-base min-w-[80px]">
+                {{ getLevelName(student.state.levelId) }}
+              </td>
+              <td class="text-sm sm:text-base min-w-[50px]">
+                {{ student.vigesimalScore }}
+              </td>
               <td>
-                <div class="flex items-center gap-4 sm:gap-5 flex-row w-[200px]">
+                <div
+                  class="flex items-center gap-4 sm:gap-5 flex-row w-[200px]"
+                >
                   <div class="flex items-center gap-0.5">
                     <p-button
                       rounded
@@ -56,19 +124,40 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Disminuir puntaje"
-                      (click)="onDecrementPoints(student)"
-                      [disabled]="isSavingPoints() || getDisplayPoints(student) <= 0"
+                      (click)="onDecrementPoints(student.state)"
+                      [disabled]="
+                        isSavingPoints() || getDisplayPoints(student.state) <= 0
+                      "
                     >
-                      <i-lucide pButtonIcon [img]="minusIcon" class="size-5 sm:size-6" />
+                      <i-lucide
+                        pButtonIcon
+                        [img]="minusIcon"
+                        class="size-5 sm:size-6"
+                      />
                     </p-button>
 
-                    @if (getEditingStudent(student.id); as editingStudent) {
-                      <span class="font-bold text-sm md:text-base min-w-[40px] text-center {{ editingStudent.originalPoints === editingStudent.currentPoints ? 'text-black' : editingStudent.originalPoints > editingStudent.currentPoints ? 'text-danger-500' : 'text-success-500' }}">
+                    @if (
+                      getEditingStudent(student.state.id);
+                      as editingStudent
+                    ) {
+                      <span
+                        class="font-bold text-sm md:text-base min-w-[40px] text-center {{
+                          editingStudent.originalPoints ===
+                          editingStudent.currentPoints
+                            ? 'text-black'
+                            : editingStudent.originalPoints >
+                                editingStudent.currentPoints
+                              ? 'text-danger-500'
+                              : 'text-success-500'
+                        }}"
+                      >
                         {{ editingStudent.currentPoints }}
                       </span>
                     } @else {
-                      <span class="text-sm sm:text-base min-w-[38px] text-center">
-                        {{ student.progressPoints }}
+                      <span
+                        class="text-sm sm:text-base min-w-[38px] text-center"
+                      >
+                        {{ student.state.progressPoints }}
                       </span>
                     }
 
@@ -79,14 +168,18 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Incrementar puntaje"
-                      (click)="onIncrementPoints(student)"
+                      (click)="onIncrementPoints(student.state)"
                       [disabled]="isSavingPoints()"
                     >
-                      <i-lucide pButtonIcon [img]="plusIcon" class="size-5 sm:size-6" />
+                      <i-lucide
+                        pButtonIcon
+                        [img]="plusIcon"
+                        class="size-5 sm:size-6"
+                      />
                     </p-button>
                   </div>
 
-                  @if (getEditingStudent(student.id); as editingStudent) {
+                  @if (getEditingStudent(student.state.id); as editingStudent) {
                     <div class="flex items-center gap-2">
                       <p-button
                         rounded
@@ -95,10 +188,14 @@
                         styleClass="aspect-square size-[30px] sm:size-[32px]"
                         size="small"
                         title="Cancelar"
-                        (click)="onCancelEditingPoints(student.id)"
+                        (click)="onCancelEditingPoints(student.state.id)"
                         [disabled]="isSavingPoints()"
                       >
-                        <i-lucide pButtonIcon [img]="cancelIcon" class="size-5" />
+                        <i-lucide
+                          pButtonIcon
+                          [img]="cancelIcon"
+                          class="size-5"
+                        />
                       </p-button>
 
                       <p-button
@@ -108,10 +205,18 @@
                         styleClass="aspect-square size-[30px] sm:size-[32px]"
                         size="small"
                         title="Aplicar cambios"
-                        (click)="onApplyPointsChange(student.id)"
-                        [disabled]="isSavingPoints() || editingStudent.currentPoints === editingStudent.originalPoints"
+                        (click)="onApplyPointsChange(student.state.id)"
+                        [disabled]="
+                          isSavingPoints() ||
+                          editingStudent.currentPoints ===
+                            editingStudent.originalPoints
+                        "
                       >
-                        <i-lucide pButtonIcon [img]="applyIcon" class="size-5" />
+                        <i-lucide
+                          pButtonIcon
+                          [img]="applyIcon"
+                          class="size-5"
+                        />
                       </p-button>
 
                       @if (isSavingPoints()) {
@@ -120,7 +225,7 @@
                           strokeWidth="4"
                           [style]="{
                             width: '24px',
-                            height: '24px'
+                            height: '24px',
                           }"
                         ></p-progress-spinner>
                       }
@@ -137,9 +242,13 @@
                     styleClass="aspect-square"
                     size="small"
                     title="Aplicar penalización"
-                    (click)="onOpenApplyStudentPenaltyDialog(student.id)"
+                    (click)="onOpenApplyStudentPenaltyDialog(student.state.id)"
                   >
-                    <i-lucide pButtonIcon [img]="applyPenaltyIcon" class="size-5 ms:size-auto" />
+                    <i-lucide
+                      pButtonIcon
+                      [img]="applyPenaltyIcon"
+                      class="size-5 ms:size-auto"
+                    />
                   </p-button>
                 </div>
               </td>
@@ -150,7 +259,9 @@
     </div>
 
     <div class="flex flex-col px-[15px] md:px-0">
-      <h2 class="text-lg text-gray-700 font-bold mb-1 md:mb-2">Habilidades usadas</h2>
+      <h2 class="text-lg text-gray-700 font-bold mb-1 md:mb-2">
+        Habilidades usadas
+      </h2>
 
       <div class="flex flex-col gap-3 max-w-[400px] md:min-w-[400px] w-full">
         @if (!isStudentAbilitiesUsagesLoading()) {

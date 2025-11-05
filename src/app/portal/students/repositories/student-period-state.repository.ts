@@ -171,7 +171,7 @@ export class StudentPeriodStateRepository {
     )
   }
 
-  public async modifyStudentHealtPoints(
+  public async modifyStudentHealthPoints(
     studentPeriodState: StudentPeriodStatesDbModel,
     data: {
       modifier: PointsModifier
@@ -186,18 +186,18 @@ export class StudentPeriodStateRepository {
       EducationalExperience.SHADOW_WARFARE
     ] as ShadowWarfareExperienceStateDb
 
-    let newStudentHealtPoints = shadowWarfareStudentExperience.healthPoints
+    let newStudentHealthPoints = shadowWarfareStudentExperience.healthPoints
 
     if (data.modifier === PointsModifier.INCREMENT) {
-      newStudentHealtPoints = Math.min(
+      newStudentHealthPoints = Math.min(
         classroom.experiences.SHADOW_WARFARE.healthPointsBase,
-        newStudentHealtPoints + data.points
+        newStudentHealthPoints + data.points
       )
     } else if (data.modifier === PointsModifier.DECREASE) {
-      newStudentHealtPoints = Math.max(0, newStudentHealtPoints - data.points)
+      newStudentHealthPoints = Math.max(0, newStudentHealthPoints - data.points)
     }
 
-    if (shadowWarfareStudentExperience.healthPoints === newStudentHealtPoints)
+    if (shadowWarfareStudentExperience.healthPoints === newStudentHealthPoints)
       return shadowWarfareStudentExperience.healthPoints
 
     const batch = writeBatch(this.firestore)
@@ -209,12 +209,12 @@ export class StudentPeriodStateRepository {
         ...studentPeriodState.experiences,
         SHADOW_WARFARE: {
           ...shadowWarfareStudentExperience,
-          healthPoints: newStudentHealtPoints
+          healthPoints: newStudentHealthPoints
         }
       }
     })
 
-    if (newStudentHealtPoints === 0) {
+    if (newStudentHealthPoints === 0) {
       const eliminatedStudentRef = EliminatedStudentRepository.generateRef(
         this.firestore
       )
@@ -243,7 +243,7 @@ export class StudentPeriodStateRepository {
 
     await batch.commit()
 
-    return newStudentHealtPoints
+    return newStudentHealthPoints
   }
 
   public async eliminateStudentByVotes(

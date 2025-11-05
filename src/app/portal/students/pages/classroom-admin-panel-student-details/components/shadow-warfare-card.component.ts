@@ -18,7 +18,7 @@ import { TeamService } from '~/teams/services/team/team.service'
     <p-card>
       <ng-template pTemplate="header">
         <div class="p-4 pb-0">
-          <h2 class="text-xl font-semibold text-danger-500 m-0">
+          <h2 class="text-2xl font-semibold text-danger-500 m-0">
             Guerra de Sombras
           </h2>
         </div>
@@ -29,11 +29,11 @@ import { TeamService } from '~/teams/services/team/team.service'
           <div>
             <p class="text-sm text-gray-500 mb-1">Personaje</p>
             <div class="flex items-center gap-2">
-              <span class="text-red-500">👤</span>
+              <span class="text-lg">👤</span>
 
               @if (!isLoading()) {
                 @if (character(); as character) {
-                  <span class="font-semibold">{{ character.name }}</span>
+                  <span class="font-semibold text-lg">{{ character.name }}</span>
                 }
               } @else {
                 <p-skeleton width="w-[80px]" height="1rem" borderRadius="10px" />
@@ -45,7 +45,7 @@ import { TeamService } from '~/teams/services/team/team.service'
             <div class="flex items-center gap-2">
               @if (!isLoading()) {
                 @if (team(); as team) {
-                  <span class="font-semibold">{{ team.name }}</span>
+                  <span class="font-semibold text-lg">{{ team.name }}</span>
                 }
               } @else {
                 <p-skeleton width="w-[80px]" height="1rem" borderRadius="10px" />
@@ -54,10 +54,7 @@ import { TeamService } from '~/teams/services/team/team.service'
           </div>
           <div>
             <p class="text-sm text-gray-500 mb-1">Puntos de vida</p>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-heart-fill text-red-500"></i>
-              <span class="font-semibold">{{ shadowWarfareState().healthPoints }}</span>
-            </div>
+            <span class="font-semibold text-xl">{{ shadowWarfareState().healthPoints }}</span>
           </div>
         </div>
 
@@ -144,35 +141,35 @@ export class ShadowWarfareCardComponent implements OnInit {
   public studentHomeworks = signal<StudentHomeworkModel[]>([])
 
   public homeworkInfo = computed<StudentHomeworksStats>(() => {
-  const studentHomeworks = this.studentHomeworks();
+    const studentHomeworks = this.studentHomeworks();
 
     if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
 
-  let successful = 0;
-  let noSuccessful = 0;
-  let completed = 0;
-  let noCompleted = 0;
+    let successful = 0;
+    let noSuccessful = 0;
+    let completed = 0;
+    let noCompleted = 0;
 
-  for (const homework of studentHomeworks) {
-    switch (homework.status) {
-      case StudentHomeworkStatus.CORRECT_ANSWER:
-        successful++;
-        completed++;
-        break;
-      case StudentHomeworkStatus.WRONG_ANSWER:
-      case StudentHomeworkStatus.FAILED_DEADLINE:
-        noSuccessful++;
-        completed++;
-        break;
-      case StudentHomeworkStatus.PENDING:
-        noCompleted++;
-        break;
-      default:
-        break;
+    for (const homework of studentHomeworks) {
+      switch (homework.status) {
+        case StudentHomeworkStatus.CORRECT_ANSWER:
+          successful++;
+          completed++;
+          break;
+        case StudentHomeworkStatus.WRONG_ANSWER:
+        case StudentHomeworkStatus.FAILED_DEADLINE:
+          noSuccessful++;
+          completed++;
+          break;
+        case StudentHomeworkStatus.PENDING:
+          noCompleted++;
+          break;
+        default:
+          break;
+      }
     }
-  }
 
-  return { successful, noSuccessful, completed, noCompleted };
+    return { successful, noSuccessful, completed, noCompleted };
   })
 
   public isLoading = signal<boolean>(true)

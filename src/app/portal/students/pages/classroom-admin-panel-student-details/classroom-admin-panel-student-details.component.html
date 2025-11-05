@@ -43,6 +43,8 @@
               @if (getMasteryRoadState(studentPeriodState.experiences); as masteryRoadState) {
                 <gow-mastery-road-card
                   [studentPeriodStateId]="studentPeriodState.id"
+                  [academicPeriodId]="studentPeriodState.academicPeriodId"
+                  [classroomId]="studentPeriodState.classroomId"
                   [state]="masteryRoadState"
                 />
               }
