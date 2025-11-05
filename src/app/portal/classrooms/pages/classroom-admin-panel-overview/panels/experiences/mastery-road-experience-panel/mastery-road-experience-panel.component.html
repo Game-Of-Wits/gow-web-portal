@@ -32,7 +32,7 @@
 
       <div class="overflow-x-auto md:overflow-visible w-full px-[15px] md:px-0">
         <p-table
-          [value]="students()"
+          [value]="studentsRanking()"
           [loading]="isStudentsLoading()"
           [scrollable]="true"
           scrollHeight="700px"
@@ -41,7 +41,9 @@
           <ng-template #header>
             <tr class="text-sm sm:text-base">
               <th pFrozenColumn>Nombre completo</th>
+              <th>Ranking</th>
               <th>Nivel</th>
+              <th>Nota academica</th>
               <th>
                 <div class="flex items-center gap-3">
                   <span>Puntaje</span>
@@ -69,10 +71,21 @@
           <ng-template #body let-student>
             <tr>
               <td pFrozenColumn class="text-sm sm:text-base min-w-[120px]">
-                {{ student.firstName }} {{ student.lastName }}
+                {{ student.state.firstName }} {{ student.state.lastName }}
+              </td>
+              <td class="text-sm sm:text-base min-w-[40px]">
+                <p-tag
+                  value="#{{ student.rank }}"
+                  styleClass="{{
+                    (rankColor[student.rank]) ?? 'bg-transparent text-black'
+                  }}"
+                />
               </td>
               <td class="text-sm sm:text-base min-w-[80px]">
-                {{ getLevelName(student.levelId) }}
+                {{ getLevelName(student.state.levelId) }}
+              </td>
+              <td class="text-sm sm:text-base min-w-[50px]">
+                {{ student.vigesimalScore }}
               </td>
               <td>
                 <div
@@ -86,9 +99,9 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Disminuir puntaje"
-                      (click)="onDecrementPoints(student)"
+                      (click)="onDecrementPoints(student.state)"
                       [disabled]="
-                        isSavingPoints() || getDisplayPoints(student) <= 0
+                        isSavingPoints() || getDisplayPoints(student.state) <= 0
                       "
                     >
                       <i-lucide
@@ -98,7 +111,8 @@
                       />
                     </p-button>
 
-                    @if (getEditingStudent(student.id); as editingStudent) {
+                    @if (getEditingStudent(student.state.id); as editingStudent)
+                    {
                     <span
                       class="font-bold text-sm md:text-base min-w-[40px] text-center {{
                         editingStudent.originalPoints ===
@@ -114,7 +128,7 @@
                     </span>
                     } @else {
                     <span class="text-sm sm:text-base min-w-[38px] text-center">
-                      {{ student.progressPoints }}
+                      {{ student.state.progressPoints }}
                     </span>
                     }
 
@@ -125,7 +139,7 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Incrementar puntaje"
-                      (click)="onIncrementPoints(student)"
+                      (click)="onIncrementPoints(student.state)"
                       [disabled]="isSavingPoints()"
                     >
                       <i-lucide
@@ -136,7 +150,7 @@
                     </p-button>
                   </div>
 
-                  @if (getEditingStudent(student.id); as editingStudent) {
+                  @if (getEditingStudent(student.state.id); as editingStudent) {
                   <div class="flex items-center gap-2">
                     <p-button
                       rounded
@@ -145,7 +159,7 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Cancelar"
-                      (click)="onCancelEditingPoints(student.id)"
+                      (click)="onCancelEditingPoints(student.state.id)"
                       [disabled]="isSavingPoints()"
                     >
                       <i-lucide pButtonIcon [img]="cancelIcon" class="size-5" />
@@ -158,7 +172,7 @@
                       styleClass="aspect-square size-[30px] sm:size-[32px]"
                       size="small"
                       title="Aplicar cambios"
-                      (click)="onApplyPointsChange(student.id)"
+                      (click)="onApplyPointsChange(student.state.id)"
                       [disabled]="
                         isSavingPoints() ||
                         editingStudent.currentPoints ===
@@ -191,7 +205,7 @@
                     styleClass="aspect-square"
                     size="small"
                     title="Aplicar penalización"
-                    (click)="onOpenApplyStudentPenaltyDialog(student.id)"
+                    (click)="onOpenApplyStudentPenaltyDialog(student.state.id)"
                   >
                     <i-lucide
                       pButtonIcon

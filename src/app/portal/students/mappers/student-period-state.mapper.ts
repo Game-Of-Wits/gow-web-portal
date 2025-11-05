@@ -127,7 +127,7 @@ export class StudentPeriodStateMapper {
   private studentPeriodStateExperiencesToModel(experiences: {
     [key: string]: StudentPeriodStateDbExperience
   }): Map<EducationalExperience, StudentPeriodStateExperience> {
-    const experienesMapped: Map<
+    const experiencesMapped: Map<
       EducationalExperience,
       StudentPeriodStateExperience
     > = new Map()
@@ -140,7 +140,7 @@ export class StudentPeriodStateMapper {
       const abilityIds = experience.abilities.map(ability => ability.id)
       const homeworksIds = experience.homeworks.map(homework => homework.id)
 
-      experienesMapped.set(EducationalExperience.SHADOW_WARFARE, {
+      experiencesMapped.set(EducationalExperience.SHADOW_WARFARE, {
         abilityIds,
         homeworksIds,
         characterId: experience.character.id,
@@ -159,7 +159,7 @@ export class StudentPeriodStateMapper {
         levelReward => levelReward.id
       )
 
-      experienesMapped.set(EducationalExperience.MASTERY_ROAD, {
+      experiencesMapped.set(EducationalExperience.MASTERY_ROAD, {
         abilityIds,
         levelRewardIds,
         currentLevelId: experience.currentLevel.id,
@@ -167,6 +167,6 @@ export class StudentPeriodStateMapper {
       } as MasteryRoadExperienceState)
     }
 
-    return experienesMapped
+    return experiencesMapped
   }
 }
