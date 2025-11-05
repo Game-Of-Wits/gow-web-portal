@@ -42,6 +42,7 @@ import { LevelService } from '~/levels/services/level/level.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { PointsModifier } from '~/shared/models/PointsModifier'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
+import { rankingStyles } from '~/students/data/rankingStyles'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
 import { MasteryRoadStudentPeriodStateRanking } from '~/students/models/MasteryRoadStudentPeriodStateRanking'
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
@@ -101,11 +102,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public readonly cancelIcon = X
   public readonly modifyPointsIcon = Bolt
   public readonly applyPenaltyIcon = Gavel
-  public readonly rankColor: { [rank: number]: string } = {
-    1: 'bg-yellow-400 text-yellow-900',
-    2: 'bg-slate-600 text-slate-200',
-    3: 'bg-amber-700 text-white'
-  }
+  public readonly rankingStyles = rankingStyles
 
   private destroy$ = new Subject<void>()
 
@@ -186,9 +183,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       return students
     })
 
-    const studentStates = this.studentsRanking().map(
-      student => student.state
-    )
+    const studentStates = this.studentsRanking().map(student => student.state)
     const updateRankingStudents =
       calcMasteryRoadStudentPeriodStatesRanking(studentStates)
 

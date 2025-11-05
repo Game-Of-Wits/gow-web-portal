@@ -73,13 +73,19 @@
               <td pFrozenColumn class="text-sm sm:text-base min-w-[120px]">
                 {{ student.state.firstName }} {{ student.state.lastName }}
               </td>
-              <td class="text-sm sm:text-base min-w-[40px]">
-                <p-tag
-                  value="#{{ student.rank }}"
-                  styleClass="{{
-                    (rankColor[student.rank]) ?? 'bg-transparent text-black'
-                  }}"
-                />
+              <td class="text-sm sm:text-base min-w-[50px]">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">{{
+                    rankingStyles[student.rank]?.textIcon ?? "🚀"
+                  }}</span>
+                  <p-tag
+                    value="#{{ student.rank }}"
+                    styleClass="text-sm sm:text-base {{
+                      rankingStyles[student.rank].styleClass ??
+                        'bg-transparent text-black'
+                    }}"
+                  />
+                </div>
               </td>
               <td class="text-sm sm:text-base min-w-[80px]">
                 {{ getLevelName(student.state.levelId) }}
@@ -111,8 +117,8 @@
                       />
                     </p-button>
 
-                    @if (getEditingStudent(student.state.id); as editingStudent)
-                    {
+                    @if ( getEditingStudent(student.state.id); as editingStudent
+                    ) {
                     <span
                       class="font-bold text-sm md:text-base min-w-[40px] text-center {{
                         editingStudent.originalPoints ===
@@ -187,9 +193,9 @@
                       ariaLabel="loading"
                       strokeWidth="4"
                       [style]="{
-                        width: '24px',
-                        height: '24px'
-                      }"
+                            width: '24px',
+                            height: '24px',
+                          }"
                     ></p-progress-spinner>
                     }
                   </div>

@@ -18,7 +18,7 @@ import { TeamService } from '~/teams/services/team/team.service'
     <p-card>
       <ng-template pTemplate="header">
         <div class="p-4 pb-0">
-          <h2 class="text-xl font-semibold text-danger-500 m-0">
+          <h2 class="text-2xl font-semibold text-danger-500 m-0">
             Guerra de Sombras
           </h2>
         </div>
@@ -144,35 +144,35 @@ export class ShadowWarfareCardComponent implements OnInit {
   public studentHomeworks = signal<StudentHomeworkModel[]>([])
 
   public homeworkInfo = computed<StudentHomeworksStats>(() => {
-  const studentHomeworks = this.studentHomeworks();
+    const studentHomeworks = this.studentHomeworks();
 
-    if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
+      if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
 
-  let successful = 0;
-  let noSuccessful = 0;
-  let completed = 0;
-  let noCompleted = 0;
+    let successful = 0;
+    let noSuccessful = 0;
+    let completed = 0;
+    let noCompleted = 0;
 
-  for (const homework of studentHomeworks) {
-    switch (homework.status) {
-      case StudentHomeworkStatus.CORRECT_ANSWER:
-        successful++;
-        completed++;
-        break;
-      case StudentHomeworkStatus.WRONG_ANSWER:
-      case StudentHomeworkStatus.FAILED_DEADLINE:
-        noSuccessful++;
-        completed++;
-        break;
-      case StudentHomeworkStatus.PENDING:
-        noCompleted++;
-        break;
-      default:
-        break;
+    for (const homework of studentHomeworks) {
+      switch (homework.status) {
+        case StudentHomeworkStatus.CORRECT_ANSWER:
+          successful++;
+          completed++;
+          break;
+        case StudentHomeworkStatus.WRONG_ANSWER:
+        case StudentHomeworkStatus.FAILED_DEADLINE:
+          noSuccessful++;
+          completed++;
+          break;
+        case StudentHomeworkStatus.PENDING:
+          noCompleted++;
+          break;
+        default:
+          break;
+      }
     }
-  }
 
-  return { successful, noSuccessful, completed, noCompleted };
+    return { successful, noSuccessful, completed, noCompleted };
   })
 
   public isLoading = signal<boolean>(true)

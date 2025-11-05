@@ -15,7 +15,7 @@ import { StudentPeriodStateService } from '~/students/services/student-period-st
     <p-card>
       <ng-template pTemplate="header">
         <div class="flex justify-between items-center p-4 pb-0">
-          <h2 class="text-xl font-semibold text-info-600 m-0">
+          <h2 class="text-2xl font-semibold text-info-600 m-0">
             Camino de la Maestría
           </h2>
         </div>
