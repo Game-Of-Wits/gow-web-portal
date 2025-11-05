@@ -12,6 +12,7 @@ import { ErrorResponse } from '@shared/types/ErrorResponse'
 import {
   Bolt,
   Check,
+  CheckCheck,
   EllipsisVertical,
   Gavel,
   LucideAngularModule,
@@ -65,6 +66,12 @@ interface StudentPointsEdit {
   currentPoints: number
 }
 
+interface StudentPointsUpdateResult {
+  studentId: string
+  newLevelId: string
+  newProgressPoints: number
+}
+
 @Component({
   selector: 'gow-mastery-road-experience-panel',
   templateUrl: './mastery-road-experience-panel.component.html',
@@ -86,6 +93,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public readonly plusIcon = Plus
   public readonly minusIcon = Minus
   public readonly applyIcon = Check
+  public readonly applyAllIcon = CheckCheck
   public readonly cancelIcon = X
   public readonly modifyPointsIcon = Bolt
   public readonly applyPenaltyIcon = Gavel
@@ -111,7 +119,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public levels = signal<LevelModel[]>([])
   public isLevelsLoading = signal<boolean>(true)
 
-  public editingStudentsPoints = signal<Map<string, StudentPointsEdit>>(
+  public editingStudentsPointsMap = signal<Map<string, StudentPointsEdit>>(
     new Map()
   )
   public isSavingPoints = signal<boolean>(false)
@@ -129,6 +137,10 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   public readonly levelsMap = computed(
     () => new Map(this.levels().map(level => [level.id, level.name]))
+  )
+
+  public readonly hasEditingStudentsPoints = computed(() => 
+    this.editingStudentsPointsMap().size > 0
   )
 
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
@@ -164,21 +176,21 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public isEditingStudent(studentId: string): boolean {
-    return this.editingStudentsPoints().has(studentId)
+    return this.editingStudentsPointsMap().has(studentId)
   }
 
   public getDisplayPoints(student: MasteryRoadStudentPeriodState): number {
-    const editing = this.editingStudentsPoints().get(student.id)
+    const editing = this.editingStudentsPointsMap().get(student.id)
     if (editing) return editing.currentPoints
     return student.progressPoints
   }
 
   public getEditingStudent(studentId: string): StudentPointsEdit | null {
-    return this.editingStudentsPoints().get(studentId) ?? null
+    return this.editingStudentsPointsMap().get(studentId) ?? null
   }
 
   public onIncrementPoints(student: MasteryRoadStudentPeriodState) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       const editing = newMap.get(student.id)
 
@@ -200,7 +212,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public onDecrementPoints(student: MasteryRoadStudentPeriodState) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       const editing = newMap.get(student.id)
 
@@ -222,7 +234,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public onCancelEditingPoints(studentId: string) {
-    this.editingStudentsPoints.update(map => {
+    this.editingStudentsPointsMap.update(map => {
       const newMap = new Map(map)
       newMap.delete(studentId)
       return newMap
@@ -230,7 +242,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   }
 
   public async onApplyPointsChange(studentId: string) {
-    const editing = this.editingStudentsPoints().get(studentId)
+    const editing = this.editingStudentsPointsMap().get(studentId)
     const experienceSessionId = this.context.experienceSession()?.id ?? null
 
     if (!editing || experienceSessionId === null) return
@@ -277,6 +289,89 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
       .catch(err => {
         const error = err as ErrorResponse
         this.showModifyStudentProgressPointsErrorMessage(error.code)
+      })
+      .finally(() => {
+        this.isSavingPoints.set(false)
+      })
+  }
+
+ public async onApplyAllPointsChanges() {
+    const editingStudentsPointsMap = this.editingStudentsPointsMap()
+    const experienceSessionId = this.context.experienceSession()?.id ?? null
+
+    if (editingStudentsPointsMap.size === 0 || experienceSessionId === null) return
+
+    this.isSavingPoints.set(true)
+
+    const studentsPointsToUpdate = Array.from(editingStudentsPointsMap.entries()).filter(
+      ([_, editingPoints]) => editingPoints.currentPoints !== editingPoints.originalPoints
+    )
+
+    if (studentsPointsToUpdate.length === 0) {
+      this.editingStudentsPointsMap.set(new Map())
+      this.isSavingPoints.set(false)
+      return
+    }
+
+    const updatePromises = studentsPointsToUpdate.map(([studentId, editingPoints]) => {
+      const pointsDifference = Math.abs(editingPoints.currentPoints - editingPoints.originalPoints)
+      
+      return this.studentPeriodStateService
+        .modifyStudentProgressPoints(studentId, experienceSessionId, {
+          points: pointsDifference,
+          modifier:
+            editingPoints.originalPoints < editingPoints.currentPoints
+              ? PointsModifier.INCREMENT
+              : PointsModifier.DECREASE
+        })
+        .then(({ newLevelId, newProgressPoints }) => ({
+          studentId,
+          newLevelId,
+          newProgressPoints
+        }))
+        .catch(err => {
+          const error = err as ErrorResponse
+          this.showModifyStudentProgressPointsErrorMessage(error.code)
+          return null
+        })
+    })
+
+    Promise.all(updatePromises)
+      .then(studentPointsUpdateResults => {
+        const successfulUpdates = studentPointsUpdateResults.filter(
+          (result): result is StudentPointsUpdateResult => result !== null
+        )
+        
+        this.students.update(students => {
+          successfulUpdates.forEach(({ studentId, newLevelId, newProgressPoints }) => {
+            const studentIndex = students.findIndex(
+              student => student.id === studentId
+            )
+
+            if (studentIndex === -1) return
+
+            students[studentIndex].progressPoints = newProgressPoints
+            students[studentIndex].levelId = newLevelId
+          })
+
+          return students
+        })
+
+        this.editingStudentsPointsMap.update(map => {
+          const newMap = new Map(map)
+          successfulUpdates.forEach(({ studentId }) => {
+            newMap.delete(studentId)
+          })
+          return newMap
+        })
+
+        if (successfulUpdates.length > 0) {
+          this.toastService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: `Puntos modificados correctamente para ${successfulUpdates.length} estudiante(s)`
+          })
+        }
       })
       .finally(() => {
         this.isSavingPoints.set(false)
