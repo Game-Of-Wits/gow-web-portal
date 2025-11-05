@@ -1,20 +1,28 @@
 import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
+import { Functions, httpsCallable } from '@angular/fire/functions'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { catchError, firstValueFrom, map, Observable, switchMap, throwError } from 'rxjs'
+import {
+  catchError,
+  firstValueFrom,
+  map,
+  Observable,
+  switchMap,
+  throwError
+} from 'rxjs'
 import { ExperienceSessionRepository } from '~/class-sessions/repositories/experience-session.repository'
 import { PenaltyRepository } from '~/penalties/repositories/penalty.repository'
 import { PointsModifier } from '~/shared/models/PointsModifier'
 import { StudentPeriodStateMapper } from '~/students/mappers/student-period-state.mapper'
 import { MasteryRoadStudentPeriodState } from '~/students/models/MasteryRoadStudentPeriodState'
+import { MasteryRoadStudentPeriodStateOnlyStats } from '~/students/models/MasteryRoadStudentPeriodStateOnlyStats'
+import { MasteryRoadStudentPeriodStateRanking } from '~/students/models/MasteryRoadStudentPeriodStateRanking'
 import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfareStudentPeriodState'
 import { StudentPeriodStatesModel } from '~/students/models/StudentPeriodStates.model'
 import { EliminatedStudentRepository } from '~/students/repositories/eliminated-student.repository'
 import { StudentRepository } from '~/students/repositories/student.repository'
 import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
-import { MasteryRoadStudentPeriodStateOnlyStats } from '~/students/models/MasteryRoadStudentPeriodStateOnlyStats'
 import { calcMasteryRoadStudentPeriodStatesRanking } from '~/students/utils/calcMasteryRoadStudentPeriodStatesRanking'
-import { MasteryRoadStudentPeriodStateRanking } from '~/students/models/MasteryRoadStudentPeriodStateRanking'
 
 @Injectable({ providedIn: 'root' })
 export class StudentPeriodStateService {
@@ -30,6 +38,8 @@ export class StudentPeriodStateService {
   private readonly eliminatedStudentRepository = inject(
     EliminatedStudentRepository
   )
+
+  private readonly cloudFunctions = inject(Functions)
 
   public async getAllStudentPeriodStatesByStudentProfileId(
     studentProfileId: string
@@ -50,11 +60,41 @@ export class StudentPeriodStateService {
     }
   }
 
-  public async getMasteryRoadStudentPeriodStateRankingById(studentPeriodStateId: string): Promise<MasteryRoadStudentPeriodStateRanking<MasteryRoadStudentPeriodStateOnlyStats> | null> {
+  public async downloadReportOfMasteryRoadStudentPeriodStates({
+    classroomId,
+    academicPeriodId
+  }: {
+    classroomId: string
+    academicPeriodId: string
+  }): Promise<{ downloadReportUrl: string }> {
     try {
-      const studentPeriodState = await this.studentPeriodStateRepository.getByIdAsync(studentPeriodStateId)
+      const generateReportOfMasteryRoadStudentPeriodStatesFn = httpsCallable(
+        this.cloudFunctions,
+        'generateReportOfMasteryRoadStudentPeriodStates'
+      )
 
-      if (studentPeriodState === null) throw new ErrorResponse('student-period-not-exist')
+      const result = await generateReportOfMasteryRoadStudentPeriodStatesFn({
+        classroomId,
+        academicPeriodId
+      })
+
+      return result.data as { downloadReportUrl: string }
+    } catch (err: any) {
+      throw new ErrorResponse(err.code, err.message)
+    }
+  }
+
+  public async getMasteryRoadStudentPeriodStateRankingById(
+    studentPeriodStateId: string
+  ): Promise<MasteryRoadStudentPeriodStateRanking<MasteryRoadStudentPeriodStateOnlyStats> | null> {
+    try {
+      const studentPeriodState =
+        await this.studentPeriodStateRepository.getByIdAsync(
+          studentPeriodStateId
+        )
+
+      if (studentPeriodState === null)
+        throw new ErrorResponse('student-period-not-exist')
 
       const studentPeriodStatesStats = await firstValueFrom(
         this.getAllMasteryRoadStudentPeriodStatesOnlyStats({
@@ -63,9 +103,13 @@ export class StudentPeriodStateService {
         })
       )
 
-      const studentsStatsRanking = calcMasteryRoadStudentPeriodStatesRanking(studentPeriodStatesStats)
+      const studentsStatsRanking = calcMasteryRoadStudentPeriodStatesRanking(
+        studentPeriodStatesStats
+      )
 
-      const studentRanking = studentsStatsRanking.find(studentRanking => studentRanking.state.id === studentPeriodStateId)
+      const studentRanking = studentsStatsRanking.find(
+        studentRanking => studentRanking.state.id === studentPeriodStateId
+      )
 
       return studentRanking ?? null
     } catch (err) {
@@ -112,7 +156,9 @@ export class StudentPeriodStateService {
       })
       .pipe(
         map(students =>
-          this.studentPeriodStateMapper.onlyMasteryRoadExperienceStatsList(students)
+          this.studentPeriodStateMapper.onlyMasteryRoadExperienceStatsList(
+            students
+          )
         ),
         catchError(err => {
           if (err instanceof FirestoreError)

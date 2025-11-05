@@ -29,11 +29,11 @@ import { TeamService } from '~/teams/services/team/team.service'
           <div>
             <p class="text-sm text-gray-500 mb-1">Personaje</p>
             <div class="flex items-center gap-2">
-              <span class="text-red-500">👤</span>
+              <span class="text-lg">👤</span>
 
               @if (!isLoading()) {
                 @if (character(); as character) {
-                  <span class="font-semibold">{{ character.name }}</span>
+                  <span class="font-semibold text-lg">{{ character.name }}</span>
                 }
               } @else {
                 <p-skeleton width="w-[80px]" height="1rem" borderRadius="10px" />
@@ -45,7 +45,7 @@ import { TeamService } from '~/teams/services/team/team.service'
             <div class="flex items-center gap-2">
               @if (!isLoading()) {
                 @if (team(); as team) {
-                  <span class="font-semibold">{{ team.name }}</span>
+                  <span class="font-semibold text-lg">{{ team.name }}</span>
                 }
               } @else {
                 <p-skeleton width="w-[80px]" height="1rem" borderRadius="10px" />
@@ -54,10 +54,7 @@ import { TeamService } from '~/teams/services/team/team.service'
           </div>
           <div>
             <p class="text-sm text-gray-500 mb-1">Puntos de vida</p>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-heart-fill text-red-500"></i>
-              <span class="font-semibold">{{ shadowWarfareState().healthPoints }}</span>
-            </div>
+            <span class="font-semibold text-xl">{{ shadowWarfareState().healthPoints }}</span>
           </div>
         </div>
 
@@ -146,7 +143,7 @@ export class ShadowWarfareCardComponent implements OnInit {
   public homeworkInfo = computed<StudentHomeworksStats>(() => {
     const studentHomeworks = this.studentHomeworks();
 
-      if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
+    if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
 
     let successful = 0;
     let noSuccessful = 0;

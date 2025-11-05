@@ -13,6 +13,7 @@ import {
   Bolt,
   Check,
   CheckCheck,
+  Download,
   EllipsisVertical,
   Gavel,
   LucideAngularModule,
@@ -103,6 +104,7 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
   public readonly modifyPointsIcon = Bolt
   public readonly applyPenaltyIcon = Gavel
   public readonly rankingStyles = rankingStyles
+  public readonly downloadIcon = Download
 
   private destroy$ = new Subject<void>()
 
@@ -115,6 +117,8 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   private readonly context = inject(ClassroomAdminPanelContextService)
   private readonly toastService = inject(MessageService)
+
+  public isDownloadingReport = signal<boolean>(false)
 
   public isExperienceSessionEndingLoading = signal<boolean>(false)
 
@@ -166,6 +170,48 @@ export class MasteryRoadExperiencePanelComponent implements OnInit, OnDestroy {
 
   public getLevelName(levelId: string): string | null {
     return this.levelsMap().get(levelId) ?? null
+  }
+
+  public async onDownloadReport() {
+    const classroomId = this.context.classroom()?.id ?? null
+    const academicPeriodId = this.context.activeAcademicPeriod()?.id ?? null
+
+    if (classroomId === null || academicPeriodId === null) {
+      this.toastService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo obtener la información del aula o período académico'
+      })
+      return
+    }
+
+    this.isDownloadingReport.set(true)
+
+    try {
+      const { downloadReportUrl } =
+        await this.studentPeriodStateService.downloadReportOfMasteryRoadStudentPeriodStates(
+          {
+            classroomId,
+            academicPeriodId
+          }
+        )
+
+      window.open(downloadReportUrl, '_blank')
+
+      this.toastService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Reporte generado correctamente'
+      })
+    } catch (err) {
+      const error = err as ErrorResponse
+      this.showErrorMessage(
+        'Error',
+        error.message || 'No se pudo generar el reporte'
+      )
+    } finally {
+      this.isDownloadingReport.set(false)
+    }
   }
 
   public onSuccessApplyPenaltyToStudent(result: ApplyPenaltyToStudentSuccess) {

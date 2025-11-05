@@ -2,26 +2,45 @@
   <div
     class="flex w-full justify-between items-center mb-3.5 px-[15px] sm:px-0"
   >
-    <div class="flex items-center gap-3">
-      <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestría</h1>
-    </div>
+    <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestría</h1>
 
-    <button
-      pButton
-      severity="danger"
-      class="rounded-xl"
-      [loading]="isExperienceSessionEndingLoading()"
-      (click)="onEndOfExperienceSession()"
-    >
-      <i-lucide
-        pButtonIcon
-        [img]="stopIcon"
-        class="fill-white size-5 md:size-6"
-      />
-      <span pButtonLabel class="hidden sm:inline-flex"
-        >Concluir experiencia</span
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        severity="secondary"
+        outlined
+        class="rounded-xl"
+        [loading]="isDownloadingReport()"
+        (click)="onDownloadReport()"
+        title="Descargar reporte de Excel"
       >
-    </button>
+        <i-lucide
+          pButtonIcon
+          [img]="downloadIcon"
+          class="fill-white size-5 md:size-6"
+        />
+        <span pButtonLabel class="hidden sm:inline-flex"
+          >Descargar reporte</span
+        >
+      </button>
+
+      <button
+        pButton
+        severity="danger"
+        class="rounded-xl"
+        [loading]="isExperienceSessionEndingLoading()"
+        (click)="onEndOfExperienceSession()"
+      >
+        <i-lucide
+          pButtonIcon
+          [img]="stopIcon"
+          class="fill-white size-5 md:size-6"
+        />
+        <span pButtonLabel class="hidden sm:inline-flex"
+          >Concluir experiencia</span
+        >
+      </button>
+    </div>
   </div>
 
   <div class="flex-col md:flex-row flex md:items-start gap-4 md:gap-6 md:px-0">
@@ -117,25 +136,29 @@
                       />
                     </p-button>
 
-                    @if ( getEditingStudent(student.state.id); as editingStudent
+                    @if (
+                      getEditingStudent(student.state.id);
+                      as editingStudent
                     ) {
-                    <span
-                      class="font-bold text-sm md:text-base min-w-[40px] text-center {{
-                        editingStudent.originalPoints ===
-                        editingStudent.currentPoints
-                          ? 'text-black'
-                          : editingStudent.originalPoints >
-                            editingStudent.currentPoints
-                          ? 'text-danger-500'
-                          : 'text-success-500'
-                      }}"
-                    >
-                      {{ editingStudent.currentPoints }}
-                    </span>
+                      <span
+                        class="font-bold text-sm md:text-base min-w-[40px] text-center {{
+                          editingStudent.originalPoints ===
+                          editingStudent.currentPoints
+                            ? 'text-black'
+                            : editingStudent.originalPoints >
+                                editingStudent.currentPoints
+                              ? 'text-danger-500'
+                              : 'text-success-500'
+                        }}"
+                      >
+                        {{ editingStudent.currentPoints }}
+                      </span>
                     } @else {
-                    <span class="text-sm sm:text-base min-w-[38px] text-center">
-                      {{ student.state.progressPoints }}
-                    </span>
+                      <span
+                        class="text-sm sm:text-base min-w-[38px] text-center"
+                      >
+                        {{ student.state.progressPoints }}
+                      </span>
                     }
 
                     <p-button
@@ -157,48 +180,56 @@
                   </div>
 
                   @if (getEditingStudent(student.state.id); as editingStudent) {
-                  <div class="flex items-center gap-2">
-                    <p-button
-                      rounded
-                      outlined
-                      severity="danger"
-                      styleClass="aspect-square size-[30px] sm:size-[32px]"
-                      size="small"
-                      title="Cancelar"
-                      (click)="onCancelEditingPoints(student.state.id)"
-                      [disabled]="isSavingPoints()"
-                    >
-                      <i-lucide pButtonIcon [img]="cancelIcon" class="size-5" />
-                    </p-button>
+                    <div class="flex items-center gap-2">
+                      <p-button
+                        rounded
+                        outlined
+                        severity="danger"
+                        styleClass="aspect-square size-[30px] sm:size-[32px]"
+                        size="small"
+                        title="Cancelar"
+                        (click)="onCancelEditingPoints(student.state.id)"
+                        [disabled]="isSavingPoints()"
+                      >
+                        <i-lucide
+                          pButtonIcon
+                          [img]="cancelIcon"
+                          class="size-5"
+                        />
+                      </p-button>
 
-                    <p-button
-                      rounded
-                      outlined
-                      severity="success"
-                      styleClass="aspect-square size-[30px] sm:size-[32px]"
-                      size="small"
-                      title="Aplicar cambios"
-                      (click)="onApplyPointsChange(student.state.id)"
-                      [disabled]="
-                        isSavingPoints() ||
-                        editingStudent.currentPoints ===
-                          editingStudent.originalPoints
-                      "
-                    >
-                      <i-lucide pButtonIcon [img]="applyIcon" class="size-5" />
-                    </p-button>
+                      <p-button
+                        rounded
+                        outlined
+                        severity="success"
+                        styleClass="aspect-square size-[30px] sm:size-[32px]"
+                        size="small"
+                        title="Aplicar cambios"
+                        (click)="onApplyPointsChange(student.state.id)"
+                        [disabled]="
+                          isSavingPoints() ||
+                          editingStudent.currentPoints ===
+                            editingStudent.originalPoints
+                        "
+                      >
+                        <i-lucide
+                          pButtonIcon
+                          [img]="applyIcon"
+                          class="size-5"
+                        />
+                      </p-button>
 
-                    @if (isSavingPoints()) {
-                    <p-progress-spinner
-                      ariaLabel="loading"
-                      strokeWidth="4"
-                      [style]="{
+                      @if (isSavingPoints()) {
+                        <p-progress-spinner
+                          ariaLabel="loading"
+                          strokeWidth="4"
+                          [style]="{
                             width: '24px',
                             height: '24px',
                           }"
-                    ></p-progress-spinner>
-                    }
-                  </div>
+                        ></p-progress-spinner>
+                      }
+                    </div>
                   }
                 </div>
               </td>
@@ -233,34 +264,39 @@
       </h2>
 
       <div class="flex flex-col gap-3 max-w-[400px] md:min-w-[400px] w-full">
-        @if (!isStudentAbilitiesUsagesLoading()) { @for ( studentAbilityUsage of
-        studentAbilityUsages(); track position; let position = $index ) {
-        <gow-student-ability-usage-card
-          [studentAbilityUsage]="studentAbilityUsage"
-          colorScheme="danger"
-        />
-        } @empty {
-        <div class="flex flex-col gap-4 items-center h-full mt-[60px]">
-          <img
-            ngSrc="/assets/images/ability-uses-empty.png"
-            priority
-            width="800"
-            height="678"
-            class="w-[220px] md:w-[280px] aspect-[1.18]"
-          />
-          <span class="text-gray-700 text-center w-2/3 text-sm md:text-base"
-            >Ningún estudiante ha usado alguna de sus habilidades</span
-          >
-        </div>
-        } } @else {
-        <div class="flex flex-col gap-1 items-center h-full mt-[60px]">
-          <p-progress-spinner
-            ariaLabel="loading"
-            strokeWidth="4"
-            [style]="{ width: '50px', height: '50px' }"
-          ></p-progress-spinner>
-          <span class="text-gray-400 text-center">Cargando...</span>
-        </div>
+        @if (!isStudentAbilitiesUsagesLoading()) {
+          @for (
+            studentAbilityUsage of studentAbilityUsages();
+            track position;
+            let position = $index
+          ) {
+            <gow-student-ability-usage-card
+              [studentAbilityUsage]="studentAbilityUsage"
+              colorScheme="danger"
+            />
+          } @empty {
+            <div class="flex flex-col gap-4 items-center h-full mt-[60px]">
+              <img
+                ngSrc="/assets/images/ability-uses-empty.png"
+                priority
+                width="800"
+                height="678"
+                class="w-[220px] md:w-[280px] aspect-[1.18]"
+              />
+              <span class="text-gray-700 text-center w-2/3 text-sm md:text-base"
+                >Ningún estudiante ha usado alguna de sus habilidades</span
+              >
+            </div>
+          }
+        } @else {
+          <div class="flex flex-col gap-1 items-center h-full mt-[60px]">
+            <p-progress-spinner
+              ariaLabel="loading"
+              strokeWidth="4"
+              [style]="{ width: '50px', height: '50px' }"
+            ></p-progress-spinner>
+            <span class="text-gray-400 text-center">Cargando...</span>
+          </div>
         }
       </div>
     </div>
