@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { StudentProfileService } from '~/student-profiles/services/student-profile/student-profile.service'
 import { MasteryRoadStudentPeriodState } from '../models/MasteryRoadStudentPeriodState'
+import { MasteryRoadStudentPeriodStateOnlyStats } from '../models/MasteryRoadStudentPeriodStateOnlyStats'
 import { ShadowWarfareStudentPeriodState } from '../models/ShadowWarfareStudentPeriodState'
 import {
   MasteryRoadExperienceState,
@@ -108,6 +109,20 @@ export class StudentPeriodStateMapper {
     }
   }
 
+  public onlyMasteryRoadExperienceStats(
+    studentPeriodState: StudentPeriodStatesDbModel
+  ): MasteryRoadStudentPeriodStateOnlyStats {
+    const masteryRoadExperience = studentPeriodState.experiences[
+      EducationalExperience.MASTERY_ROAD
+    ] as MasteryRoadExperienceStateDb
+
+    return {
+      id: studentPeriodState.id,
+      levelId: masteryRoadExperience.currentLevel.id,
+      progressPoints: masteryRoadExperience.progressPoints
+    }
+  }
+
   public async onlyMasteryRoadExperienceList(
     studentPeriodStates: StudentPeriodStatesDbModel[]
   ): Promise<MasteryRoadStudentPeriodState[]> {
@@ -122,6 +137,14 @@ export class StudentPeriodStateMapper {
           (result as PromiseFulfilledResult<MasteryRoadStudentPeriodState>)
             .value
       )
+  }
+
+  public onlyMasteryRoadExperienceStatsList(
+    studentPeriodStates: StudentPeriodStatesDbModel[]
+  ): MasteryRoadStudentPeriodStateOnlyStats[] {
+    return studentPeriodStates.map(studentPeriodState =>
+      this.onlyMasteryRoadExperienceStats(studentPeriodState)
+    )
   }
 
   private studentPeriodStateExperiencesToModel(experiences: {

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core'
 import { FirestoreError } from '@angular/fire/firestore'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
-import { catchError, Observable, switchMap, throwError } from 'rxjs'
+import { catchError, firstValueFrom, map, Observable, switchMap, throwError } from 'rxjs'
 import { ExperienceSessionRepository } from '~/class-sessions/repositories/experience-session.repository'
 import { PenaltyRepository } from '~/penalties/repositories/penalty.repository'
 import { PointsModifier } from '~/shared/models/PointsModifier'
@@ -12,6 +12,9 @@ import { StudentPeriodStatesModel } from '~/students/models/StudentPeriodStates.
 import { EliminatedStudentRepository } from '~/students/repositories/eliminated-student.repository'
 import { StudentRepository } from '~/students/repositories/student.repository'
 import { StudentPeriodStateRepository } from '~/students/repositories/student-period-state.repository'
+import { MasteryRoadStudentPeriodStateOnlyStats } from '~/students/models/MasteryRoadStudentPeriodStateOnlyStats'
+import { calcMasteryRoadStudentPeriodStatesRanking } from '~/students/utils/calcMasteryRoadStudentPeriodStatesRanking'
+import { MasteryRoadStudentPeriodStateRanking } from '~/students/models/MasteryRoadStudentPeriodStateRanking'
 
 @Injectable({ providedIn: 'root' })
 export class StudentPeriodStateService {
@@ -47,6 +50,30 @@ export class StudentPeriodStateService {
     }
   }
 
+  public async getMasteryRoadStudentPeriodStateRankingById(studentPeriodStateId: string): Promise<MasteryRoadStudentPeriodStateRanking<MasteryRoadStudentPeriodStateOnlyStats> | null> {
+    try {
+      const studentPeriodState = await this.studentPeriodStateRepository.getByIdAsync(studentPeriodStateId)
+
+      if (studentPeriodState === null) throw new ErrorResponse('student-period-not-exist')
+
+      const studentPeriodStatesStats = await firstValueFrom(
+        this.getAllMasteryRoadStudentPeriodStatesOnlyStats({
+          classroomId: studentPeriodState.classroom.id,
+          academicPeriodId: studentPeriodState.academicPeriod.id
+        })
+      )
+
+      const studentsStatsRanking = calcMasteryRoadStudentPeriodStatesRanking(studentPeriodStatesStats)
+
+      const studentRanking = studentsStatsRanking.find(studentRanking => studentRanking.state.id === studentPeriodStateId)
+
+      return studentRanking ?? null
+    } catch (err) {
+      const error = err as ErrorResponse | FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
   public getAllMasteryRoadStudentPeriodStates({
     classroomId,
     academicPeriodId
@@ -62,6 +89,30 @@ export class StudentPeriodStateService {
       .pipe(
         switchMap(students =>
           this.studentPeriodStateMapper.onlyMasteryRoadExperienceList(students)
+        ),
+        catchError(err => {
+          if (err instanceof FirestoreError)
+            return throwError(() => new ErrorResponse(err.code))
+          return throwError(() => err)
+        })
+      )
+  }
+
+  public getAllMasteryRoadStudentPeriodStatesOnlyStats({
+    classroomId,
+    academicPeriodId
+  }: {
+    classroomId: string
+    academicPeriodId: string
+  }): Observable<MasteryRoadStudentPeriodStateOnlyStats[]> {
+    return this.studentPeriodStateRepository
+      .getAllByClassroomIdAndExperienceSession({
+        classroomId,
+        academicPeriodId
+      })
+      .pipe(
+        map(students =>
+          this.studentPeriodStateMapper.onlyMasteryRoadExperienceStatsList(students)
         ),
         catchError(err => {
           if (err instanceof FirestoreError)
@@ -114,7 +165,7 @@ export class StudentPeriodStateService {
 
       if (data.points <= 0) throw new ErrorResponse('points-must-be-positive')
 
-      return await this.studentPeriodStateRepository.modifyStudentHealtPoints(
+      return await this.studentPeriodStateRepository.modifyStudentHealthPoints(
         studentPeriodState,
         data
       )
