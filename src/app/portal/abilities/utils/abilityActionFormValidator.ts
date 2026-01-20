@@ -6,9 +6,13 @@ import {
   AddClassroomActionForm,
   AddDeferealHomeworkActionForm,
   AddHealthActionForm,
+  AddInvulnerabilityActionForm,
+  AddMirrorActionForm,
+  AddProtectionActionForm,
   AddRevealActionForm,
+  AddRevengeActionForm,
   AddReviveActionForm,
-  AddTheftActionForm
+  AddTheftActionForm,
 } from '../models/AbilityForm.model'
 
 export const actionFormGuardValidators = [
@@ -17,8 +21,11 @@ export const actionFormGuardValidators = [
   isHealthActionForm,
   isReviveActionForm,
   isRevealActionForm,
-  isClassroomActionForm,
-  isDeferralHomeworkActionForm
+  isProtectionActionForm,
+  isMirrorActionForm,
+  isInvulnerabilityActionForm,
+  isRevengeActionForm,
+  isDeferralHomeworkActionForm,
 ]
 
 export function isClassroomActionForm(
@@ -62,6 +69,31 @@ export function isDeferralHomeworkActionForm(
 ): action is FormGroup<AddDeferealHomeworkActionForm> {
   return action.value.type === AbilityActionType.DEFEREAL_HOMEWORK
 }
+
+export function isProtectionActionForm(
+  action: AbilityActionForm
+): action is FormGroup<AddProtectionActionForm> {
+  return action.value.type === AbilityActionType.PROTECTION
+}
+
+export function isMirrorActionForm(
+  action: AbilityActionForm
+): action is FormGroup<AddMirrorActionForm> {
+  return action.value.type === AbilityActionType.MIRROR
+}
+
+export function isInvulnerabilityActionForm(
+  action: AbilityActionForm
+): action is FormGroup<AddInvulnerabilityActionForm> {
+  return action.value.type === AbilityActionType.INVULNERABILITY
+}
+
+export function isRevengeActionForm(
+  action: AbilityActionForm
+): action is FormGroup<AddRevengeActionForm> {
+  return action.value.type === AbilityActionType.REVENGE
+}
+
 export function isAbilityActionForm(
   a: AbilityActionForm,
   b: AbilityActionForm

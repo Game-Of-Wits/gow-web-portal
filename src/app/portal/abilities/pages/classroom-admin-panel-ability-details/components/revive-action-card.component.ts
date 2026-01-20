@@ -1,12 +1,11 @@
 import { Component, input } from '@angular/core'
-import { LucideAngularModule, Target } from 'lucide-angular'
+import { LucideAngularModule, Target, UsersRound } from 'lucide-angular'
 import { CardModule } from 'primeng/card'
 import { TagModule } from 'primeng/tag'
-import {
-  abilityActionTypeFormats,
-  abilityTargetFormats
-} from '~/abilities/data/formats'
+import { abilityActionTypeFormats } from '~/abilities/data/formats'
+import { abilityReviveTargetFormats } from '~/abilities/data/formats/abilityReviveTargetFormats'
 import { ReviveActionModel } from '~/abilities/models/Ability.model'
+import { AbilityReviveTarget } from '~/abilities/models/AbilityReviveTarget.model'
 
 @Component({
   selector: 'gow-revive-action-card',
@@ -21,9 +20,19 @@ import { ReviveActionModel } from '~/abilities/models/Ability.model'
           <i-lucide [img]="targetIcon" class="size-11" />
           <div>
             <span class="font-bold block">Objetivo</span>
-            <p>{{ abilityTargetFormats[action().target] }}</p>
+            <p>{{ abilityReviveTargetFormats[action().target] }}</p>
           </div>
         </li>
+
+        @if (action().target !== abilityReviveTarget.YOURSELF) {
+          <li class="flex items-center gap-2">
+            <i-lucide [img]="maxTargetsIcon" class="size-11" />
+            <div>
+              <span class="font-bold block">Cantidad de objetivos</span>
+              <p>{{ action().maxTargets }} objetivos</p>
+            </div>
+          </li>
+        }
       </ul>
     </p-card>
   `,
@@ -31,9 +40,11 @@ import { ReviveActionModel } from '~/abilities/models/Ability.model'
 })
 export class ReviveActionCardComponent {
   public readonly targetIcon = Target
+  public readonly maxTargetsIcon = UsersRound
 
   public readonly abilityActionTypeFormats = abilityActionTypeFormats
-  public readonly abilityTargetFormats = abilityTargetFormats
+  public readonly abilityReviveTargetFormats = abilityReviveTargetFormats
+  public readonly abilityReviveTarget = AbilityReviveTarget
 
   public action = input.required<ReviveActionModel>({
     alias: 'action'

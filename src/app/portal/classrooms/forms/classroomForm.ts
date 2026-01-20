@@ -68,10 +68,7 @@ export const classroomForm = (
             ),
             initialAbilities: fb.nonNullable.array<FormGroup<AbilityForm>>(
               [],
-              [
-                Validators.required,
-                InitialAbilitiesValidator.noEqualNames()
-              ]
+              [Validators.required, InitialAbilitiesValidator.noEqualNames()]
             )
           },
           { validators: [ShadowWarfareValidator.minimumOneCharacterPerTeam()] }

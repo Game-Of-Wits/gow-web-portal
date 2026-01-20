@@ -3,8 +3,10 @@ import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { AbilityActionModel } from './Ability.model'
 import { AbilityActionType } from './AbilityActionType.model'
 import { AbilityClassShift } from './AbilityClassShift.model'
+import { AbilityHealthTarget } from './AbilityHealthTarget.model'
 import { AbilityLevelScope } from './AbilityLevelScope.model'
 import { AbilityModifier } from './AbilityModifier.model'
+import { AbilityProtectionTarget } from './AbilityProtectionTarget.model'
 import { AbilityTarget } from './AbilityTarget.model'
 import { AbilityTheftTarget } from './AbilityTheftTarget.model'
 import { AbilityType } from './AbilityType.model'
@@ -12,6 +14,11 @@ import { AbilityUnitTime } from './AbilityUnitTime.model'
 import { AbilityUsage } from './AbilityUsage.model'
 import { AbilityUsageInterval } from './AbilityUsageInterval.model'
 import { DiscoveryInformation } from './DiscoveryInformation.model'
+import { AbilityReviveTarget } from './AbilityReviveTarget.model'
+import { AbilityRevealTarget } from './AbilityRevealTarget.model'
+import { AbilityInvulnerabilityTarget } from './AbilityInvulnerabilityTarget.model'
+import { AbilityRevengeTarget } from './AbilityRevengeTarget.model'
+import { AbilityMirrorTarget } from './AbilityMirrorTarget.model'
 
 export interface AbilityFormDefaultValues {
   name: string
@@ -49,6 +56,10 @@ export type AbilityActionForm =
   | FormGroup<AddReviveActionForm>
   | FormGroup<AddRevealActionForm>
   | FormGroup<AddDeferealHomeworkActionForm>
+  | FormGroup<AddProtectionActionForm>
+  | FormGroup<AddInvulnerabilityActionForm>
+  | FormGroup<AddMirrorActionForm>
+  | FormGroup<AddRevengeActionForm>
 
 export interface AddClassroomActionForm {
   type: FormControl<AbilityActionType.CLASSROOM>
@@ -71,12 +82,14 @@ export interface AddHealthActionForm {
   type: FormControl<AbilityActionType.HEALTH>
   modifier: FormControl<AbilityModifier>
   healthPoints: FormControl<number>
-  target: FormControl<AbilityTarget>
+  target: FormControl<AbilityHealthTarget>
+  maxTargets: FormControl<number>
 }
 
 export interface AddReviveActionForm {
   type: FormControl<AbilityActionType.REVIVE>
-  target: FormControl<AbilityTarget>
+  target: FormControl<AbilityReviveTarget>
+  maxTargets: FormControl<number>
 }
 
 export interface AddRevealActionForm {
@@ -86,11 +99,36 @@ export interface AddRevealActionForm {
     [DiscoveryInformation.TEAM]: FormControl<boolean>
     [DiscoveryInformation.ABILITIES]: FormControl<boolean>
   }>
-  target: FormControl<AbilityTarget>
+  target: FormControl<AbilityRevealTarget>
+  maxTargets: FormControl<number>
 }
 
 export interface AddDeferealHomeworkActionForm {
   type: FormControl<AbilityActionType.DEFEREAL_HOMEWORK>
   unitTime: FormControl<AbilityUnitTime>
   time: FormControl<number>
+}
+
+export interface AddProtectionActionForm {
+  type: FormControl<AbilityActionType.PROTECTION>
+  target: FormControl<AbilityProtectionTarget>
+  maxTargets: FormControl<number>
+}
+
+export interface AddInvulnerabilityActionForm {
+  type: FormControl<AbilityActionType.INVULNERABILITY>
+  target: FormControl<AbilityInvulnerabilityTarget>
+  maxTargets: FormControl<number>
+}
+
+export interface AddRevengeActionForm {
+  type: FormControl<AbilityActionType.REVENGE>
+  target: FormControl<AbilityRevengeTarget>
+  maxTargets: FormControl<number>
+}
+
+export interface AddMirrorActionForm {
+  type: FormControl<AbilityActionType.MIRROR>
+  target: FormControl<AbilityMirrorTarget>
+  maxTargets: FormControl<number>
 }

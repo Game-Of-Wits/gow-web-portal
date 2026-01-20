@@ -3,7 +3,14 @@
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/dist", "!**/node_modules", "!**/.angular"],
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/.angular",
+      "!**/public",
+      "!**/.vscode"
+    ],
     "maxSize": 2097152
   },
   "formatter": {

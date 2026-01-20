@@ -1,9 +1,17 @@
 import { Component, computed, input } from '@angular/core'
-import { HeartMinus, HeartPlus, LucideAngularModule, Target } from 'lucide-angular'
+import {
+  HeartMinus,
+  HeartPlus,
+  LucideAngularModule,
+  Target,
+  UsersRound
+} from 'lucide-angular'
 import { CardModule } from 'primeng/card'
 import { TagModule } from 'primeng/tag'
-import { abilityActionTypeFormats, abilityTargetFormats } from '~/abilities/data/formats'
+import { abilityActionTypeFormats } from '~/abilities/data/formats'
+import { abilityHealthTargetFormats } from '~/abilities/data/formats/abilityHealthTargetFormats'
 import { HealthActionModel } from '~/abilities/models/Ability.model'
+import { AbilityHealthTarget } from '~/abilities/models/AbilityHealthTarget.model'
 import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
 
 @Component({
@@ -27,9 +35,19 @@ import { AbilityModifier } from '~/abilities/models/AbilityModifier.model'
           <i-lucide [img]="targetIcon" class="size-11" />
           <div>
             <span class="font-bold block">Objetivo</span>
-            <p>{{ abilityTargetFormats[action().target] }}</p>
+            <p>{{ abilityHealthTargetFormats[action().target] }}</p>
           </div>
         </li>
+
+        @if (action().target !== abilityHealthTarget.YOURSELF) {
+          <li class="flex items-center gap-2">
+            <i-lucide [img]="maxTargetsIcon" class="size-11" />
+            <div>
+              <span class="font-bold block">Cantidad de objetivos</span>
+              <p>{{ action().maxTargets }} objetivos</p>
+            </div>
+          </li>
+        }
       </ul>
     </p-card>
   `,
@@ -39,9 +57,11 @@ export class HealthActionCardComponent {
   public readonly decrementHealtlIcon = HeartMinus
   public readonly incrementHealtlIcon = HeartPlus
   public readonly targetIcon = Target
+  public readonly maxTargetsIcon = UsersRound
 
   public readonly abilityActionTypeFormats = abilityActionTypeFormats
-  public readonly abilityTargetFormats = abilityTargetFormats
+  public readonly abilityHealthTargetFormats = abilityHealthTargetFormats
+  public readonly abilityHealthTarget = AbilityHealthTarget
 
   public action = input.required<HealthActionModel>({
     alias: 'action'

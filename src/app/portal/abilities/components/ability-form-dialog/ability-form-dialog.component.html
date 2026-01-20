@@ -154,6 +154,7 @@
               [enableClear]="false"
               formControlName="type"
               [scrollHeight]="100"
+              [disabled]="true"
             />
 
             @if (usageTypeControl?.invalid && usageTypeControl?.touched) {
@@ -163,7 +164,7 @@
             }
           </div>
 
-          @if (usageTypeControl?.value == usageType.INTERVAL_TIME) {
+          @if (educationalExperienceControl?.value == educationalExperience.SHADOW_WARFARE) {
             <div class="flex flex-col gap-1 w-full">
               <gow-select-field
                 label="Horario de uso"

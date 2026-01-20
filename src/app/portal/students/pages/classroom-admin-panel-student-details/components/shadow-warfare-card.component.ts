@@ -1,10 +1,20 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core'
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal
+} from '@angular/core'
 import { CardModule } from 'primeng/card'
 import { SkeletonModule } from 'primeng/skeleton'
 import { TagModule } from 'primeng/tag'
 import { CharacterModel } from '~/characters/models/Character.model'
 import { CharacterService } from '~/characters/services/character/character.service'
-import { StudentHomeworkModel, StudentHomeworkStatus } from '~/homeworks/models/StudentHomework.model'
+import {
+  StudentHomeworkModel,
+  StudentHomeworkStatus
+} from '~/homeworks/models/StudentHomework.model'
 import { StudentHomeworkService } from '~/homeworks/services/student-homework/student-homework.service'
 import { StudentHomeworksStats } from '~/students/models/StudentHomeworksStats.model'
 import { ShadowWarfareExperienceState } from '~/students/models/StudentPeriodStates.model'
@@ -141,35 +151,36 @@ export class ShadowWarfareCardComponent implements OnInit {
   public studentHomeworks = signal<StudentHomeworkModel[]>([])
 
   public homeworkInfo = computed<StudentHomeworksStats>(() => {
-    const studentHomeworks = this.studentHomeworks();
+    const studentHomeworks = this.studentHomeworks()
 
-    if (this.studentHomeworks().length === 0) return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
+    if (this.studentHomeworks().length === 0)
+      return { noSuccessful: 0, completed: 0, noCompleted: 0, successful: 0 }
 
-    let successful = 0;
-    let noSuccessful = 0;
-    let completed = 0;
-    let noCompleted = 0;
+    let successful = 0
+    let noSuccessful = 0
+    let completed = 0
+    let noCompleted = 0
 
     for (const homework of studentHomeworks) {
       switch (homework.status) {
         case StudentHomeworkStatus.CORRECT_ANSWER:
-          successful++;
-          completed++;
-          break;
+          successful++
+          completed++
+          break
         case StudentHomeworkStatus.WRONG_ANSWER:
         case StudentHomeworkStatus.FAILED_DEADLINE:
-          noSuccessful++;
-          completed++;
-          break;
+          noSuccessful++
+          completed++
+          break
         case StudentHomeworkStatus.PENDING:
-          noCompleted++;
-          break;
+          noCompleted++
+          break
         default:
-          break;
+          break
       }
     }
 
-    return { successful, noSuccessful, completed, noCompleted };
+    return { successful, noSuccessful, completed, noCompleted }
   })
 
   public isLoading = signal<boolean>(true)

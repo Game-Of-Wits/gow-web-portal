@@ -10,8 +10,7 @@ import { AbilityUsageInterval } from '~/abilities/models/AbilityUsageInterval.mo
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 
 export const experienceAbilityForm = (
-  defaultExperience: EducationalExperience,
-  defaultUsageType: AbilityUsage
+  defaultExperience: EducationalExperience
 ): FormGroup<AbilityForm> => {
   return new FormGroup<AbilityForm>({
     name: new FormControl('', {
@@ -46,7 +45,7 @@ export const experienceAbilityForm = (
       validators: [Validators.required]
     }),
     usage: new FormGroup({
-      type: new FormControl<AbilityUsage>(defaultUsageType, {
+      type: new FormControl<AbilityUsage>(AbilityUsage.ONE_TIME, {
         nonNullable: true,
         validators: [Validators.required]
       }),

@@ -19,6 +19,7 @@ export class TeacherProfileService {
       return TeacherProfileMapper.toModel(teacherProfile)
     } catch (err) {
       const error = err as ErrorResponse | FirestoreError
+      console.error(error)
       throw new ErrorResponse(error.code)
     }
   }

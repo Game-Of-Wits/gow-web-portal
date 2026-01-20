@@ -2,7 +2,6 @@ import { Component, Input, input, signal } from '@angular/core'
 import { FormArray, FormGroup } from '@angular/forms'
 import { LucideAngularModule, Pencil, Plus } from 'lucide-angular'
 import { AbilityForm } from '~/abilities/models/AbilityForm.model'
-import { AbilityUsage } from '~/abilities/models/AbilityUsage.model'
 import { EducationalExperience } from '~/shared/models/EducationalExperience'
 import { AbilityListFormItemComponent } from '../ability-list-form-item/ability-list-form-item.component'
 import { ExperienceAbilityFormDialogComponent } from '../experience-ability-form-dialog/experience-ability-form-dialog.component'
@@ -24,9 +23,6 @@ export class InitialExperienceAbilityListFormComponent {
 
   public experience = input.required<EducationalExperience>({
     alias: 'experience'
-  })
-  public abilityUsage = input.required<AbilityUsage>({
-    alias: 'abilityUsage'
   })
 
   public showAddAbilityFormDialog = signal<boolean>(false)

@@ -1,4 +1,4 @@
-<form [formGroup]="actionForm" class="flex flex-col gap-2 mb-[24px]">
+<form [formGroup]="actionForm" class="flex flex-col gap-2">
   <div class="flex flex-col gap-1">
     <gow-select-field
       label="Modificador"
@@ -21,7 +21,7 @@
       label="Puntos de vida a modificar"
       placeholder="Ingrese la cantidad de puntos de vida a modificar"
       formControlName="healthPoints"
-      focusColor="danger"
+      [focusColor]="colorScheme()"
     />
 
     @if (healthPointsControl?.invalid && healthPointsControl?.touched) {
@@ -44,10 +44,10 @@
     <gow-select-field
       label="Objetivo"
       placeholder="Selecciona el objetivo a revelar"
-      [options]="abilityTargetOptions"
+      [options]="abilityHealthTargetOptions"
       [enableClear]="false"
       [focusColor]="colorScheme()"
-      [scrollHeight]="80"
+      [scrollHeight]="targetControl?.value !== abilityHealthTarget.YOURSELF ? 80 : 60"
       formControlName="target"
     />
 
@@ -57,4 +57,29 @@
       }
     }
   </div>
+
+  @if (targetControl?.value !== abilityHealthTarget.YOURSELF) {
+    <div class="flex flex-col gap-1 mb-2">
+      <gow-number-field
+        label="Cantidad de objetivos"
+        placeholder="Ingrese la cantidad máxima de objetivos"
+        formControlName="maxTargets"
+        [focusColor]="colorScheme()"
+      />
+
+      @if (maxTargetsControl?.invalid && maxTargetsControl?.touched) {
+        @if (hasErrorValidation(maxTargetsControl, "required")) {
+          <p class="text-sm text-red-500">Es requerido</p>
+        } @else if (hasErrorValidation(maxTargetsControl, "min")) {
+          <p class="text-sm text-red-500">
+            Mínimo debe ser {{ maxTargetsControl?.errors?.["min"].min }} objetivo
+          </p>
+        } @else if (hasErrorValidation(maxTargetsControl, "max")) {
+          <p class="text-sm text-red-500">
+            Máximo debe ser {{ maxTargetsControl?.errors?.["max"].max }} objetivo
+          </p>
+        }
+      }
+    </div>
+  }
 </form>

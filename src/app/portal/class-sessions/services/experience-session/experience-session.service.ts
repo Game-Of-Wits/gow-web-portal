@@ -1,8 +1,5 @@
 import { Injectable, inject } from '@angular/core'
-import {
-  FirestoreError,
-  serverTimestamp
-} from '@angular/fire/firestore'
+import { FirestoreError, serverTimestamp } from '@angular/fire/firestore'
 import { ErrorCode } from '@shared/types/ErrorCode'
 import { ErrorResponse } from '@shared/types/ErrorResponse'
 import { map, Observable, take } from 'rxjs'
@@ -11,6 +8,7 @@ import { CreateExperienceSession } from '~/class-sessions/models/CreateExperienc
 import { ExperienceSessionModel } from '~/class-sessions/models/ExperienceSession.model'
 import { ClassSessionRepository } from '~/class-sessions/repositories/class-session.repository'
 import { ExperienceSessionRepository } from '~/class-sessions/repositories/experience-session.repository'
+import { ClassShift } from '~/shared/models/ClassShift'
 import { AuthStore } from '~/shared/store/auth.store'
 
 @Injectable({ providedIn: 'root' })
@@ -111,6 +109,30 @@ export class ExperienceSessionService {
         await this.experienceSessionRepository.create(data)
 
       return ExperienceSessionMapper.toModel(experienceSessionDb)
+    } catch (err) {
+      const error = err as FirestoreError
+      throw new ErrorResponse(error.code)
+    }
+  }
+
+  public async startNightShiftExperienceSession(experienceSessionId: string) {
+    try {
+      if (!this.authStore.isAuth())
+        throw new ErrorResponse(ErrorCode.Unauthenticated)
+
+      const activeExperienceSessionExists =
+        await this.experienceSessionRepository.existsActiveExperienceSessionById(
+          experienceSessionId
+        )
+
+      if (!activeExperienceSessionExists)
+        throw new ErrorResponse('experience-session-not-active')
+
+      await this.experienceSessionRepository.updateById(experienceSessionId, {
+        rules: {
+          shift: ClassShift.NIGHT
+        }
+      })
     } catch (err) {
       const error = err as FirestoreError
       throw new ErrorResponse(error.code)

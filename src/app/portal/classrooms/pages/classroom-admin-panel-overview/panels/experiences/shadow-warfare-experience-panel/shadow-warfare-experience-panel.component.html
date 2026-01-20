@@ -5,11 +5,17 @@
 
       @if (experienceShiftRule(); as shift) {
         <p-tag [value]="classShiftFormats[shift]" severity="secondary" styleClass="text-base" />
-      }
 
-      <button pButton severity="secondary" size="small" class="rounded-full">
-        <i-lucide pButtonIcon [img]="optionsIcon" class="size-4.5" />
-      </button>
+
+        @if (shift != classShift.NIGHT) {
+          <div>
+            <button pButton severity="secondary" size="small" class="rounded-full" (click)="menu.toggle($event)">
+              <i-lucide pButtonIcon [img]="optionsIcon" class="size-4.5" />
+            </button>
+            <p-menu #menu [model]="shadowWarfareOptions" [popup]="true"></p-menu>
+          </div>
+        }
+      }
     </div>
 
     <button
@@ -18,7 +24,7 @@
       class="rounded-xl"
       [loading]="isExperienceSessionEndingLoading()"
       (click)="onEndOfExperienceSession()"
-      [disabled]="isRevivingStudentLoading()"
+      [disabled]="isRevivingStudentLoading() || isClassShiftUpdatingLoading()"
     >
       <i-lucide pButtonIcon [img]="stopIcon" class="fill-white" />
       <span pButtonLabel>Concluir experiencia</span>

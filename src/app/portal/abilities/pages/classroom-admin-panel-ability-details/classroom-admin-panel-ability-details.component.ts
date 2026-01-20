@@ -45,9 +45,13 @@ import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { AscensionActionCardComponent } from './components/ascension-action-card.component'
 import { DeferealHomeworkActionCardComponent } from './components/defereal-homework-action-card.component'
 import { HealthActionCardComponent } from './components/health-action-card.component'
+import { ProtectionActionCardComponent } from './components/protection-action-card.component'
 import { RevealActionCardComponent } from './components/reveal-action-card.component'
 import { ReviveActionCardComponent } from './components/revive-action-card.component'
 import { TheftActionCardComponent } from './components/theft-action-card.component'
+import { MirrorActionCardComponent } from './components/mirror-action-card.component'
+import { RevengeActionCardComponent } from './components/revenge-action-card.component'
+import { InvulnerabilityActionCardComponent } from './components/invulnerability-action-card.component'
 
 const deleteAbilityErrorMessages: ErrorMessages = {
   ...commonErrorMessages
@@ -75,6 +79,10 @@ const abilityLoadingErrorMessages: ErrorMessages = {
     HealthActionCardComponent,
     RevealActionCardComponent,
     ReviveActionCardComponent,
+    ProtectionActionCardComponent,
+    MirrorActionCardComponent,
+    RevengeActionCardComponent,
+    InvulnerabilityActionCardComponent,
     AscensionActionCardComponent,
     ButtonModule,
     TagModule,
