@@ -153,7 +153,10 @@ export class ClassroomAdminPanelLevelsPageComponent implements OnInit {
 
     const levelPosition = this.levels().findIndex(l => l.id === level.id)
 
-    minPoints = levelPosition === 0 ? 0 : (this.levels()[levelPosition - 1]?.requiredPoints ?? 0) + 1
+    minPoints =
+      levelPosition === 0
+        ? 0
+        : (this.levels()[levelPosition - 1]?.requiredPoints ?? 0) + 1
     maxPoints = this.levels()[levelPosition + 1]?.requiredPoints ?? null
 
     if (maxPoints !== null) maxPoints -= 1

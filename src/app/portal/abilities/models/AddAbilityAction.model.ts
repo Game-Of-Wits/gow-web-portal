@@ -4,6 +4,10 @@ import {
   ClassroomActionFormData,
   DeferealHomeworkActionFormData,
   HealthActionFormData,
+  InvulnerabilityActionFormData,
+  MirrorActionFormData,
+  ProtectionActionFormData,
+  RevengeActionFormData,
   ReviveActionFormData,
   TheftActionFormData
 } from './AbilityFormData.model'
@@ -15,4 +19,8 @@ export type AddAbilityAction =
   | HealthActionFormData
   | ReviveActionFormData
   | RevealActionModel
+  | ProtectionActionFormData
+  | MirrorActionFormData
+  | InvulnerabilityActionFormData
+  | RevengeActionFormData
   | DeferealHomeworkActionFormData

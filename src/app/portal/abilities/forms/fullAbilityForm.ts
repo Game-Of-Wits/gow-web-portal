@@ -14,6 +14,10 @@ import { healthActionForm } from './healthActionForm'
 import { revealActionForm } from './revealActionForm'
 import { reviveActionForm } from './reviveActionForm'
 import { theftActionForm } from './theftActionForm'
+import { protectionActionForm } from './protectionActionForm'
+import { invulnerabilityActionForm } from './invulnerabilityActionForm'
+import { revengeActionForm } from './revengeActionForm'
+import { mirrorActionForm } from './mirrorActionForm'
 
 export const fullAbilityForm = (
   defaultValues?: AbilityFormData
@@ -43,7 +47,7 @@ export const fullAbilityForm = (
       validators: [Validators.required, Validators.minLength(1)]
     }),
     experience: new FormControl<EducationalExperience>(
-      defaultValues?.experience ?? EducationalExperience.SHADOW_WARFARE,
+      defaultValues?.experience ?? EducationalExperience.MASTERY_ROAD,
       {
         nonNullable: true,
         validators: [Validators.required]
@@ -88,10 +92,18 @@ export const fullAbilityForm = (
         return revealActionForm(action)
       if (action.type === AbilityActionType.REVIVE)
         return reviveActionForm(action)
-      if (action.type === AbilityActionType.DEFEREAL_HOMEWORK)
-        return deferealHomeworkActionForm(action)
       if (action.type === AbilityActionType.HEALTH)
         return healthActionForm(action)
+      if (action.type === AbilityActionType.DEFEREAL_HOMEWORK)
+        return deferealHomeworkActionForm(action)
+      if (action.type === AbilityActionType.PROTECTION)
+        return protectionActionForm(action)
+      if (action.type === AbilityActionType.INVULNERABILITY)
+        return invulnerabilityActionForm(action)
+      if (action.type === AbilityActionType.MIRROR)
+        return mirrorActionForm(action)
+      if (action.type === AbilityActionType.REVENGE)
+        return revengeActionForm(action)
       return classroomActionForm()
     })
 
@@ -101,6 +113,32 @@ export const fullAbilityForm = (
       abilityActionsForm.push(actionForm)
     )
   }
+
+  abilityForm.controls.experience.valueChanges.subscribe(experience => {
+    const usageCtrls = abilityForm.controls.usage.controls
+    const usageForm = abilityForm.controls.usage
+
+    if (experience === EducationalExperience.MASTERY_ROAD) {
+      usageCtrls.type.enable()
+      usageCtrls.interval.enable()
+
+      usageCtrls.type.setValue(AbilityUsage.ONE_TIME, { emitEvent: false })
+      usageCtrls.shift.setValue(AbilityClassShift.ALL, { emitEvent: false })
+      usageCtrls.interval.setValue(AbilityUsageInterval.SCHOOL_DAY, {
+        emitEvent: false
+      })
+
+      usageForm.disable()
+    } else if (experience === EducationalExperience.SHADOW_WARFARE) {
+      usageForm.enable()
+
+      usageCtrls.interval.setValue(AbilityUsageInterval.SCHOOL_DAY, {
+        emitEvent: false
+      })
+
+      usageCtrls.interval.disable()
+    }
+  })
 
   return abilityForm
 }

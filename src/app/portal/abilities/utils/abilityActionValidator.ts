@@ -5,6 +5,7 @@ import {
   ClassroomActionModel,
   DeferealHomeworkActionModel,
   HealthActionModel,
+  ProtectionActionModel,
   RevealActionModel,
   ReviveActionModel,
   TheftActionModel
@@ -17,6 +18,7 @@ export const actionGuardValidators = [
   isReviveAction,
   isRevealAction,
   isClassroomAction,
+  isProtectionAction,
   isDeferralHomeworkAction
 ]
 
@@ -61,6 +63,13 @@ export function isDeferralHomeworkAction(
 ): action is DeferealHomeworkActionModel {
   return action.type === AbilityActionType.DEFEREAL_HOMEWORK
 }
+
+export function isProtectionAction(
+  action: AbilityActionModel
+): action is ProtectionActionModel {
+  return action.type === AbilityActionType.PROTECTION
+}
+
 export function isAbilityAction(
   a: AbilityActionModel,
   b: AbilityActionModel

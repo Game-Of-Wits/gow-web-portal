@@ -1,13 +1,12 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyCHug83aNuYtPtd52qDrdTAExqyCRCqk_A',
-    authDomain: 'gameofwits-gow.firebaseapp.com',
-    databaseURL: 'https://gameofwits-gow-default-rtdb.firebaseio.com',
-    projectId: 'gameofwits-gow',
-    storageBucket: 'gameofwits-gow.firebasestorage.app',
-    messagingSenderId: '897776608067',
-    appId: '1:897776608067:web:53ee09603535be492d05f6',
-    measurementId: 'G-7SK6M8JQ6X'
+    apiKey: 'AIzaSyCiK8pMTQaYoPs3vS6oxwrl6Nph3m7IZks',
+    authDomain: 'game-of-wits-96e8b.firebaseapp.com',
+    projectId: 'game-of-wits-96e8b',
+    storageBucket: 'game-of-wits-96e8b.firebasestorage.app',
+    messagingSenderId: '741697521605',
+    appId: '1:741697521605:web:66a08be97967d050abadac',
+    measurementId: 'G-BCHQ5ZTQ97'
   }
 }

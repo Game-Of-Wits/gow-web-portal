@@ -87,8 +87,8 @@ export class ModifyStudentHealthPointsFormDialogComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      this.currentStudentHealthPoints();
-      this.calcFinalHealthPoints();
+      this.currentStudentHealthPoints()
+      this.calcFinalHealthPoints()
     })
   }
 

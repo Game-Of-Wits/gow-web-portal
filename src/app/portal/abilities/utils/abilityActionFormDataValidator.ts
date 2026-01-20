@@ -6,19 +6,21 @@ import {
   AddClassroomActionForm,
   AddDeferealHomeworkActionForm,
   AddHealthActionForm,
+  AddProtectionActionForm,
   AddRevealActionForm,
   AddReviveActionForm,
   AddTheftActionForm
 } from '../models/AbilityForm.model'
 
-export const actionFormGuardValidators = [
-  isClassroomActionForm,
-  isTheftActionForm,
-  isHealthActionForm,
-  isReviveActionForm,
-  isRevealActionForm,
-  isClassroomActionForm,
-  isDeferralHomeworkActionForm
+export const actionFormDataGuard = [
+  isClassroomActionFormData,
+  isTheftActionFormData,
+  isHealthActionFormData,
+  isReviveActionFormData,
+  isRevealActionFormData,
+  isClassroomActionFormData,
+  isProtectionActionFormData,
+  isDeferralHomeworkActionFormData
 ]
 
 export function isClassroomActionFormData(
@@ -62,11 +64,18 @@ export function isDeferralHomeworkActionFormData(
 ): action is FormGroup<AddDeferealHomeworkActionForm> {
   return action.value.type === AbilityActionType.DEFEREAL_HOMEWORK
 }
+
+export function isProtectionActionFormData(
+  action: AbilityActionForm
+): action is FormGroup<AddProtectionActionForm> {
+  return action.value.type === AbilityActionType.PROTECTION
+}
+
 export function isAbilityActionFormData(
   a: AbilityActionForm,
   b: AbilityActionForm
 ): boolean {
-  return actionFormGuardValidators.some(
+  return actionFormDataGuard.some(
     guardValidator => guardValidator(a) && guardValidator(b)
   )
 }

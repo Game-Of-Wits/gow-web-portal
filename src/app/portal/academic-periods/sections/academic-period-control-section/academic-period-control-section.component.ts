@@ -8,6 +8,7 @@ import { Toast } from 'primeng/toast'
 import { StartAcademicPeriodDialogComponent } from '~/academic-periods/components/start-academic-period-dialog/start-academic-period-dialog.component'
 import type { AcademicPeriodModel } from '~/academic-periods/models/AcademicPeriod.model'
 import { AcademicPeriodService } from '~/academic-periods/services/academic-period/academic-period.service'
+import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { GeneralPanelContextService } from '~/shared/contexts/general-panel-context/general-panel-context.service'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
 import { DefaultSchoolStore } from '~/shared/store/default-school.store'
@@ -41,6 +42,7 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
 
   private readonly defaultSchoolStore = inject(DefaultSchoolStore)
   private readonly context = inject(GeneralPanelContextService)
+  private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   readonly startAcademicPeriod = Play
   readonly stopAcademicPeriod = Square
@@ -75,6 +77,9 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
 
   public onSuccessStartAcademicPeriod(newAcademicPeriod: AcademicPeriodModel) {
     this.activeAcademicPeriod.set(newAcademicPeriod)
+    this.weekAndDayDiff.set(
+      getWeekAndDayDifference(newAcademicPeriod.startedAt)
+    )
     this.context.activeAcademicPeriod.set(newAcademicPeriod)
   }
 
@@ -107,9 +112,9 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
   }
 
   private onLoadAcademicPeriod() {
-    const schoolId = this.defaultSchoolStore.school()?.id
+    const schoolId = this.defaultSchoolStore.school()?.id ?? null
 
-    if (schoolId === undefined) return
+    if (schoolId === null) return
 
     this.academicPeriodService
       .getSchoolActiveAcademicPeriod(schoolId)
@@ -143,6 +148,10 @@ export class AcademicPeriodControlSectionComponent implements OnInit {
       .then(() => {
         this.activeAcademicPeriod.set(null)
         this.context.activeAcademicPeriod.set(null)
+        this.classroomContext.experienceSession.set(null)
+        this.classroomContext.classSession.set(null)
+        this.classroomContext.activeAcademicPeriod.set(null)
+        this.classroomContext.classroom.set(null)
       })
       .catch(err => {
         const error = err as ErrorResponse

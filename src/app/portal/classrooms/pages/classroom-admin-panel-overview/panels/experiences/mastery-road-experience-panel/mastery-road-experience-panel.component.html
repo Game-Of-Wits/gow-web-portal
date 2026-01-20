@@ -94,15 +94,12 @@
               </td>
               <td class="text-sm sm:text-base min-w-[50px]">
                 <div class="flex items-center gap-2">
-                  <span class="text-lg">{{
-                    rankingStyles[student.rank]?.textIcon ?? "🚀"
-                  }}</span>
+                  <span class="text-lg">
+                    {{ rankingStyles[student.rank].textIcon ?? "🚀" }}
+                  </span>
                   <p-tag
                     value="#{{ student.rank }}"
-                    styleClass="text-sm sm:text-base {{
-                      rankingStyles[student.rank].styleClass ??
-                        'bg-transparent text-black'
-                    }}"
+                    styleClass="text-sm sm:text-base {{ rankingStyles[student.rank].styleClass ?? 'bg-transparent text-black'}}"
                   />
                 </div>
               </td>

@@ -9,12 +9,11 @@ import {
 } from 'lucide-angular'
 import { CardModule } from 'primeng/card'
 import { TagModule } from 'primeng/tag'
-import {
-  abilityActionTypeFormats,
-  abilityTargetFormats
-} from '~/abilities/data/formats'
+import { abilityActionTypeFormats } from '~/abilities/data/formats'
+import { abilityRevealTargetFormats } from '~/abilities/data/formats/abilityRevealTargetFormats'
 import { discoveryInformationFormats } from '~/abilities/data/formats/discoveryInformationFormats'
 import { RevealActionModel } from '~/abilities/models/Ability.model'
+import { AbilityRevealTarget } from '~/abilities/models/AbilityRevealTarget.model'
 import { DiscoveryInformation } from '~/abilities/models/DiscoveryInformation.model'
 
 @Component({
@@ -30,9 +29,19 @@ import { DiscoveryInformation } from '~/abilities/models/DiscoveryInformation.mo
           <i-lucide [img]="targetIcon" class="size-11" />
           <div>
             <span class="font-bold block">Objetivo</span>
-            <p>{{ abilityTargetFormats[action().target] }}</p>
+            <p>{{ abilityRevealTargetFormats[action().target] }}</p>
           </div>
         </li>
+
+        @if (action().target !== abilityRevealTarget.YOURSELF) {
+          <li class="flex items-center gap-2">
+            <i-lucide [img]="maxTargetsIcon" class="size-11" />
+            <div>
+              <span class="font-bold block">Cantidad de objetivos</span>
+              <p>{{ action().maxTargets }} objetivos</p>
+            </div>
+          </li>
+        }
 
         <li>
           <span class="font-bold block">Información</span>
@@ -53,9 +62,11 @@ import { DiscoveryInformation } from '~/abilities/models/DiscoveryInformation.mo
 })
 export class RevealActionCardComponent {
   public readonly targetIcon = Target
+  public readonly maxTargetsIcon = UsersRound
 
   public readonly abilityActionTypeFormats = abilityActionTypeFormats
-  public readonly abilityTargetFormats = abilityTargetFormats
+  public readonly abilityRevealTargetFormats = abilityRevealTargetFormats
+  public readonly abilityRevealTarget = AbilityRevealTarget
   public readonly discoveryInformationFormats = discoveryInformationFormats
 
   public readonly informationIconMap: Record<

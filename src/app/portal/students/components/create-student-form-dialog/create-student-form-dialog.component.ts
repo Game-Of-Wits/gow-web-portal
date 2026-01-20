@@ -64,11 +64,13 @@ export class CreateStudentFormDialogComponent implements OnInit {
     this.studentService
       .createStudent(this.classroomId(), createStudentData)
       .then(student => {
-        this.isCreatingStudentLoading.set(false)
         this.createStudentForm = createStudentForm()
         this.onSuccess.emit(student)
       })
       .catch(err => {})
+      .finally(() => {
+        this.isCreatingStudentLoading.set(false)
+      })
   }
 
   public onCloseDialog() {

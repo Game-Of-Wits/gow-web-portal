@@ -30,6 +30,7 @@ export type HomeworkFormSubmit = {
     formData: HomeworkFormData
   }
   onFinish: () => void
+  onError: () => void
 }
 
 @Component({
@@ -98,6 +99,9 @@ export class HomeworkFormDialogComponent implements OnInit {
       },
       onFinish: () => {
         this.onCloseDialog()
+      },
+      onError: () => {
+        this.isSubmitLoading.set(false)
       }
     })
   }

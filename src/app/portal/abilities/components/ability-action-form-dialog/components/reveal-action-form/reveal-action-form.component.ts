@@ -12,20 +12,27 @@ import {
   UserRound,
   UsersRound
 } from 'lucide-angular'
-import { abilityTargetOptions } from '~/abilities/data/options'
+import { abilityRevealTargetOptions } from '~/abilities/data/options'
 import { AddRevealActionForm } from '~/abilities/models/AbilityForm.model'
-import { AbilityTarget } from '~/abilities/models/AbilityTarget.model'
 import { DiscoveryInformation } from '~/abilities/models/DiscoveryInformation.model'
 import { SelectFieldComponent } from '~/shared/components/ui/select-field/select-field.component'
 import { AbilityActionColorSchema } from '../../ability-action-form-dialog.component'
+import { NumberFieldComponent } from '~/shared/components/ui/number-field/number-field.component'
+import { AbilityRevealTarget } from '~/abilities/models/AbilityRevealTarget.model'
 
 @Component({
   selector: 'gow-reveal-action-form',
   templateUrl: './reveal-action-form.component.html',
-  imports: [SelectFieldComponent, ReactiveFormsModule, LucideAngularModule]
+  imports: [
+    SelectFieldComponent,
+    NumberFieldComponent,
+    ReactiveFormsModule,
+    LucideAngularModule
+  ]
 })
 export class RevealActionFormComponent {
-  public readonly abilityTargetOptions = abilityTargetOptions
+  public readonly abilityRevealTargetOptions = abilityRevealTargetOptions
+  public readonly abilityRevealTarget = AbilityRevealTarget
   public readonly discoveryInformationOptions: Array<{
     value: DiscoveryInformation
     icon: LucideIconData
@@ -78,7 +85,11 @@ export class RevealActionFormComponent {
     return this.actionForm.get('information')
   }
 
-  get targetControl(): AbstractControl<AbilityTarget> | null {
+  get targetControl(): AbstractControl<AbilityRevealTarget> | null {
     return this.actionForm.get('target')
+  }
+
+  get maxTargetsControl(): AbstractControl<number> | null {
+    return this.actionForm.get('maxTargets')
   }
 }

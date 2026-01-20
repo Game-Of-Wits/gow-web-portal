@@ -25,18 +25,26 @@ import {
   classroomActionForm,
   deferealHomeworkActionForm,
   healthActionForm,
+  invulnerabilityActionForm,
+  mirrorActionForm,
+  protectionActionForm,
   revealActionForm,
+  revengeActionForm,
   reviveActionForm,
   theftActionForm
 } from '~/abilities/forms'
 import { AbilityActionType } from '~/abilities/models/AbilityActionType.model'
 import { AbilityActionForm } from '~/abilities/models/AbilityForm.model'
+import { isProtectionActionFormData } from '~/abilities/utils/abilityActionFormDataValidator'
 import {
   isAscensionActionForm,
   isClassroomActionForm,
   isDeferralHomeworkActionForm,
   isHealthActionForm,
+  isInvulnerabilityActionForm,
+  isMirrorActionForm,
   isRevealActionForm,
+  isRevengeActionForm,
   isReviveActionForm,
   isTheftActionForm
 } from '~/abilities/utils/abilityActionFormValidator'
@@ -44,9 +52,13 @@ import { SelectFieldComponent } from '~/shared/components/ui/select-field/select
 import { AscensionActionFormComponent } from './components/ascension-action-form/ascension-action-form.component'
 import { DeferealHomeworkActionFormComponent } from './components/defereal-homework-action-form/defereal-homework-action-form.component'
 import { HealthActionFormComponent } from './components/health-action-form/health-action-form.component'
+import { ProtectionActionFormComponent } from './components/protection-action-form/protection-action-form.component'
 import { RevealActionFormComponent } from './components/reveal-action-form/reveal-action-form.component'
 import { ReviveActionFormComponent } from './components/revive-action-form/revive-action-form.component'
 import { TheftActionFormComponent } from './components/theft-action-form/theft-action-form.component'
+import { InvulnerabilityActionFormComponent } from './components/invulnerability-action-form/invulnerability-action-form.component'
+import { MirrorActionFormComponent } from './components/mirror-action-form/mirror-action-form.component'
+import { RevengeActionFormComponent } from './components/revenge-action-form/revenge-action-form.component'
 
 export type AbilityActionColorSchema = 'primary' | 'info' | 'danger'
 
@@ -70,7 +82,11 @@ const abilityActionFormMap: Record<AbilityActionType, Function> = {
   [AbilityActionType.CLASSROOM]: classroomActionForm,
   [AbilityActionType.REVIVE]: reviveActionForm,
   [AbilityActionType.REVEAL]: revealActionForm,
-  [AbilityActionType.THEFT]: theftActionForm
+  [AbilityActionType.THEFT]: theftActionForm,
+  [AbilityActionType.PROTECTION]: protectionActionForm,
+  [AbilityActionType.INVULNERABILITY]: invulnerabilityActionForm,
+  [AbilityActionType.MIRROR]: mirrorActionForm,
+  [AbilityActionType.REVENGE]: revengeActionForm
 }
 
 @Component({
@@ -87,6 +103,10 @@ const abilityActionFormMap: Record<AbilityActionType, Function> = {
     HealthActionFormComponent,
     TheftActionFormComponent,
     DeferealHomeworkActionFormComponent,
+    ProtectionActionFormComponent,
+    InvulnerabilityActionFormComponent,
+    MirrorActionFormComponent,
+    RevengeActionFormComponent,
     LucideAngularModule
   ]
 })
@@ -96,13 +116,19 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
   public readonly dialogColorScheme = dialogColorScheme
   public readonly classroomAbilityActionType = AbilityActionType.CLASSROOM
 
+  public readonly abilityActionTypeOptions = abilityActionTypeOptions
+
   public isAscensionActionForm = isAscensionActionForm
   public isTheftActionForm = isTheftActionForm
   public isHealthActionForm = isHealthActionForm
   public isRevealActionForm = isRevealActionForm
   public isReviveActionForm = isReviveActionForm
   public isDeferralHomeworkActionForm = isDeferralHomeworkActionForm
+  public isProtectionActionForm = isProtectionActionFormData
   public isClassroomActionForm = isClassroomActionForm
+  public isRevengeActionForm = isRevengeActionForm
+  public isInvulnerabilityActionForm = isInvulnerabilityActionForm
+  public isMirrorActionForm = isMirrorActionForm
 
   @Input() abilityActionForm!: AbilityActionForm | null
   @Input() abilityActionListForm!: FormArray<AbilityActionForm>
@@ -123,6 +149,7 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
   }>({ alias: 'success' })
 
   public showForm = signal<boolean>(true)
+  public showSelectAction = signal<boolean>(true)
 
   public abilityActionTypeControl = new FormControl<AbilityActionType | null>(
     null,
@@ -144,6 +171,8 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['abilityActionForm']) {
+      this.showSelectAction.set(false)
+
       const current = changes['abilityActionForm']
         .currentValue as AbilityActionForm | null
 
@@ -181,18 +210,5 @@ export class AbilityActionFormDialogComponent implements OnInit, OnChanges {
       form: abilityActionForm
     })
     this.onCloseDialog()
-  }
-
-  public abilityActionsUsed() {
-    return this.abilityActionListForm
-      .getRawValue()
-      .map(abilityAction => abilityAction.type)
-  }
-
-  public availableActionOptions() {
-    return abilityActionTypeOptions.filter(
-      option =>
-        !this.abilityActionsUsed().includes(option.code as AbilityActionType)
-    )
   }
 }

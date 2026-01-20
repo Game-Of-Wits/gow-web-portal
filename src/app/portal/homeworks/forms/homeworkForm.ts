@@ -25,7 +25,7 @@ export const homeworkForm = (
       nonNullable: true,
       validators: [
         Validators.required,
-        Validators.minLength(3),
+        Validators.minLength(1),
         Validators.maxLength(50)
       ]
     }),
@@ -49,7 +49,7 @@ export const homeworkForm = (
         {
           validators: [
             Validators.required,
-            Validators.minLength(2),
+            Validators.minLength(1),
             HomeworkValidator.duplicateAnswers()
           ]
         }

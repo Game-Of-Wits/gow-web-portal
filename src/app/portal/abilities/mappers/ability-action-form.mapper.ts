@@ -1,32 +1,13 @@
-import {
-  AbilityActionModel,
-  AscensionActionModel,
-  ClassroomActionModel,
-  DeferealHomeworkActionModel,
-  HealthActionModel,
-  RevealActionModel,
-  ReviveActionModel,
-  TheftActionModel
-} from '../models/Ability.model'
+import { AbilityActionModel, RevealActionModel } from '../models/Ability.model'
 import { AbilityActionType } from '../models/AbilityActionType.model'
 import {
   AbilityActionFormData,
-  AscensionActionFormData,
-  ClassroomActionFormData,
-  DeferealHomeworkActionFormData,
-  HealthActionFormData,
-  RevealActionFormData,
-  ReviveActionFormData,
-  TheftActionFormData
+  RevealActionFormData
 } from '../models/AbilityFormData.model'
 import { DiscoveryInformation } from '../models/DiscoveryInformation.model'
 
 export class AbilityActionFormMapper {
   static toModel(action: AbilityActionFormData): AbilityActionModel {
-    if (action.type === AbilityActionType.THEFT)
-      return action as TheftActionModel
-    if (action.type === AbilityActionType.HEALTH)
-      return action as HealthActionModel
     if (action.type === AbilityActionType.REVEAL) {
       const actionInformation = Object.entries(action.information).reduce(
         (arr, value) => {
@@ -40,24 +21,15 @@ export class AbilityActionFormMapper {
       return {
         information: actionInformation,
         type: AbilityActionType.REVEAL,
-        target: action.target
+        target: action.target,
+        maxTargets: action.maxTargets
       } as RevealActionModel
     }
-    if (action.type === AbilityActionType.REVIVE)
-      return action as ReviveActionModel
-    if (action.type === AbilityActionType.ASCENSION)
-      return action as AscensionActionModel
-    if (action.type === AbilityActionType.DEFEREAL_HOMEWORK)
-      return action as DeferealHomeworkActionModel
 
-    return action as ClassroomActionModel
+    return action as AbilityActionModel
   }
 
   static toForm(action: AbilityActionModel): AbilityActionFormData {
-    if (action.type === AbilityActionType.THEFT)
-      return action as TheftActionFormData
-    if (action.type === AbilityActionType.HEALTH)
-      return action as HealthActionFormData
     if (action.type === AbilityActionType.REVEAL) {
       const actionInformation: Record<DiscoveryInformation, boolean> = {
         [DiscoveryInformation.CHARACTER]: false,
@@ -72,16 +44,11 @@ export class AbilityActionFormMapper {
       return {
         information: actionInformation,
         type: AbilityActionType.REVEAL,
-        target: action.target
+        target: action.target,
+        maxTargets: action.maxTargets
       } as RevealActionFormData
     }
-    if (action.type === AbilityActionType.REVIVE)
-      return action as ReviveActionFormData
-    if (action.type === AbilityActionType.ASCENSION)
-      return action as AscensionActionFormData
-    if (action.type === AbilityActionType.DEFEREAL_HOMEWORK)
-      return action as DeferealHomeworkActionFormData
 
-    return action as ClassroomActionFormData
+    return action as AbilityActionFormData
   }
 }

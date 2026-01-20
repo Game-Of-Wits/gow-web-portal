@@ -3,7 +3,7 @@
     <gow-select-field
       label="Objetivo"
       placeholder="Selecciona el objetivo a revelar"
-      [options]="abilityTargetOptions"
+      [options]="abilityRevealTargetOptions"
       [enableClear]="false"
       [focusColor]="colorScheme()"
       formControlName="target"
@@ -16,6 +16,31 @@
     }
   </div>
 
+  @if (targetControl?.value !== abilityRevealTarget.YOURSELF) {
+    <div class="flex flex-col gap-1 mb-2">
+      <gow-number-field
+        label="Cantidad de objetivos"
+        placeholder="Ingrese la cantidad máxima de objetivos"
+        formControlName="maxTargets"
+        [focusColor]="colorScheme()"
+      />
+
+      @if (maxTargetsControl?.invalid && maxTargetsControl?.touched) {
+        @if (hasErrorValidation(maxTargetsControl, "required")) {
+          <p class="text-sm text-red-500">Es requerido</p>
+        } @else if (hasErrorValidation(maxTargetsControl, "min")) {
+          <p class="text-sm text-red-500">
+            Mínimo debe ser {{ maxTargetsControl?.errors?.["min"].min }} objetivo
+          </p>
+        } @else if (hasErrorValidation(maxTargetsControl, "max")) {
+          <p class="text-sm text-red-500">
+            Máximo debe ser {{ maxTargetsControl?.errors?.["max"].max }} objetivo
+          </p>
+        }
+      }
+    </div>
+  }
+
   <div class="flex flex-col gap-1">
     <div class="flex items-center gap-1.5">
       <p>Información a revelar</p>
@@ -26,6 +51,10 @@
         } @else if (hasErrorValidation(informationControl, "minimumOneDiscoveryInformationActive")) {
           <p class="text-sm text-red-500">
             Mínimo uno de estos datos debe estar activo
+          </p>
+        } @else if (hasErrorValidation(maxTargetsControl, "max")) {
+          <p class="text-sm text-red-500">
+            Máximo debe ser {{ maxTargetsControl?.errors?.["max"].max }} objetivo
           </p>
         }
       }
@@ -38,9 +67,9 @@
             <div class="p-6 rounded-xl flex items-center justify-center cursor-pointer {{ discoveryInformationControl.value && 'shadow-lg outline outline-gray-100' }}">
               <i-lucide [img]="information.icon" class="size-[25px] {{ information.filled && 'fill-gray-800' }}" />
             </div>
-
-            <span class="text-base {{ discoveryInformationControl.value && 'font-bold' }}">{{ information.name }}</span>
-
+            <span class="text-base {{ discoveryInformationControl.value && 'font-bold' }}">
+              {{ information.name }}
+            </span>
             <input
               type="checkbox"
               class="hidden"

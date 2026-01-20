@@ -17,9 +17,10 @@ import {
   Square,
   Vote
 } from 'lucide-angular'
-import { ConfirmationService, MessageService } from 'primeng/api'
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api'
 import { ButtonModule } from 'primeng/button'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
+import { MenuModule } from 'primeng/menu'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { TableModule } from 'primeng/table'
 import { TagModule } from 'primeng/tag'
@@ -40,6 +41,7 @@ import {
 import { ClassroomAdminPanelContextService } from '~/classrooms/contexts/classroom-admin-panel-context/classroom-admin-panel-context.service'
 import { classShiftFormats } from '~/shared/data/classShiftFormats'
 import { commonErrorMessages } from '~/shared/data/commonErrorMessages'
+import { ClassShift } from '~/shared/models/ClassShift'
 import { ErrorMessages } from '~/shared/types/ErrorMessages'
 import { ShadowWarfareStudentPeriodState } from '~/students/models/ShadowWarfareStudentPeriodState'
 import { StudentPeriodStateService } from '~/students/services/student-period-state/student-period-state.service'
@@ -78,6 +80,7 @@ const teamsLoadingErrorMessages: ErrorMessages = {
     StudentAbilityUsageCardComponent,
     TableModule,
     ProgressSpinnerModule,
+    MenuModule,
     ButtonModule,
     Toast,
     NgOptimizedImage,
@@ -99,6 +102,7 @@ export class ShadowWarfareExperiencePanelComponent
   public readonly reviveIcon = HeartPlus
 
   public readonly classShiftFormats = classShiftFormats
+  public readonly classShift = ClassShift
 
   private destroy$ = new Subject<void>()
 
@@ -166,6 +170,38 @@ export class ShadowWarfareExperiencePanelComponent
   )
 
   public adminPanelOverviewLoading = output<boolean>({ alias: 'loading' })
+
+  public isClassShiftUpdatingLoading = signal<boolean>(false)
+  public readonly shadowWarfareOptions: MenuItem[] = [
+    {
+      label: 'Activar turno noche',
+      command: () => {
+        this.isClassShiftUpdatingLoading.set(true)
+
+        const experienceSessionId =
+          this.classroomContext.experienceSession()?.id ?? null
+
+        if (experienceSessionId == null) return
+
+        this.experienceSessionService
+          .startNightShiftExperienceSession(experienceSessionId)
+          .then(() => {
+            this.classroomContext.experienceSession.update(
+              experienceSession => {
+                if (experienceSession == null) return experienceSession
+                return {
+                  ...experienceSession,
+                  rules: { shift: ClassShift.NIGHT }
+                }
+              }
+            )
+          })
+          .finally(() => {
+            this.isClassShiftUpdatingLoading.set(false)
+          })
+      }
+    }
+  ]
 
   ngOnInit(): void {
     const classroomId = this.classroomContext.classroom()?.id ?? null
@@ -388,7 +424,7 @@ export class ShadowWarfareExperiencePanelComponent
         takeUntil(this.destroy$),
         tap(() => {
           if (this.isStudentAbilitiesUsagesLoading()) {
-            this.isStudentAbilitiesUsagesLoading.set(false);
+            this.isStudentAbilitiesUsagesLoading.set(false)
           }
         })
       )
@@ -397,7 +433,7 @@ export class ShadowWarfareExperiencePanelComponent
           this.studentAbilityUsages.set(studentAbilityUsages)
         },
         error: err => {
-         this.isStudentAbilitiesUsagesLoading.set(false)
+          this.isStudentAbilitiesUsagesLoading.set(false)
           const error = err as ErrorResponse
           this.onStudentAbilityUsagesErrorMessage(error.code)
         }

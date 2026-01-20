@@ -89,7 +89,8 @@ export class ClassroomAdminPanelStudentsPageComponent implements OnInit {
 
       studentProfiles[studentProfileIndex].firstName = studentProfile.firstName
       studentProfiles[studentProfileIndex].lastName = studentProfile.lastName
-      studentProfiles[studentProfileIndex].phoneNumber = studentProfile.phoneNumber
+      studentProfiles[studentProfileIndex].phoneNumber =
+        studentProfile.phoneNumber
 
       return studentProfiles
     })

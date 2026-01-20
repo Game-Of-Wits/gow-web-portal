@@ -28,7 +28,6 @@ import {
   AbilityForm
 } from '~/abilities/models/AbilityForm.model'
 import { AbilityType } from '~/abilities/models/AbilityType.model'
-import { AbilityUsage } from '~/abilities/models/AbilityUsage.model'
 import { SelectFieldComponent } from '~/shared/components/ui/select-field/select-field.component'
 import { TextFieldComponent } from '~/shared/components/ui/text-field/text-field.component'
 import { TextareaFieldComponent } from '~/shared/components/ui/textarea-field/textarea-field.component'
@@ -52,7 +51,7 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
   public readonly closeIcon = X
   public readonly abilityTypeOptions = abilityTypeOptions
   public readonly abilityClassShiftOptions = abilityClassShiftOptions
-  public readonly usageType = AbilityUsage
+  public readonly educationalExperience = EducationalExperience
 
   @Input() abilityForm?: FormGroup<AbilityForm> | null = null
 
@@ -63,9 +62,6 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
   public buttonIcon = input.required<LucideIconData>({ alias: 'buttonIcon' })
   public abilityExperience = input.required<EducationalExperience>({
     alias: 'experience'
-  })
-  public abilityUsageType = input.required<AbilityUsage>({
-    alias: 'abilityUsage'
   })
 
   public isClassroomActionActive = signal<boolean>(false)
@@ -81,8 +77,7 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (this.abilityForm === null)
       this.abilityForm = experienceAbilityForm(
-        this.abilityExperience(),
-        this.abilityUsageType()
+        this.abilityExperience()
       )
   }
 
@@ -128,8 +123,7 @@ export class ExperienceAbilityFormDialogComponent implements OnInit, OnChanges {
     this.onClose.emit()
     this.isClassroomActionActive.set(false)
     this.abilityForm = experienceAbilityForm(
-      this.abilityExperience(),
-      this.abilityUsageType()
+      this.abilityExperience()
     )
   }
 

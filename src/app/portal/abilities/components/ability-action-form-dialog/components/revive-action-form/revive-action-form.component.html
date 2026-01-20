@@ -1,12 +1,12 @@
 <form [formGroup]="actionForm" class="flex flex-col gap-2">
-  <div class="flex flex-col gap-1 mb-6">
+  <div class="flex flex-col gap-1">
     <gow-select-field
       label="Objetivo"
       placeholder="Seleccione el objetivo a revivir"
-      [options]="abilityTargetOptions"
+      [options]="abilityReviveTargetOptions"
       formControlName="target"
       [enableClear]="false"
-      [scrollHeight]="70"
+      [scrollHeight]="targetControl?.value !== abilityReviveTarget.YOURSELF ? 80 : 60"
       [focusColor]="colorScheme()"
     />
 
@@ -16,4 +16,29 @@
       }
     }
   </div>
+
+  @if (targetControl?.value !== abilityReviveTarget.YOURSELF) {
+    <div class="flex flex-col gap-1 mb-2">
+      <gow-number-field
+        label="Cantidad de objetivos"
+        placeholder="Ingrese la cantidad máxima de objetivos"
+        formControlName="maxTargets"
+        [focusColor]="colorScheme()"
+      />
+
+      @if (maxTargetsControl?.invalid && maxTargetsControl?.touched) {
+        @if (hasErrorValidation(maxTargetsControl, "required")) {
+          <p class="text-sm text-red-500">Es requerido</p>
+        } @else if (hasErrorValidation(maxTargetsControl, "min")) {
+          <p class="text-sm text-red-500">
+            Mínimo debe ser {{ maxTargetsControl?.errors?.["min"].min }} objetivo
+          </p>
+        } @else if (hasErrorValidation(maxTargetsControl, "max")) {
+          <p class="text-sm text-red-500">
+            Máximo debe ser {{ maxTargetsControl?.errors?.["max"].max }} objetivo
+          </p>
+        }
+      }
+    </div>
+  }
 </form>

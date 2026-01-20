@@ -15,7 +15,6 @@ import { Toast } from 'primeng/toast'
 import { TooltipModule } from 'primeng/tooltip'
 import { InitialExperienceAbilityListFormComponent } from '~/abilities/components/initial-experience-ability-list-form/initial-experience-ability-list-form.component'
 import { AbilityForm } from '~/abilities/models/AbilityForm.model'
-import { AbilityUsage } from '~/abilities/models/AbilityUsage.model'
 import { InitialCharacterListFormComponent } from '~/characters/components/initial-character-list-form/initial-character-list-form.component'
 import { CharacterForm } from '~/characters/models/CharacterForm.model'
 import { classroomForm } from '~/classrooms/forms/classroomForm'
@@ -68,7 +67,6 @@ export class PortalCreateClassroomPageComponent implements OnInit {
 
   public readonly shadowWarfareExperience = EducationalExperience.SHADOW_WARFARE
   public readonly masteryRoadExperience = EducationalExperience.MASTERY_ROAD
-  public readonly abilityUsage = AbilityUsage.INTERVAL_TIME
   public readonly addClassroomIcon = Plus
   public readonly shadowWarfareTeamsFormGroupPath =
     'experiences.SHADOW_WARFARE.teams'
@@ -143,12 +141,14 @@ export class PortalCreateClassroomPageComponent implements OnInit {
     this.classroomService
       .createClassroom(data)
       .then(classroomId => {
-        this.isCreatingLoading.set(false)
         this.router.navigate(['p', 's', schoolId, 'c', classroomId])
       })
       .catch(err => {
         const error = err as { code: string; message: string }
         this.showCreateClassroomErrorMessage(error.code, error.message)
+      })
+      .finally(() => {
+        this.isCreatingLoading.set(false)
       })
   }
 

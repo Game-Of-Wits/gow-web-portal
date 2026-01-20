@@ -4,7 +4,7 @@
   [draggable]="false"
   [resizable]="false"
   [closable]="false"
-  [style]="{ 'max-width': '550px', width: '100%', border: '0px', overflow: 'hidden' }"
+  [style]="{ 'max-width': '550px', width: '100%', border: '0px', overflow: 'hidden', 'height': 'fit-content', 'max-height': '80vh' }"
 >
   <ng-template #header>
     <div class="flex justify-between items-center w-full">
@@ -21,14 +21,14 @@
   </ng-template>
 
   <div class="flex flex-col gap-3">
-    @if (abilityActionTypeControl.value === null || !abilityActionsUsed().includes(abilityActionTypeControl.value)) {
+    @if (abilityActionTypeControl.value === null || showSelectAction()) {
       <div class="flex flex-col gap-1">
         <gow-select-field
           label="Tipo de acción"
           placeholder="Seleccione el tipo de acción"
           [enableClear]="false"
           [scrollHeight]="abilityActionForm == null ? 180 : abilityActionForm.value.type == classroomAbilityActionType ? 120 : 150"
-          [options]="availableActionOptions()"
+          [options]="abilityActionTypeOptions"
           [formControl]="abilityActionTypeControl"
           [focusColor]="colorScheme()"
         />
@@ -54,6 +54,14 @@
         <gow-revive-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
       } @else if (isDeferralHomeworkActionForm(actionForm)) {
         <gow-defereal-homework-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isProtectionActionForm(actionForm)) {
+        <gow-protection-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isMirrorActionForm(actionForm)) {
+        <gow-mirror-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isRevengeActionForm(actionForm)) {
+        <gow-revenge-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
+      } @else if (isInvulnerabilityActionForm(actionForm)) {
+        <gow-invulnerability-action-form [actionForm]="actionForm" [colorScheme]="colorScheme()" />
       } @else if (isClassroomActionForm(actionForm)) {
         <p-message severity="warn">
           <ng-template #icon>

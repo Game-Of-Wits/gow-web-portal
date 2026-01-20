@@ -19,10 +19,7 @@ import {
 } from '~/abilities/data/formats'
 import { fullAbilityForm } from '~/abilities/forms/fullAbilityForm'
 import { AbilityFormMapper } from '~/abilities/mappers/ability-form.mapper'
-import {
-  AbilityActionModel,
-  AbilityModel
-} from '~/abilities/models/Ability.model'
+import { AbilityModel } from '~/abilities/models/Ability.model'
 import { AbilityActionType } from '~/abilities/models/AbilityActionType.model'
 import { AbilityForm } from '~/abilities/models/AbilityForm.model'
 import { AbilityType } from '~/abilities/models/AbilityType.model'
@@ -227,13 +224,6 @@ export class ClassroomAdminPanelAbiltiesPageComponent implements OnInit {
         }
       }
     })
-  }
-
-  public getAllAbilityActionsText(abilityActions: AbilityActionModel[]) {
-    return abilityActions.reduce((text, action, index, arr) => {
-      const divider = index === arr.length - 1 ? '' : ' · '
-      return text + this.getAbilityActionTypeFormat(action.type) + divider
-    }, '')
   }
 
   private loadAbilities() {

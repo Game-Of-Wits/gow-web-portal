@@ -20,7 +20,6 @@
           <th>Tipo</th>
           <th>Uso de habilidad</th>
           <th>Experiencia educacional</th>
-          <th>Tipo de acciones</th>
           <th>¿Es inicial?</th>
           <th>Acciones</th>
         </tr>
@@ -35,7 +34,6 @@
           <td>{{ getAbilityTypeFormat(ability.type) }}</td>
           <td>{{ getAbilityUsageTypeFormat(ability.usage.type) }}</td>
           <td>{{ getEducationalExperienceFormat(ability.experience) }}</td>
-          <td>{{ getAllAbilityActionsText(ability.actions) }}</td>
           <td>{{ ability.isInitial ? 'Si' : 'No' }}</td>
           <td class="flex items-center gap-1.5">
             <button

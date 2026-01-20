@@ -61,8 +61,16 @@
                       <gow-revive-action-card [action]="action" />
                     } @else if (action.type === abilityActionType.ASCENSION) {
                       <gow-ascension-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.PROTECTION) {
+                      <gow-protection-action-card [action]="action" />
                     } @else if (action.type === abilityActionType.DEFEREAL_HOMEWORK) {
                       <gow-defereal-homework-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.INVULNERABILITY) {
+                      <gow-invulnerability-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.MIRROR) {
+                      <gow-mirror-action-card [action]="action" />
+                    } @else if (action.type === abilityActionType.REVENGE) {
+                      <gow-revenge-action-card [action]="action" />
                     }
                   }
                 </div>

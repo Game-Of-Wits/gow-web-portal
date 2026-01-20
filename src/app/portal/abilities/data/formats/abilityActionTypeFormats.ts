@@ -7,5 +7,9 @@ export const abilityActionTypeFormats: Record<AbilityActionType, string> = {
   [AbilityActionType.REVEAL]: 'Revelación',
   [AbilityActionType.REVIVE]: 'Recurección',
   [AbilityActionType.ASCENSION]: 'Ascención de habilidades',
-  [AbilityActionType.DEFEREAL_HOMEWORK]: 'Postergación para la entrega de tarea'
+  [AbilityActionType.PROTECTION]: 'Protección',
+  [AbilityActionType.DEFEREAL_HOMEWORK]: 'Postergación para la entrega de tarea',
+  [AbilityActionType.INVULNERABILITY]: 'Invulnerabilidad',
+  [AbilityActionType.MIRROR]: 'Reflectar',
+  [AbilityActionType.REVENGE]: 'Venganza'
 }

@@ -3,7 +3,9 @@ import { FieldValidator } from '~/shared/validators/FieldValidator'
 import { EditStudentProfileForm } from '../models/EditStudentProfileForm.model'
 import { EditStudentProfileFormData } from '../models/EditStudentProfileFormData.model'
 
-export const editStudentProfileForm = (defaultValues?: EditStudentProfileFormData): FormGroup<EditStudentProfileForm> => {
+export const editStudentProfileForm = (
+  defaultValues?: EditStudentProfileFormData
+): FormGroup<EditStudentProfileForm> => {
   return new FormGroup<EditStudentProfileForm>({
     firstName: new FormControl(defaultValues?.firstName ?? '', {
       nonNullable: true,

@@ -22,7 +22,8 @@ const editStudentProfileErrorMessages: ErrorMessages = {
   },
   'phone-number-is-using': {
     summary: 'El número telefónico ya esta en uso',
-    message: 'El nuevo número telefónico del estudiante ya esta en uso por otro estudiante'
+    message:
+      'El nuevo número telefónico del estudiante ya esta en uso por otro estudiante'
   },
   ...commonErrorMessages
 }
@@ -54,7 +55,8 @@ export class EditStudentProfileFormDialogComponent {
 
   public isLoading = signal<boolean>(false)
 
-  public studentProfileEditForm: FormGroup<EditStudentProfileForm> = editStudentProfileForm()
+  public studentProfileEditForm: FormGroup<EditStudentProfileForm> =
+    editStudentProfileForm()
 
   public onClose = output<void>({ alias: 'close' })
   public onSuccess = output<StudentProfileModel>({
@@ -123,15 +125,21 @@ export class EditStudentProfileFormDialogComponent {
   }
 
   get firstNameControl(): AbstractControl<string> {
-    return this.studentProfileEditForm.get('firstName') as AbstractControl<string>
+    return this.studentProfileEditForm.get(
+      'firstName'
+    ) as AbstractControl<string>
   }
 
   get lastNameControl(): AbstractControl<string> {
-    return this.studentProfileEditForm.get('lastName') as AbstractControl<string>
+    return this.studentProfileEditForm.get(
+      'lastName'
+    ) as AbstractControl<string>
   }
 
   get phoneNumberControl(): AbstractControl<string> {
-    return this.studentProfileEditForm.get('phoneNumber') as AbstractControl<string>
+    return this.studentProfileEditForm.get(
+      'phoneNumber'
+    ) as AbstractControl<string>
   }
 
   private showEditStudentProfileErrorMessage(code: string) {

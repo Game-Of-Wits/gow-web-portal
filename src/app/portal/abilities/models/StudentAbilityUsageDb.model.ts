@@ -1,4 +1,4 @@
-import { DocumentReference, Timestamp } from "@angular/fire/firestore"
+import { DocumentReference, Timestamp } from '@angular/fire/firestore'
 
 export interface StudentAbilityUsageDbModel {
   id: string
