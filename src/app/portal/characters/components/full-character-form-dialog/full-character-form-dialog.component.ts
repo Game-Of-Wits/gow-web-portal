@@ -12,7 +12,9 @@ import {
   input,
   OnInit,
   output,
-  signal
+  signal,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -61,7 +63,7 @@ export type FullCharacterFormSubmit = {
     LucideAngularModule
   ]
 })
-export class FullCharacterFormDialogComponent implements OnInit {
+export class FullCharacterFormDialogComponent implements OnInit, OnChanges {
   public readonly closeIcon = X
   public readonly grabIcon = GripVertical
   public readonly abilityIcon = Sparkle
@@ -74,7 +76,7 @@ export class FullCharacterFormDialogComponent implements OnInit {
   private readonly classroomContext = inject(ClassroomAdminPanelContextService)
 
   @Input() fullCharacterForm: FormGroup<FullCharacterForm> | null = null
-  public characterFormId = input<string | null>(null, { alias: 'id' })
+  @Input() id: string | null = null
 
   public showDialog = input.required<boolean>({ alias: 'show' })
   public headerTitle = input.required<string>({ alias: 'headerTitle' })
@@ -115,6 +117,7 @@ export class FullCharacterFormDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const limitAbilities = this.classroomLimitAbilities()
+
     if (limitAbilities === undefined) return
 
     if (this.fullCharacterForm === null)
@@ -123,6 +126,17 @@ export class FullCharacterFormDialogComponent implements OnInit {
     this.selectedAbilities.set(this.fullCharacterForm.getRawValue().abilities)
 
     this.loadAbilities()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['fullCharacterForm']) {
+      const form = changes['fullCharacterForm'].currentValue as FormGroup<FullCharacterForm> | null
+
+      if (form === null) return
+
+      this.selectedAbilities.set(form.getRawValue().abilities)
+      this.abilitiesControl.setValue(form.getRawValue().abilities)
+    }
   }
 
   @HostListener('document:keydown.escape')
@@ -140,7 +154,7 @@ export class FullCharacterFormDialogComponent implements OnInit {
 
   public onSubmitCharacterForm() {
     const characterForm = this.fullCharacterForm
-    const characterId = this.characterFormId()
+    const characterId = this.id
 
     if (!characterForm || characterForm.invalid) return
 
@@ -209,6 +223,8 @@ export class FullCharacterFormDialogComponent implements OnInit {
 
     if (classroomId === undefined) return
 
+    this.isAbilitiesLoading.set(true)
+
     this.abilityService
       .getAllAbilitiesByClassroomAndExperienceAsync(
         classroomId,
@@ -218,7 +234,8 @@ export class FullCharacterFormDialogComponent implements OnInit {
         this.abilities.set(abilities)
         this.isAbilitiesLoading.set(false)
       })
-      .catch(err => {})
+      .catch(err => {
+      })
   }
 
   get characterNameControl(): AbstractControl<string> {

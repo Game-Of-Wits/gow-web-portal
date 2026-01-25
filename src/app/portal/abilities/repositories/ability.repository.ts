@@ -3,7 +3,6 @@ import {
   addDoc,
   collection,
   DocumentReference,
-  deleteDoc,
   doc,
   documentId,
   Firestore,
@@ -11,7 +10,8 @@ import {
   getDocs,
   query,
   updateDoc,
-  where
+  where,
+  writeBatch
 } from '@angular/fire/firestore'
 import { chuckArray } from '@shared/utils/chuckArray'
 import { ClassroomRepository } from '~/classrooms/repositories/classroom.repository'
@@ -20,10 +20,15 @@ import { AbilityDbModel } from '../models/AbilityDb.model'
 import { CreateAbility } from '../models/CreateAbility.model'
 import { UpdateAbility } from '../models/UpdateAbility.model'
 import { UpdateAbilityDb } from '../models/UpdateAbilityDb.model'
+import { CharacterRepository } from '~/characters/repositories/character.repository'
+import { ErrorResponse } from '@shared/types/ErrorResponse'
+import { firstValueFrom } from 'rxjs'
 
 @Injectable({ providedIn: 'root' })
 export class AbilityRepository {
   private readonly firestore = inject(Firestore)
+
+  private readonly characterRepository = inject(CharacterRepository)
 
   private static readonly collectionName = 'abilities'
   private readonly collectionName = AbilityRepository.collectionName
@@ -180,7 +185,33 @@ export class AbilityRepository {
   }
 
   public async deleteById(id: string) {
-    await deleteDoc(this.getRefById(id))
+    const ability = await this.getByIdAsync(id)
+
+    if (ability === null) throw new ErrorResponse('ability-not-exist')
+
+    const batch = writeBatch(this.firestore)
+
+    const abilityDeletedRef = this.getRefById(id)
+
+    batch.delete(abilityDeletedRef)
+
+    const characters = await firstValueFrom(this.characterRepository.getAllByClassroomId(ability.classroom.id))
+
+    characters.forEach(character => {
+      const characterHasAbilityDeleted = character.abilities.findIndex(abilityRef => abilityRef.id === id) !== -1
+
+      if (!characterHasAbilityDeleted) return
+
+      const characterRef = CharacterRepository.getRefById(this.firestore, character.id)
+
+      const newCharacterAbilitiesRefs = character.abilities.filter(abilityRef => abilityRef.id !== id)
+
+      batch.update(characterRef, {
+        abilities: newCharacterAbilitiesRefs
+      })
+    })
+
+    await batch.commit()
   }
 
   private getCollectionRef() {

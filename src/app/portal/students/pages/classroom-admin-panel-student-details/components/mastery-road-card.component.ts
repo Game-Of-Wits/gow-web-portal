@@ -159,7 +159,6 @@ export class MasteryRoadCardComponent implements OnInit {
       window.open(downloadReportUrl, '_blank')
     } catch (err) {
       const error = err as ErrorResponse
-      console.log(error)
     } finally {
       this.isDownloadingReport.set(false)
     }
