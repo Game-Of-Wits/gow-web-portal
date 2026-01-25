@@ -74,7 +74,7 @@ export class AbilityService {
 
       const abilityData = structuredClone(data)
 
-      if (abilityData.usage.type === AbilityUsage.ONE_TIME) {
+      if (abilityData.experience === EducationalExperience.MASTERY_ROAD) {
         delete abilityData.usage.interval
         delete abilityData.usage.shift
       }
