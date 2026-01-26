@@ -114,9 +114,7 @@ export class MasteryRoadCardComponent implements OnInit {
   private readonly levelService = inject(LevelService)
   private readonly studentPeriodStateService = inject(StudentPeriodStateService)
 
-  public readonly rankingStyles: {
-    [rank: number]: { styleClass: string | null; textIcon: string | null }
-  } = rankingStyles
+  public readonly rankingStyles: Record<number, { styleClass: string | null; textIcon: string | null } | undefined> = rankingStyles
 
   public studentPeriodStateId = input.required<string>({
     alias: 'studentPeriodStateId'
