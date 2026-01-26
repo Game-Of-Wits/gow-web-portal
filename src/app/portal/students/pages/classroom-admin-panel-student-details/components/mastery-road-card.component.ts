@@ -55,12 +55,12 @@ import { StudentPeriodStateService } from '~/students/services/student-period-st
           <div>
             <p class="text-sm text-gray-500 mb-1">Ranking</p>
             <div class="flex items-center gap-x-1.5">
-              <span class="text-[1.40rem]">{{ rankingStyles[currentRank()].textIcon ?? '🚀' }}</span>
+              <span class="text-[1.40rem]">{{ rankingStyles[currentRank()]?.textIcon ?? '🚀' }}</span>
               @if (!isRankingLoading()) {
                 <p-tag
                   value="#{{ currentRank() }}"
                   styleClass="text-[1.1rem] {{
-                    rankingStyles[currentRank()].styleClass ?? 'bg-transparent text-black'
+                    rankingStyles[currentRank()]?.styleClass ?? 'bg-transparent text-black'
                   }}"
                 />
               } @else {
