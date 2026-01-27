@@ -53,7 +53,7 @@ import { AbilityModel } from '~/abilities/models/Ability.model'
       </ng-template>
 
       <div class="flex flex-col gap-4 h-full">
-        <div class="flex flex-col gap-1.5 scroll-auto h-[500px]">
+        <div class="flex flex-col gap-1.5 scroll-auto h-125">
           @for (ability of abilities(); track ability.id) {
             <label
               class="flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer border-4 transition-[border-color] hover:bg-danger-50"
