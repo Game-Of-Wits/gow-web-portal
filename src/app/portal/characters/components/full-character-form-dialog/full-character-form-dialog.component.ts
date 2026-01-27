@@ -14,7 +14,7 @@ import {
   output,
   signal,
   OnChanges,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core'
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import {
@@ -130,7 +130,8 @@ export class FullCharacterFormDialogComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['fullCharacterForm']) {
-      const form = changes['fullCharacterForm'].currentValue as FormGroup<FullCharacterForm> | null
+      const form = changes['fullCharacterForm']
+        .currentValue as FormGroup<FullCharacterForm> | null
 
       if (form === null) return
 
@@ -231,11 +232,14 @@ export class FullCharacterFormDialogComponent implements OnInit, OnChanges {
         EducationalExperience.SHADOW_WARFARE
       )
       .then(abilities => {
-        this.abilities.set(abilities)
+        this.abilities.set(
+          [...abilities].sort((a, b) =>
+            a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+          )
+        )
         this.isAbilitiesLoading.set(false)
       })
-      .catch(err => {
-      })
+      .catch(err => {})
   }
 
   get characterNameControl(): AbstractControl<string> {
