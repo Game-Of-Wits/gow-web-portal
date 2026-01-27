@@ -70,89 +70,95 @@
           }
         </div>
 
-        @if (!hasActiveAcademicPeriod()) {
-          <div class="flex flex-col gap-1">
-            <gow-select-field
-              label="Equipo"
-              focusColor="danger"
-              placeholder="Selecciona un equipo"
-              formControlName="team"
-              [options]="teamOptions()"
-              [scrollHeight]="200"
-              [enableClear]="false"
-            />
+        <div class="flex flex-col gap-1">
+          <gow-select-field
+            label="Equipo"
+            focusColor="danger"
+            placeholder="Selecciona un equipo"
+            formControlName="team"
+            [options]="teamOptions()"
+            [scrollHeight]="200"
+            [enableClear]="false"
+            [disabled]="hasActiveAcademicPeriod()"
+          />
 
-            @if (teamControl.touched && teamControl.invalid) {
-              @if (hasErrorValidation(teamControl, "required")) {
-                <p class="text-red-500 text-sm">Es requerido</p>
-              } @else if (hasErrorValidation(teamControl, "minlength")) {
-                <p class="text-red-500 text-sm">
-                  Mínimo
-                  {{ teamControl.errors?.["minlength"]?.requiredLength }}
-                  caracteres
-                </p>
-              } @else if (hasErrorValidation(teamControl, "maxlength")) {
-                <p class="text-red-500 text-sm">
-                  Máximo
-                  {{ teamControl.errors?.["maxlength"]?.requiredLength }}
-                  caracteres
-                </p>
-              }
+          @if (teamControl.touched && teamControl.invalid) {
+            @if (hasErrorValidation(teamControl, "required")) {
+              <p class="text-red-500 text-sm">Es requerido</p>
+            } @else if (hasErrorValidation(teamControl, "minlength")) {
+              <p class="text-red-500 text-sm">
+                Mínimo
+                {{ teamControl.errors?.["minlength"]?.requiredLength }}
+                caracteres
+              </p>
+            } @else if (hasErrorValidation(teamControl, "maxlength")) {
+              <p class="text-red-500 text-sm">
+                Máximo
+                {{ teamControl.errors?.["maxlength"]?.requiredLength }}
+                caracteres
+              </p>
             }
-          </div>
+          }
+        </div>
 
-          <div class="flex flex-col gap-2.5">
-            <span>Orden de obtención de habilidades ({{ abilitiesControl.value.length }} - {{ classroomLimitAbilities() }})</span>
+        <div class="flex flex-col gap-2.5">
+          <span>Orden de obtención de habilidades ({{ abilitiesControl.value.length }} - {{ classroomLimitAbilities() }})</span>
 
-            @if (!isAbilitiesLoading()) {
-              <div
-                class="flex flex-col gap-1"
-                cdkDropList
-                [cdkDropListData]="abilitiesControl.value"
-                (cdkDropListDropped)="onDropAbility($event)"
-              >
-                @for (abilityId of abilitiesControl.value; track $index) {
-                  @if (abilitiesMap().get(abilityId); as ability) {
-                    <div class="flex items-center justify-between rounded-lg bg-danger-50" cdkDrag>
-                      <div class="flex items-center gap-1">
+          @if (!isAbilitiesLoading()) {
+            <div
+              class="flex flex-col gap-1"
+              cdkDropList
+              [cdkDropListData]="abilitiesControl.value"
+              (cdkDropListDropped)="onDropAbility($event)"
+              [cdkDropListDisabled]="hasActiveAcademicPeriod()"
+            >
+              @for (abilityId of abilitiesControl.value; track $index) {
+                @if (abilitiesMap().get(abilityId); as ability) {
+                  <div class="flex items-center justify-between rounded-lg bg-danger-50 {{ hasActiveAcademicPeriod() && 'px-2 py-2' }}" cdkDrag>
+                    <div class="flex items-center gap-1">
+                      @if (!hasActiveAcademicPeriod()) {
                         <div class="pl-1 pr-2 py-2 cursor-grab active:cursor-grabbing" cdkDragHandle>
                           <i-lucide [img]="grabIcon" class="size-8 text-danger-500" />
                         </div>
-
-                        <div class="flex items-center gap-2">
-                          <i-lucide
-                            [img]="abilityIcon"
-                            class="text-danger-500 fill-danger-500 size-7"
-                          />
-
-                          <span
-                            class="text-lg line-clamp-1 overflow-ellipsis text-danger-600"
-                            [title]="ability.name"
-                          >
-                            {{ ability.name }}
-                          </span>
-                        </div>
-                      </div>
+                      }
 
                       <div class="flex items-center gap-2">
-                        <span class="font-bold text-lg text-danger-500">{{ abilityTypeFormats[ability.type] }}</span>
+                        <i-lucide
+                          [img]="abilityIcon"
+                          class="text-danger-500 fill-danger-500 size-7"
+                        />
 
+                        <span
+                          class="text-lg line-clamp-1 overflow-ellipsis text-danger-600"
+                          [title]="ability.name"
+                        >
+                          {{ ability.name }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-lg text-danger-500">{{ abilityTypeFormats[ability.type] }}</span>
+
+                      @if (!hasActiveAcademicPeriod()) {
                         <p-button text severity="danger" (click)="onRemoveAbility($index)">
                           <i-lucide pButtonIcon [img]="removeIcon" />
                         </p-button>
-                      </div>
+                      }
                     </div>
-                  }
-                } @empty {
-                  <div
-                    class="w-full h-[200px] flex justify-center items-center rounded-2xl border-2 border-gray-300 border-dashed"
-                  >
-                    <span class="text-gray-500">No tiene habilidades seleccionadas</span>
                   </div>
                 }
-              </div>
-            }
+              } @empty {
+                <div
+                  class="w-full h-50 flex justify-center items-center rounded-2xl border-2 border-gray-300 border-dashed"
+                >
+                  <span class="text-gray-500">No tiene habilidades seleccionadas</span>
+                </div>
+              }
+            </div>
+          }
 
+          @if (!hasActiveAcademicPeriod()) {
             <p-button
               severity="danger"
               styleClass="w-full py-2.5"
@@ -160,8 +166,8 @@
               label="Seleccionar habilidades"
               (click)="onOpenSelectAbilities()"
             />
-          </div>
-        }
+          }
+        </div>
       </div>
     </div>
   </p-dialog>

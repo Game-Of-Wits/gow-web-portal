@@ -1,12 +1,12 @@
 <article
-  class="flex flex-col gap-2.5 shadow-md rounded-xl bg-white px-[20px] py-[16px] max-w-[400px] w-full"
+  class="flex flex-col gap-2.5 shadow-md rounded-xl bg-white px-5 py-4 max-w-100 w-full"
 >
-  <span class="text-sm text-gray-500">{{
-    studentAbilityUsage().usageAt| date: "shortTime"
-  }}</span>
+  <span class="text-sm text-gray-500">
+    {{ studentAbilityUsage().usageAt | date:'dd EEE - HH:mm:ss' }}
+  </span>
 
   <div class="flex items-start gap-2.5">
-    <i-lucide [img]="abilityIcon" class="size-[30px] fill-black" />
+    <i-lucide [img]="abilityIcon" class="size-7.5 fill-black" />
     <p class="text-xl md:text-2xl font-bold" [title]="studentAbilityUsage().abilityName">
       {{ studentAbilityUsage().abilityName }}
     </p>
@@ -14,13 +14,13 @@
 
   <div class="flex items-center gap-2.5">
     <div
-      class="flex aspect-square items-center justify-center size-[36px] {{
+      class="flex aspect-square items-center justify-center size-9 {{
         colorSchemeMap[colorScheme()].background
       }} rounded-full"
     >
       <i-lucide
         [img]="defaultAvatar"
-        class="size-[20px] {{ colorSchemeMap[colorScheme()].text }}"
+        class="size-5 {{ colorSchemeMap[colorScheme()].text }}"
       />
     </div>
 

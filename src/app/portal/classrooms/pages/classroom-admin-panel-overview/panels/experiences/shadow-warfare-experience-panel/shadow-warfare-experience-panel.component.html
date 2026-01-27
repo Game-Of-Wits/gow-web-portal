@@ -1,4 +1,4 @@
-<section class="px-[26px] py-4.5">
+<section class="px-6.5 py-4.5">
   <div class="flex justify-between items-center mb-3.5">
     <div class="flex items-center gap-3">
       <h1 class="text-3xl font-bold">Guerra de Sombras</h1>
@@ -36,11 +36,10 @@
       <h2 class="text-lg text-gray-700 font-bold mb-2">Estudiantes</h2>
 
       <p-table
-        scrollHeight="400px"
+        scrollHeight="680px"
         [value]="students()"
         [loading]="isStudentsLoading() || isCharactersLoading() || isTeamsLoading()"
         [scrollable]="true"
-        [style]="{ height: '500px' }"
       >
         <ng-template #header>
           <tr>
@@ -108,18 +107,18 @@
     <div>
       <h2 class="text-lg text-gray-700 font-bold mb-2">Habilidades usadas</h2>
 
-      <div class="flex flex-col gap-3 w-[400px]">
+      <div class="flex flex-col gap-3 w-100 overflow-y-scroll h-170">
         @if (!isStudentAbilitiesUsagesLoading()) {
           @for (studentAbilityUsage of studentAbilityUsages(); track studentAbilityUsage.id) {
             <gow-student-ability-usage-card [studentAbilityUsage]="studentAbilityUsage" colorScheme="danger" />
           } @empty {
-            <div class="flex flex-col gap-4 items-center h-full mt-[60px]">
-              <img ngSrc="/assets/images/ability-uses-empty.png" priority width="800" height="678" class="w-[280px] aspect-[1.18]" />
+            <div class="flex flex-col gap-4 items-center h-full mt-15">
+              <img ngSrc="/assets/images/ability-uses-empty.png" priority width="800" height="678" class="w-70 aspect-[1.18]" />
               <span class="text-gray-700 text-center w-2/3">Ningún estudiante ha usado alguna de sus habilidades</span>
             </div>
           }
         } @else {
-          <div class="flex flex-col gap-1 items-center h-full mt-[60px]">
+          <div class="flex flex-col gap-1 items-center h-full mt-15">
             <p-progress-spinner
               ariaLabel="loading"
               strokeWidth="4"
