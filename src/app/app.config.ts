@@ -1,4 +1,5 @@
 import { provideHttpClient, withFetch } from '@angular/common/http'
+import { LOCALE_ID } from '@angular/core';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core'
 import {
   getAnalytics,
@@ -14,12 +15,16 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions'
 import { getMessaging, provideMessaging } from '@angular/fire/messaging'
 import { getStorage, provideStorage } from '@angular/fire/storage'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 import { provideRouter } from '@angular/router'
 import { provideStore } from '@ngrx/store'
 import { providePrimeNG } from 'primeng/config'
 import { GoWTheme } from '~/shared/theme'
 import { environment } from '../environments/environment'
 import { routes } from './app.routes'
+
+registerLocaleData(localeEs, 'es-PE'); // <- clave: registrar con ese id
 
 const app = initializeApp({
   apiKey: environment.firebase.apiKey,
@@ -60,6 +65,7 @@ export const appConfig: ApplicationConfig = {
     provideDatabase(() => getDatabase()),
     provideFunctions(() => getFunctions(app, 'us-central1')),
     provideMessaging(() => getMessaging()),
-    provideStorage(() => getStorage())
+    provideStorage(() => getStorage()),
+    { provide: LOCALE_ID, useValue: 'es-PE' },
   ]
 }
