@@ -451,7 +451,11 @@ export class ShadowWarfareExperiencePanelComponent
       .getAllShadowWarfareStudentPeriodStates({ classroomId, academicPeriodId })
       .subscribe({
         next: students => {
-          this.students.set(students)
+          this.students.set(
+            [...students].sort((a, b) =>
+              a.firstName.localeCompare(b.firstName, 'es', { sensitivity: 'base' })
+            )
+          )
           this.isStudentsLoading.set(false)
         },
         error: err => {

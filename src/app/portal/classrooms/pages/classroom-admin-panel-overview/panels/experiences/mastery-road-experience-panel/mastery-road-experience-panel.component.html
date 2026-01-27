@@ -1,6 +1,6 @@
-<section class="w-screen md:w-full md:px-[26px] py-4.5 overflow-hidden">
+<section class="w-screen md:w-full md:px-6.5 py-4.5 overflow-hidden">
   <div
-    class="flex w-full justify-between items-center mb-3.5 px-[15px] sm:px-0"
+    class="flex w-full justify-between items-center mb-3.5 px-3.75 sm:px-0"
   >
     <h1 class="text-2xl sm:text-3xl font-bold">Camino de la Maestría</h1>
 
@@ -49,12 +49,12 @@
         Estudiantes
       </h2>
 
-      <div class="overflow-x-auto md:overflow-visible w-full px-[15px] md:px-0">
+      <div class="overflow-x-auto md:overflow-visible w-full px-3.75 md:px-0">
         <p-table
+          scrollHeight="700px"
           [value]="studentsRanking()"
           [loading]="isStudentsLoading()"
           [scrollable]="true"
-          scrollHeight="700px"
           [tableStyle]="{ 'min-width': '35rem' }"
         >
           <ng-template #header>
@@ -89,10 +89,10 @@
 
           <ng-template #body let-student>
             <tr>
-              <td pFrozenColumn class="text-sm sm:text-base min-w-[120px]">
+              <td pFrozenColumn class="text-sm sm:text-base min-w-30">
                 {{ student.state.firstName }} {{ student.state.lastName }}
               </td>
-              <td class="text-sm sm:text-base min-w-[50px]">
+              <td class="text-sm sm:text-base min-w-12.5">
                 <div class="flex items-center gap-2">
                   <span class="text-lg">
                     {{ rankingStyles[student.rank]?.textIcon ?? "🚀" }}
@@ -103,15 +103,15 @@
                   />
                 </div>
               </td>
-              <td class="text-sm sm:text-base min-w-[80px]">
+              <td class="text-sm sm:text-base min-w-20">
                 {{ getLevelName(student.state.levelId) }}
               </td>
-              <td class="text-sm sm:text-base min-w-[50px]">
+              <td class="text-sm sm:text-base min-w-12.5">
                 {{ student.vigesimalScore }}
               </td>
               <td>
                 <div
-                  class="flex items-center gap-4 sm:gap-5 flex-row w-[200px]"
+                  class="flex items-center gap-4 sm:gap-5 flex-row w-50"
                 >
                   <div class="flex items-center gap-0.5">
                     <p-button
@@ -138,7 +138,7 @@
                       as editingStudent
                     ) {
                       <span
-                        class="font-bold text-sm md:text-base min-w-[40px] text-center {{
+                        class="font-bold text-sm md:text-base min-w-10 text-center {{
                           editingStudent.originalPoints ===
                           editingStudent.currentPoints
                             ? 'text-black'
@@ -152,7 +152,7 @@
                       </span>
                     } @else {
                       <span
-                        class="text-sm sm:text-base min-w-[38px] text-center"
+                        class="text-sm sm:text-base min-w-9.5 text-center"
                       >
                         {{ student.state.progressPoints }}
                       </span>
@@ -230,7 +230,7 @@
                   }
                 </div>
               </td>
-              <td class="min-w-[50px]">
+              <td class="min-w-12.5">
                 <div class="flex items-center gap-2">
                   <p-button
                     rounded
@@ -255,12 +255,12 @@
       </div>
     </div>
 
-    <div class="flex flex-col px-[15px] md:px-0">
+    <div class="flex flex-col px-3.75 md:px-0">
       <h2 class="text-lg text-gray-700 font-bold mb-1 md:mb-2">
         Habilidades usadas
       </h2>
 
-      <div class="flex flex-col gap-3 max-w-[400px] md:min-w-[400px] w-full">
+      <div class="flex flex-col gap-3 max-w-100 md:min-w-100 w-full 2xl:h-170 2xl:overflow-y-scroll">
         @if (!isStudentAbilitiesUsagesLoading()) {
           @for (
             studentAbilityUsage of studentAbilityUsages();
@@ -272,13 +272,13 @@
               colorScheme="danger"
             />
           } @empty {
-            <div class="flex flex-col gap-4 items-center h-full mt-[60px]">
+            <div class="flex flex-col gap-4 items-center h-full mt-15">
               <img
                 ngSrc="/assets/images/ability-uses-empty.png"
                 priority
                 width="800"
                 height="678"
-                class="w-[220px] md:w-[280px] aspect-[1.18]"
+                class="w-55 md:w-70 aspect-[1.18]"
               />
               <span class="text-gray-700 text-center w-2/3 text-sm md:text-base"
                 >Ningún estudiante ha usado alguna de sus habilidades</span
@@ -286,7 +286,7 @@
             </div>
           }
         } @else {
-          <div class="flex flex-col gap-1 items-center h-full mt-[60px]">
+          <div class="flex flex-col gap-1 items-center h-full mt-15">
             <p-progress-spinner
               ariaLabel="loading"
               strokeWidth="4"
